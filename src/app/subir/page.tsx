@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { GRADOS, EJES_TEMATICOS, TIPOS_RECURSO } from '@/lib/constants'
 
 type FormData = {
@@ -17,6 +18,7 @@ type FormData = {
 }
 
 export default function SubirPage() {
+  const router = useRouter()
   const [archivo, setArchivo] = useState<File | null>(null)
   const [arrastrando, setArrastrando] = useState(false)
   const [subiendo, setSubiendo] = useState(false)
@@ -170,7 +172,7 @@ export default function SubirPage() {
     await new Promise(r => setTimeout(r, 1500))
     setSubiendo(false)
     alert('Recurso cargado correctamente (modo demo)')
-    window.location.href = '/'
+    router.push('/')
   }
 
   const formatFileSize = (bytes: number) => {

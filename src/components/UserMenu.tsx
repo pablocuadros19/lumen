@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function UserMenu() {
+  const router = useRouter()
   const [nombre, setNombre] = useState('')
   const [avatar, setAvatar] = useState('')
   const [open, setOpen] = useState(false)
@@ -20,7 +22,7 @@ export default function UserMenu() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    window.location.href = '/login'
+    router.push('/login')
   }
 
   const iniciales = nombre

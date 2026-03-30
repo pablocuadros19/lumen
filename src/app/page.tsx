@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import FilterSidebar from '@/components/FilterSidebar'
 import RecursoCard from '@/components/RecursoCard'
 import UserMenu from '@/components/UserMenu'
-import Link from 'next/link'
 import { MOCK_RECURSOS } from '@/lib/mock-data'
 
 function toggleInArray(arr: string[], val: string): string[] {
@@ -13,6 +14,7 @@ function toggleInArray(arr: string[], val: string): string[] {
 }
 
 export default function HomePage() {
+  const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [gradosActivos, setGradosActivos] = useState<string[]>([])
   const [ejesActivos, setEjesActivos] = useState<string[]>([])
@@ -189,7 +191,7 @@ export default function HomePage() {
                 <RecursoCard
                   key={r.id}
                   recurso={r}
-                  onClick={() => window.location.href = `/recurso/${r.id}`}
+                  onClick={() => router.push(`/recurso/${r.id}`)}
                 />
               ))}
             </div>
