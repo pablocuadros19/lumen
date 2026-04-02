@@ -79,6 +79,8 @@ export default function AgregarAColeccion({ recursoId, size = 'sm' }: Props) {
       setNuevoNombre('')
       setCreando(false)
       await agregarA(nueva.id)
+    } else {
+      setMensaje({ texto: 'Error al crear colección', tipo: 'error' })
     }
   }
 

@@ -12,10 +12,12 @@ export default function NuevaColeccionButton() {
   const [descripcion, setDescripcion] = useState('')
   const [color, setColor] = useState('#1A3A5C')
   const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState('')
 
   const crear = async () => {
     if (!nombre.trim()) return
     setGuardando(true)
+    setError('')
     try {
       const res = await fetch('/api/colecciones', {
         method: 'POST',
@@ -27,8 +29,14 @@ export default function NuevaColeccionButton() {
         setNombre('')
         setDescripcion('')
         setColor('#1A3A5C')
+        setError('')
         router.refresh()
+      } else {
+        const data = await res.json().catch(() => ({}))
+        setError(data.error || 'Error al crear la colección')
       }
+    } catch {
+      setError('Error de conexión')
     } finally {
       setGuardando(false)
     }
@@ -98,6 +106,10 @@ export default function NuevaColeccionButton() {
                 </div>
               </div>
             </div>
+
+            {error && (
+              <div className="mt-4 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600">{error}</div>
+            )}
 
             <div className="flex gap-3 mt-6">
               <button
