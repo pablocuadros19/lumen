@@ -20,7 +20,7 @@ export default function PdfThumbnail({ url, className = '' }: Props) {
         const data = await response.arrayBuffer()
 
         const pdfjsLib = await import('pdfjs-dist')
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs`
 
         const pdf = await pdfjsLib.getDocument({ data }).promise
         const page = await pdf.getPage(1)
