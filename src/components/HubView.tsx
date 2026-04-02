@@ -263,13 +263,14 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
         <div className="flex-1" />
         <Link
           href="/subir"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl
-                     bg-gradient-to-r from-[#1A3A5C] to-[#2E6EA6] text-white text-sm font-semibold
-                     shadow-sm hover:shadow-md hover:-translate-y-0.5
-                     transition-all duration-200 shrink-0"
+          className="flex items-center gap-2.5 px-5 py-3 rounded-2xl
+                     bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white
+                     text-sm font-semibold shadow-button
+                     hover:shadow-lg hover:shadow-[#8B2252]/30 hover:-translate-y-0.5
+                     active:scale-[0.97] transition-all duration-200 shrink-0"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
           Cargar recurso
         </Link>
