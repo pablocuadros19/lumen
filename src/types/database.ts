@@ -2,7 +2,7 @@
 
 export type Grado = '1ro' | '2do' | '3ro' | '4to' | '5to' | '6to'
 
-export type Area = 'Prácticas del Lenguaje' | 'Ciencias Naturales'
+export type Area = 'Prácticas del Lenguaje' | 'Ciencias Naturales' | 'Matemática' | 'Ciencias Sociales'
 
 export type EjeTematico =
   // Prácticas del Lenguaje
@@ -21,6 +21,20 @@ export type EjeTematico =
   | 'La Tierra y el universo'
   | 'Ambiente y cuidado'
   | 'Experimentación'
+  // Matemática
+  | 'Números y operaciones'
+  | 'Geometría'
+  | 'Medida'
+  | 'Estadística y probabilidad'
+  | 'Álgebra y funciones'
+  | 'Resolución de problemas'
+  // Ciencias Sociales
+  | 'Sociedades y territorios'
+  | 'Sociedades a través del tiempo'
+  | 'Actividades humanas y organización social'
+  | 'Ciudadanía y participación'
+  | 'Ambiente y sociedad'
+  | 'Memoria e identidad'
 
 export type TipoRecurso =
   | 'Actividad'

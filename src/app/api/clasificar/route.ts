@@ -15,7 +15,18 @@ const EJES_CIENCIAS = [
   'La Tierra y el universo', 'Ambiente y cuidado', 'Experimentación',
 ]
 
-const AREAS_VALIDAS = ['Prácticas del Lenguaje', 'Ciencias Naturales']
+const EJES_MATEMATICA = [
+  'Números y operaciones', 'Geometría', 'Medida',
+  'Estadística y probabilidad', 'Álgebra y funciones', 'Resolución de problemas',
+]
+
+const EJES_SOCIALES = [
+  'Sociedades y territorios', 'Sociedades a través del tiempo',
+  'Actividades humanas y organización social', 'Ciudadanía y participación',
+  'Ambiente y sociedad', 'Memoria e identidad',
+]
+
+const AREAS_VALIDAS = ['Prácticas del Lenguaje', 'Ciencias Naturales', 'Matemática', 'Ciencias Sociales']
 
 const TIPOS_VALIDOS = [
   'Actividad', 'Evaluación', 'Rúbrica', 'Planificación',
@@ -31,6 +42,8 @@ Analizá el contenido y devolvé un JSON con estas claves:
 - "area": una de estas EXACTAS: ${JSON.stringify(AREAS_VALIDAS)}
   Prácticas del Lenguaje = lectura, escritura, gramática, oralidad, vocabulario, textos literarios.
   Ciencias Naturales = seres vivos, cuerpo humano, materiales, fenómenos, ambiente, experimentación.
+  Matemática = números, operaciones, geometría, medida, estadística, álgebra, problemas matemáticos.
+  Ciencias Sociales = historia, geografía, sociedades, ciudadanía, ambiente y sociedad, memoria.
 
 - "titulo": título claro, descriptivo y profesional (máx 80 caracteres).
 
@@ -39,6 +52,8 @@ Analizá el contenido y devolvé un JSON con estas claves:
 - "ejes_tematicos": array con uno o más ejes según el área:
   Si área es "Prácticas del Lenguaje": ${JSON.stringify(EJES_LENGUAJE)}
   Si área es "Ciencias Naturales": ${JSON.stringify(EJES_CIENCIAS)}
+  Si área es "Matemática": ${JSON.stringify(EJES_MATEMATICA)}
+  Si área es "Ciencias Sociales": ${JSON.stringify(EJES_SOCIALES)}
 
 - "tipo_recurso": uno de estos valores EXACTOS: ${JSON.stringify(TIPOS_VALIDOS)}
 
@@ -157,7 +172,7 @@ function responderConClasificacion(respuestaTexto: string, nombreArchivo: string
   }
 
   if (clasificacion.ejes_tematicos) {
-    const todosEjes = [...EJES_LENGUAJE, ...EJES_CIENCIAS]
+    const todosEjes = [...EJES_LENGUAJE, ...EJES_CIENCIAS, ...EJES_MATEMATICA, ...EJES_SOCIALES]
     clasificacion.ejes_tematicos = clasificacion.ejes_tematicos.filter(
       (e: string) => todosEjes.includes(e)
     )
