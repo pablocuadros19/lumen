@@ -54,7 +54,7 @@ export default function ImportarPage() {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback?next=/importar`,
-        scopes: 'https://www.googleapis.com/auth/drive.readonly',
+        scopes: 'https://www.googleapis.com/auth/drive.file',
       },
     })
   }
