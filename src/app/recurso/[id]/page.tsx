@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { MOCK_RECURSOS } from '@/lib/mock-data'
 import BorrarRecursoButton from '@/components/BorrarRecursoButton'
 import FavoritoButton from '@/components/FavoritoButton'
 import CompartirButton from '@/components/CompartirButton'
@@ -54,11 +53,7 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
     .eq('id', id)
     .single()
 
-  if (data) {
-    recurso = data
-  } else {
-    recurso = MOCK_RECURSOS.find((r) => r.id === id) || null
-  }
+  recurso = data || null
 
   if (!recurso) {
     return (

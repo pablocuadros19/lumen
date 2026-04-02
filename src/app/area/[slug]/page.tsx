@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { MOCK_RECURSOS } from '@/lib/mock-data'
 import BibliotecaView from '@/components/BibliotecaView'
 import { getAreaBySlug, getEjesForArea } from '@/lib/constants'
 import type { Recurso } from '@/types/database'
@@ -23,12 +22,7 @@ export default async function AreaPage({ params }: { params: Promise<{ slug: str
     .in('estado', ['publicado', 'destacado'])
     .order('created_at', { ascending: false })
 
-  // Fallback a mock solo para Prácticas del Lenguaje
-  const recursos: Recurso[] = data && data.length > 0
-    ? data
-    : slug === 'practicas-del-lenguaje'
-      ? MOCK_RECURSOS
-      : []
+  const recursos: Recurso[] = data || []
 
   // Contar recursos nuevos desde la última visita
   let cantidadNuevos = 0
