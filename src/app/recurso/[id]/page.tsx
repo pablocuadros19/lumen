@@ -154,6 +154,14 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
                   className="w-full max-h-[600px] object-contain bg-[#f8f9fc]"
                 />
               </div>
+            ) : recurso.archivo_url && recurso.formato === 'Documento' && recurso.archivo_url.endsWith('.pdf') ? (
+              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                <iframe
+                  src={recurso.archivo_url}
+                  className="w-full h-[600px]"
+                  title={recurso.titulo}
+                />
+              </div>
             ) : (
               <div className="rounded-3xl border border-gray-100 bg-gradient-to-br from-[#1A3A5C]/4 via-[#2E6EA6]/2 to-[#8B2252]/4
                               shadow-sm p-10 flex flex-col items-center justify-center min-h-[300px]">
