@@ -8,6 +8,7 @@ import FilterSidebar from '@/components/FilterSidebar'
 import RecursoCard from '@/components/RecursoCard'
 import UserMenu from '@/components/UserMenu'
 import SolicitarRecurso from '@/components/SolicitarRecurso'
+import EfemeridesBanner from '@/components/EfemeridesBanner'
 import type { Recurso } from '@/types/database'
 
 function toggleInArray(arr: string[], val: string): string[] {
@@ -19,13 +20,23 @@ function normalizar(texto: string): string {
   return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 }
 
+interface EfemerideProxima {
+  id: string
+  nombre: string
+  mes: number
+  dia: number
+  cantidadRecursos: number
+  diasRestantes: number
+}
+
 interface Props {
   recursos: Recurso[]
   cantidadNuevos?: number
   adminIds?: string[]
+  efemerideProxima?: EfemerideProxima | null
 }
 
-export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds = [] }: Props) {
+export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds = [], efemerideProxima }: Props) {
   const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [gradosActivos, setGradosActivos] = useState<string[]>([])
@@ -112,9 +123,9 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
   return (
     <div className="min-h-screen bg-lumen-bg flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200/60 shadow-sm px-5 py-4 flex items-center gap-5 relative">
+      <header className="bg-white border-b border-gray-200/60 shadow-sm px-6 py-5 flex items-center gap-5 relative">
         {/* Gradient line inferior */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#1A3A5C] via-[#2E6EA6] to-[#8B2252] opacity-20" />
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#1A3A5C] via-[#2E6EA6] to-[#8B2252] opacity-50" />
 
         <div className="flex items-center gap-3 shrink-0">
           <Image src="/logo.png" alt="LUMEN" width={40} height={40} className="rounded" />
@@ -182,7 +193,8 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
 
         <UserMenu />
 
-        <Image src="/newman-logo.png" alt="Newman" width={36} height={36} className="shrink-0" />
+        <div className="w-px h-8 bg-gray-200 shrink-0" />
+        <Image src="/newman-logo.png" alt="Newman" width={40} height={40} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
       </header>
 
       {/* Barra de filtros activos */}
@@ -306,6 +318,12 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
                 <span className="font-bold">{cantidadNuevos} recurso{cantidadNuevos !== 1 ? 's' : ''} nuevo{cantidadNuevos !== 1 ? 's' : ''}</span>
                 {' '}desde tu última visita
               </span>
+            </div>
+          )}
+
+          {efemerideProxima && (
+            <div className="mb-5 animate-card-in">
+              <EfemeridesBanner efemeride={efemerideProxima} />
             </div>
           )}
 

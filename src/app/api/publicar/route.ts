@@ -111,6 +111,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Vincular efemérides si se seleccionaron
+    if (datos.efemeride_ids && datos.efemeride_ids.length > 0 && recursoCreado) {
+      const efeRows = datos.efemeride_ids.map((efeId: string) => ({
+        recurso_id: recursoCreado.id,
+        efemeride_id: efeId,
+      }))
+      await supabase.from('recurso_efemerides').insert(efeRows)
+    }
+
     return NextResponse.json(recursoCreado)
   } catch (error) {
     console.error('Error en publicar:', error)

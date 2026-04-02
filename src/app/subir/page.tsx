@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { GRADOS, EJES_TEMATICOS, TIPOS_RECURSO } from '@/lib/constants'
+import DrivePickerModal from '@/components/DrivePickerModal'
 
 type FormData = {
   titulo: string
@@ -28,7 +29,18 @@ export default function SubirPage() {
   const [sugerenciasIA, setSugerenciasIA] = useState(false)
   const [textoExtraido, setTextoExtraido] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+  const [showDriveModal, setShowDriveModal] = useState(false)
+  const [archivoUrl, setArchivoUrl] = useState<string | null>(null)
+  const [driveFileName, setDriveFileName] = useState('')
+  const [efemeridesDisponibles, setEfemeridesDisponibles] = useState<{ id: string; nombre: string }[]>([])
+  const [efemeridesSeleccionadas, setEfemeridesSeleccionadas] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    fetch('/api/efemerides').then(r => r.json()).then(data => {
+      if (Array.isArray(data)) setEfemeridesDisponibles(data)
+    }).catch(() => {})
+  }, [])
 
   const [form, setForm] = useState<FormData>({
     titulo: '',
@@ -122,6 +134,29 @@ export default function SubirPage() {
     }))
   }
 
+  const handleDriveImport = (data: {
+    archivo_url: string; thumbnail_url: string | null; titulo: string; resumen: string;
+    ejes_tematicos: string[]; tipo_recurso: string; idioma: string; texto_extraido?: string; fileName: string
+  }) => {
+    setArchivoUrl(data.archivo_url)
+    setDriveFileName(data.fileName)
+    setTextoExtraido(data.texto_extraido || '')
+    setSugerenciasIA(true)
+    setForm({
+      titulo: data.titulo,
+      resumen: data.resumen,
+      grados: [],
+      ejes_tematicos: data.ejes_tematicos || [],
+      tipo_recurso: data.tipo_recurso || 'Actividad',
+      editable: true,
+      idioma: (data.idioma as 'es' | 'en') || 'es',
+      link_editable: '',
+      thumbnail_url: data.thumbnail_url || '',
+    })
+    setShowDriveModal(false)
+    setPaso(2)
+  }
+
   const handlePublicar = async () => {
     if (!form.titulo || form.grados.length === 0 || form.ejes_tematicos.length === 0 || !form.tipo_recurso) {
       alert('Completá todos los campos obligatorios')
@@ -139,6 +174,8 @@ export default function SubirPage() {
       body.append('datos', JSON.stringify({
         ...form,
         texto_extraido: textoExtraido,
+        efemeride_ids: efemeridesSeleccionadas,
+        ...(archivoUrl ? { existing_archivo_url: archivoUrl, existing_thumbnail_url: form.thumbnail_url || null } : {}),
       }))
 
       const res = await fetch('/api/publicar', {
@@ -172,15 +209,16 @@ export default function SubirPage() {
   return (
     <div className="min-h-screen bg-lumen-bg bg-grid-pattern flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200/60 shadow-sm px-5 py-4 flex items-center gap-3 relative">
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#1A3A5C] via-[#2E6EA6] to-[#8B2252] opacity-20" />
+      <header className="bg-white border-b border-gray-200/60 shadow-sm px-6 py-5 flex items-center gap-3 relative">
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#1A3A5C] via-[#2E6EA6] to-[#8B2252] opacity-50" />
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image src="/logo.png" alt="LUMEN" width={36} height={36} className="rounded" />
           <span className="text-xl font-bold tracking-tight text-gradient-lumen">LUMEN</span>
         </Link>
         <div className="flex-1" />
         <span className="text-sm text-gray-400 font-medium">Cargar recurso</span>
-        <Image src="/newman-logo.png" alt="Newman" width={32} height={32} className="shrink-0" />
+        <div className="w-px h-8 bg-gray-200 shrink-0" />
+        <Image src="/newman-logo.png" alt="Newman" width={36} height={36} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
       </header>
 
       <div className="flex-1 max-w-2xl mx-auto w-full px-5 py-8">
@@ -227,7 +265,27 @@ export default function SubirPage() {
               </p>
             </div>
 
-            {/* Separador */}
+            {/* Separador + botón Drive */}
+            <div className="flex items-center gap-4 my-6">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+              <span className="text-sm text-gray-400">o importá desde</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+            </div>
+
+            <button
+              onClick={() => setShowDriveModal(true)}
+              className="w-full flex items-center justify-center gap-3 p-4 rounded-2xl
+                         bg-white border border-gray-200 shadow-sm
+                         hover:border-[#2E6EA6]/40 hover:shadow-card hover:-translate-y-0.5
+                         transition-all duration-200 cursor-pointer"
+            >
+              <svg className="w-5 h-5 text-[#2E6EA6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+              <span className="text-sm font-medium text-[#1A3A5C]">Google Drive</span>
+            </button>
+
+            {/* Separador link */}
             <div className="flex items-center gap-4 my-6">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
               <span className="text-sm text-gray-400">o pegá un link</span>
@@ -285,7 +343,7 @@ export default function SubirPage() {
         {paso === 2 && (
           <div className="animate-card-in">
             <button
-              onClick={() => { setPaso(1); setArchivo(null); setSugerenciasIA(false) }}
+              onClick={() => { setPaso(1); setArchivo(null); setSugerenciasIA(false); setArchivoUrl(null); setDriveFileName('') }}
               className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#1A3A5C] mb-4 transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -330,6 +388,27 @@ export default function SubirPage() {
                 </div>
                 <button
                   onClick={() => { setArchivo(null); setPaso(1) }}
+                  className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+            )}
+
+            {/* Archivo importado de Drive */}
+            {!archivo && archivoUrl && driveFileName && (
+              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-gray-200 shadow-sm mb-6">
+                <div className="w-10 h-10 rounded-xl bg-[#2E6EA6]/8 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-[#2E6EA6]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#1A3A5C] truncate">{driveFileName}</p>
+                  <p className="text-xs text-gray-400">Importado desde Google Drive</p>
+                </div>
+                <button
+                  onClick={() => { setArchivoUrl(null); setDriveFileName(''); setPaso(1) }}
                   className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -470,6 +549,33 @@ export default function SubirPage() {
                 </div>
               </div>
 
+              {/* Efemérides */}
+              {efemeridesDisponibles.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-[#1A3A5C] mb-2">
+                    Efeméride
+                    <span className="text-xs text-gray-400 ml-2 font-normal">Opcional — vincular a fecha escolar</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {efemeridesDisponibles.map((e) => (
+                      <button
+                        key={e.id}
+                        onClick={() => setEfemeridesSeleccionadas(prev =>
+                          prev.includes(e.id) ? prev.filter(x => x !== e.id) : [...prev, e.id]
+                        )}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer
+                          ${efemeridesSeleccionadas.includes(e.id)
+                            ? 'bg-[#2E6EA6] text-white shadow-sm'
+                            : 'bg-white text-gray-500 border border-gray-200 hover:border-[#2E6EA6] shadow-sm'
+                          }`}
+                      >
+                        {e.nombre}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Link editable */}
               <div>
                 <label className="block text-sm font-medium text-[#1A3A5C] mb-1.5">
@@ -512,7 +618,7 @@ export default function SubirPage() {
               {/* Botones */}
               <div className="flex gap-3 pt-4 border-t border-gray-100">
                 <button
-                  onClick={() => { setPaso(1); setArchivo(null); setSugerenciasIA(false) }}
+                  onClick={() => { setPaso(1); setArchivo(null); setSugerenciasIA(false); setArchivoUrl(null); setDriveFileName('') }}
                   className="px-6 py-3.5 rounded-xl border border-gray-200 text-sm text-gray-600
                              hover:bg-gray-50 shadow-sm transition-all duration-200 cursor-pointer"
                 >
@@ -537,6 +643,13 @@ export default function SubirPage() {
           </div>
         )}
       </div>
+
+      {showDriveModal && (
+        <DrivePickerModal
+          onClose={() => setShowDriveModal(false)}
+          onFileImported={handleDriveImport}
+        />
+      )}
     </div>
   )
 }

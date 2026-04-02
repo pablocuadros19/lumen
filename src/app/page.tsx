@@ -46,5 +46,36 @@ export default async function HomePage() {
 
   const adminIds = (admins || []).map(a => a.id)
 
-  return <BibliotecaView recursos={recursos} cantidadNuevos={cantidadNuevos} adminIds={adminIds} />
+  // Efeméride próxima (next 14 días)
+  let efemerideProxima: { id: string; nombre: string; mes: number; dia: number; cantidadRecursos: number; diasRestantes: number } | null = null
+  try {
+    const { data: efemerides } = await supabase.from('efemerides').select('*')
+    const { data: efeCounts } = await supabase.from('recurso_efemerides').select('efemeride_id')
+
+    if (efemerides) {
+      const efeCountMap: Record<string, number> = {}
+      for (const ec of efeCounts || []) {
+        efeCountMap[ec.efemeride_id] = (efeCountMap[ec.efemeride_id] || 0) + 1
+      }
+
+      const hoy = new Date()
+      const candidatas = efemerides
+        .map(e => {
+          const fecha = new Date(hoy.getFullYear(), e.mes - 1, e.dia)
+          if (fecha < hoy) fecha.setFullYear(hoy.getFullYear() + 1)
+          const dias = Math.ceil((fecha.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24))
+          return { id: e.id, nombre: e.nombre, mes: e.mes, dia: e.dia, cantidadRecursos: efeCountMap[e.id] || 0, diasRestantes: dias }
+        })
+        .filter(e => e.diasRestantes >= 0 && e.diasRestantes <= 14)
+        .sort((a, b) => a.diasRestantes - b.diasRestantes)
+
+      if (candidatas.length > 0) {
+        efemerideProxima = candidatas[0]
+      }
+    }
+  } catch {
+    // Tabla puede no existir aún
+  }
+
+  return <BibliotecaView recursos={recursos} cantidadNuevos={cantidadNuevos} adminIds={adminIds} efemerideProxima={efemerideProxima} />
 }
