@@ -1,9 +1,8 @@
-'use client'
-
-import { use } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
 import { MOCK_RECURSOS } from '@/lib/mock-data'
+import type { Recurso } from '@/types/database'
 
 // Colores por eje temático
 const EJE_COLORS: Record<string, string> = {
@@ -16,7 +15,6 @@ const EJE_COLORS: Record<string, string> = {
   'Vocabulario': '#C75B39',
 }
 
-// Iconos por tipo de recurso
 const TIPO_ICONS: Record<string, string> = {
   'Actividad': '📝',
   'Evaluación': '📋',
@@ -27,9 +25,24 @@ const TIPO_ICONS: Record<string, string> = {
   'Ideas / Inspiración': '💡',
 }
 
-export default function RecursoPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
-  const recurso = MOCK_RECURSOS.find((r) => r.id === id)
+export default async function RecursoPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+
+  // Intentar leer de Supabase
+  let recurso: Recurso | null = null
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('recursos')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (data) {
+    recurso = data
+  } else {
+    // Fallback a mock
+    recurso = MOCK_RECURSOS.find((r) => r.id === id) || null
+  }
 
   if (!recurso) {
     return (
@@ -72,7 +85,6 @@ export default function RecursoPage({ params }: { params: Promise<{ id: string }
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Columna principal */}
           <div className="lg:col-span-2">
-            {/* Header del recurso */}
             <div className="mb-6">
               {recurso.estado === 'destacado' && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium
@@ -82,7 +94,6 @@ export default function RecursoPage({ params }: { params: Promise<{ id: string }
               )}
               <h1 className="text-2xl font-bold text-[#1A3A5C] mb-3">{recurso.titulo}</h1>
 
-              {/* Chips */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {recurso.grados.map((g) => (
                   <span
@@ -104,7 +115,6 @@ export default function RecursoPage({ params }: { params: Promise<{ id: string }
               </div>
             </div>
 
-            {/* Resumen */}
             {recurso.resumen && (
               <div className="mb-6">
                 <h3 className="text-sm font-semibold text-[#1A3A5C] mb-2">Resumen</h3>
@@ -118,9 +128,19 @@ export default function RecursoPage({ params }: { params: Promise<{ id: string }
                 {TIPO_ICONS[recurso.tipo_recurso] || '📄'}
               </span>
               <p className="text-sm text-gray-400 mb-1">{recurso.formato}</p>
-              <p className="text-xs text-gray-300">
-                Preview no disponible en modo demo
-              </p>
+              {!recurso.archivo_url && (
+                <p className="text-xs text-gray-300">Preview no disponible</p>
+              )}
+              {recurso.archivo_url && (
+                <a
+                  href={recurso.archivo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 text-sm text-[#2E6EA6] hover:underline"
+                >
+                  Ver archivo completo
+                </a>
+              )}
             </div>
 
             {/* Copiloto pedagógico */}
@@ -151,23 +171,26 @@ export default function RecursoPage({ params }: { params: Promise<{ id: string }
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-gray-400 mt-3">
-                Próximamente: las acciones van a generar prompts de alta calidad con el contenido de este recurso.
-              </p>
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-4">
-            {/* Acciones principales */}
             <div className="rounded-xl border border-gray-200 p-4 space-y-3">
-              <button className="w-full px-4 py-3 rounded-lg bg-[#1A3A5C] text-white text-sm font-semibold
-                                 hover:bg-[#15304d] transition-colors flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Descargar
-              </button>
+              {recurso.archivo_url && (
+                <a
+                  href={recurso.archivo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full px-4 py-3 rounded-lg bg-[#1A3A5C] text-white text-sm font-semibold
+                                   hover:bg-[#15304d] transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Descargar
+                </a>
+              )}
 
               {recurso.link_editable && (
                 <a
@@ -185,16 +208,11 @@ export default function RecursoPage({ params }: { params: Promise<{ id: string }
                 </a>
               )}
 
-              <button className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-600
-                                 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                Guardar en favoritos
-              </button>
+              {!recurso.archivo_url && !recurso.link_editable && (
+                <p className="text-sm text-gray-400 text-center py-2">Sin archivo disponible</p>
+              )}
             </div>
 
-            {/* Info del recurso */}
             <div className="rounded-xl border border-gray-200 p-4">
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Información</h3>
               <div className="space-y-3 text-sm">
@@ -235,7 +253,6 @@ export default function RecursoPage({ params }: { params: Promise<{ id: string }
               </div>
             </div>
 
-            {/* Estado */}
             <div className="rounded-xl border border-gray-200 p-4">
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Estado</h3>
               <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium

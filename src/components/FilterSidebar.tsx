@@ -73,9 +73,10 @@ export default function FilterSidebar({
   onToggleEditable,
 }: FilterSidebarProps) {
   return (
-    <aside className="w-56 shrink-0 bg-white border-r border-gray-100 p-4 overflow-y-auto">
+    <aside className="w-56 shrink-0 bg-gradient-to-b from-white to-gray-50/50
+                      border-r border-gray-100/60 p-4 overflow-y-auto">
       <h2 className="text-sm font-bold text-[#1A3A5C] mb-1">Filtros</h2>
-      <div className="w-10 h-0.5 bg-[#8B2252] mb-4" />
+      <div className="w-10 h-0.5 bg-gradient-to-r from-[#8B2252] to-[#8B2252]/30 rounded-full mb-4" />
 
       <CheckboxGroup
         title="Grado"

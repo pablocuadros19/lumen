@@ -25,6 +25,8 @@ export default function SubirPage() {
   const [clasificando, setClasificando] = useState(false)
   const [paso, setPaso] = useState<1 | 2>(1) // 1: subir archivo, 2: clasificar
   const [sugerenciasIA, setSugerenciasIA] = useState(false)
+  const [textoExtraido, setTextoExtraido] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState<FormData>({
@@ -74,6 +76,7 @@ export default function SubirPage() {
       if (res.ok) {
         const data = await res.json()
         setSugerenciasIA(true)
+        setTextoExtraido(data.texto_extraido || '')
         setForm({
           titulo: data.titulo || file.name.replace(/\.[^.]+$/, ''),
           resumen: data.resumen || '',
@@ -138,41 +141,36 @@ export default function SubirPage() {
     }
 
     setSubiendo(true)
+    setErrorMsg('')
 
-    // Por ahora guardar en mock — después conecta a Supabase
-    const nuevoRecurso = {
-      id: Date.now().toString(),
-      titulo: form.titulo,
-      resumen: form.resumen,
-      grados: form.grados,
-      eje_tematico: form.ejes_tematicos[0], // DB usa singular por ahora
-      ejes_tematicos: form.ejes_tematicos,
-      tipo_recurso: form.tipo_recurso,
-      editable: form.editable,
-      idioma: form.idioma,
-      link_editable: form.link_editable,
-      area: 'Prácticas del Lenguaje',
-      formato: archivo ? detectarFormato(archivo.name) : 'Link externo',
-      estado: 'publicado',
-      archivo_drive_id: null,
-      archivo_url: null,
-      thumbnail_url: null,
-      texto_extraido: null,
-      subido_por: 'usuario',
-      autor_nombre: null,
-      descargas: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+    try {
+      const body = new FormData()
+      if (archivo) {
+        body.append('archivo', archivo)
+      }
+      body.append('datos', JSON.stringify({
+        ...form,
+        texto_extraido: textoExtraido,
+      }))
+
+      const res = await fetch('/api/publicar', {
+        method: 'POST',
+        body,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setErrorMsg(data.error || 'Error al publicar')
+        setSubiendo(false)
+        return
+      }
+
+      router.push('/')
+    } catch {
+      setErrorMsg('Error de conexión. Intentá de nuevo.')
+      setSubiendo(false)
     }
-
-    console.log('Recurso a guardar:', nuevoRecurso)
-    console.log('Archivo:', archivo)
-
-    // Simular delay de subida
-    await new Promise(r => setTimeout(r, 1500))
-    setSubiendo(false)
-    alert('Recurso cargado correctamente (modo demo)')
-    router.push('/')
   }
 
   const formatFileSize = (bytes: number) => {
@@ -182,9 +180,9 @@ export default function SubirPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-white to-lumen-bg flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-5 py-3 flex items-center gap-3">
+      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 shadow-sm px-5 py-3 flex items-center gap-3">
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image src="/logo.png" alt="LUMEN" width={36} height={36} className="rounded" />
           <span className="text-xl font-bold tracking-tight text-[#1A3A5C]">LUMEN</span>
@@ -208,10 +206,11 @@ export default function SubirPage() {
               onDragLeave={() => setArrastrando(false)}
               onDrop={handleDrop}
               onClick={() => inputRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all
+              className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer
+                transition-all duration-300
                 ${arrastrando
-                  ? 'border-[#8B2252] bg-[#8B2252]/5'
-                  : 'border-gray-300 hover:border-[#1A3A5C] hover:bg-gray-50'
+                  ? 'border-[#8B2252] bg-gradient-to-br from-[#8B2252]/5 to-[#8B2252]/10 shadow-card scale-[1.01]'
+                  : 'border-gray-300 hover:border-[#1A3A5C] hover:bg-gray-50 hover:shadow-card'
                 }`}
             >
               <input
@@ -371,7 +370,7 @@ export default function SubirPage() {
                       onClick={() => toggleGrado(g)}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all
                         ${form.grados.includes(g)
-                          ? 'bg-[#1A3A5C] text-white'
+                          ? 'bg-[#1A3A5C] text-white shadow-sm shadow-[#1A3A5C]/30'
                           : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#1A3A5C]'
                         }`}
                     >
@@ -399,7 +398,7 @@ export default function SubirPage() {
                       }))}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-all
                         ${form.ejes_tematicos.includes(e)
-                          ? 'bg-[#8B2252] text-white'
+                          ? 'bg-[#8B2252] text-white shadow-sm shadow-[#8B2252]/30'
                           : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#8B2252]'
                         }`}
                     >
@@ -493,6 +492,13 @@ export default function SubirPage() {
                 </span>
               </div>
 
+              {/* Error */}
+              {errorMsg && (
+                <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                  {errorMsg}
+                </div>
+              )}
+
               {/* Botones */}
               <div className="flex gap-3 pt-4 border-t border-gray-100">
                 <button
@@ -505,9 +511,11 @@ export default function SubirPage() {
                 <button
                   onClick={handlePublicar}
                   disabled={subiendo || !form.titulo || form.grados.length === 0 || form.ejes_tematicos.length === 0 || !form.tipo_recurso}
-                  className="flex-1 px-6 py-3 rounded-lg bg-[#8B2252] text-white text-sm font-semibold
-                             hover:bg-[#7a1e48] transition-colors
-                             disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 rounded-xl
+                             bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white text-sm font-semibold
+                             shadow-button hover:shadow-lg hover:shadow-[#8B2252]/30
+                             active:scale-[0.97] transition-all duration-200
+                             disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
                 >
                   {subiendo ? 'Subiendo...' : 'Publicar recurso'}
                 </button>

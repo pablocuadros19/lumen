@@ -15,34 +15,42 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="text-center max-w-md mx-auto px-6">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f8f9fc] to-[#1A3A5C]/8
+                    flex items-center justify-center relative overflow-hidden">
+      {/* Decoraciones de fondo */}
+      <div className="absolute top-20 -left-20 w-72 h-72 rounded-full bg-[#8B2252]/5 blur-3xl" />
+      <div className="absolute -bottom-20 -right-20 w-96 h-96 rounded-full bg-[#1A3A5C]/5 blur-3xl" />
+
+      <div className="glass rounded-3xl shadow-elevated border border-white/60
+                      text-center max-w-md mx-auto px-10 py-12 relative z-10">
         {/* Logo grande */}
         <div className="mb-6">
           <Image
             src="/logo.png"
             alt="LUMEN"
-            width={320}
-            height={320}
-            className="mx-auto"
+            width={280}
+            height={280}
+            className="mx-auto drop-shadow-sm"
             priority
           />
         </div>
 
-        <p className="text-[#2E6EA6] text-lg mb-8">
+        <p className="text-[#2E6EA6] text-lg font-medium mb-8">
           Biblioteca Pedagógica Inteligente
         </p>
 
         {/* Línea decorativa */}
-        <div className="w-16 h-0.5 bg-[#8B2252] mx-auto mb-8" />
+        <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-[#8B2252] to-transparent
+                        mx-auto mb-8 rounded-full" />
 
         {/* Botón Google */}
         <button
           onClick={handleLogin}
-          className="flex items-center justify-center gap-3 w-full px-6 py-3
-                     bg-white border-2 border-[#1A3A5C] rounded-lg
+          className="flex items-center justify-center gap-3 w-full px-6 py-3.5
+                     bg-white border border-gray-200 rounded-xl
                      text-[#1A3A5C] font-semibold text-base
-                     hover:bg-[#f0f2f5] transition-colors cursor-pointer"
+                     shadow-card hover:shadow-card-hover hover:-translate-y-0.5
+                     active:scale-[0.98] transition-all duration-200 cursor-pointer"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>

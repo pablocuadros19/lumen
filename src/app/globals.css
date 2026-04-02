@@ -1,5 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --color-lumen-blue: #1A3A5C;
+  --color-lumen-bordo: #8B2252;
+  --color-lumen-lightblue: #2E6EA6;
+  --color-lumen-bg: #f8f9fc;
+  --color-lumen-card: #ffffff;
+
+  --shadow-card: 0 1px 3px rgba(26, 58, 92, 0.08), 0 1px 2px rgba(26, 58, 92, 0.04);
+  --shadow-card-hover: 0 10px 25px rgba(26, 58, 92, 0.1), 0 4px 10px rgba(139, 34, 82, 0.06);
+  --shadow-elevated: 0 4px 12px rgba(26, 58, 92, 0.12), 0 2px 4px rgba(26, 58, 92, 0.06);
+  --shadow-button: 0 2px 8px rgba(139, 34, 82, 0.25);
+  --shadow-glow-bordo: 0 0 20px rgba(139, 34, 82, 0.15);
+  --shadow-glow-blue: 0 0 20px rgba(26, 58, 92, 0.15);
+}
 
 body {
   background: #ffffff;
@@ -7,6 +22,29 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Patrón grid sutil */
+.bg-grid-pattern {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(26, 58, 92, 0.04) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+/* Gradiente de texto LUMEN */
+.text-gradient-lumen {
+  background: linear-gradient(135deg, #1A3A5C, #8B2252);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }

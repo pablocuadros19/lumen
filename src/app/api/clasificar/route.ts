@@ -34,12 +34,12 @@ export async function POST(request: NextRequest) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
           const data = await pdfParse(buffer)
-          textoExtraido = data.text.slice(0, 4000) // Limitar para no gastar tokens
+          textoExtraido = data.text.slice(0, 6000)
         } catch {
           textoExtraido = `[No se pudo extraer texto del PDF: ${archivo.name}]`
         }
       } else if (archivo.type.startsWith('text/')) {
-        textoExtraido = new TextDecoder().decode(buffer).slice(0, 4000)
+        textoExtraido = new TextDecoder().decode(buffer).slice(0, 6000)
       } else {
         textoExtraido = `[Archivo no textual: ${archivo.name}, tipo: ${archivo.type}]`
       }
@@ -52,24 +52,38 @@ export async function POST(request: NextRequest) {
 
     const message = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 500,
+      max_tokens: 1000,
       messages: [
         {
           role: 'user',
-          content: `Sos un clasificador de recursos pedagógicos para una biblioteca escolar de nivel primario (1ro a 6to grado), área Prácticas del Lenguaje.
+          content: `Sos un bibliotecario pedagógico experto en educación primaria argentina (1ro a 6to grado), especializado en el área de Prácticas del Lenguaje según el Diseño Curricular de la Provincia de Buenos Aires.
+
+Tu tarea es clasificar un recurso pedagógico para la biblioteca escolar LUMEN. El recurso fue subido por una docente y será usado por otras docentes del colegio.
 
 Analizá el siguiente contenido y devolvé un JSON con estas claves:
-- "titulo": título claro y descriptivo del recurso (máx 60 caracteres)
-- "resumen": resumen en 1-2 oraciones de qué es y para qué sirve
+
+- "titulo": título claro, descriptivo y profesional (máx 80 caracteres). Debe reflejar el contenido real y el tema específico, no ser genérico. Ejemplo bueno: "Ejercicios de uso de coma en enumeración y vocativo". Ejemplo malo: "Actividad de ortografía".
+
+- "resumen": descripción detallada de 3-4 oraciones que responda:
+  * ¿Qué contiene concretamente? (ejercicios, explicaciones, consignas, preguntas, etc.)
+  * ¿Para qué sirve y en qué momento de la secuencia didáctica se usaría?
+  * ¿Qué habilidades o contenidos específicos trabaja?
+  * ¿Qué tipo de actividades propone? (completar, unir, escribir, leer, clasificar, etc.)
+  El resumen debe ser útil para que una docente decida si le sirve SIN abrir el archivo.
+
 - "ejes_tematicos": array con uno o más de estos valores EXACTOS: ${JSON.stringify(EJES_VALIDOS)}
+  Elegir basándose en el contenido real, no en suposiciones.
+
 - "tipo_recurso": uno de estos valores EXACTOS: ${JSON.stringify(TIPOS_VALIDOS)}
+  Guía: "Actividad" = tiene consignas para alumnos. "Evaluación" = para calificar. "Rúbrica" = criterios de evaluación. "Planificación" = organización docente. "Teoría / Marco" = material de consulta docente. "Presentación" = slides para mostrar en clase.
+
 - "idioma": "es" o "en"
 
-IMPORTANTE:
+REGLAS:
 - NO sugieras grado, eso lo elige la docente
 - Elegí SOLO valores de las listas dadas
-- Si no tenés certeza de un eje, no lo incluyas
-- Si no podés determinar algo, dejá el campo vacío o con valor por defecto
+- Basá tu análisis en el CONTENIDO REAL del texto, no inventes ni supongas
+- Si el texto extraído es escaso, describí lo que ves, no rellenes con texto genérico
 - Respondé SOLO con el JSON, sin explicaciones ni markdown
 
 CONTENIDO DEL RECURSO:
