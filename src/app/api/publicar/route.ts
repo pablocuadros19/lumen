@@ -27,11 +27,11 @@ export async function POST(request: NextRequest) {
     const datosJson = formData.get('datos') as string
     const datos = JSON.parse(datosJson)
 
-    let archivoUrl: string | null = null
-    let thumbnailUrl: string | null = null
+    let archivoUrl: string | null = datos.existing_archivo_url || null
+    let thumbnailUrl: string | null = datos.existing_thumbnail_url || null
 
-    // Subir archivo a Storage si existe
-    if (archivo) {
+    // Subir archivo a Storage si existe (y no viene pre-subido)
+    if (archivo && !archivoUrl) {
       const ext = archivo.name.split('.').pop()
       const fileId = crypto.randomUUID()
       const fileName = `${user.id}/${fileId}.${ext}`

@@ -3,6 +3,7 @@
 import type { Recurso } from '@/types/database'
 import PdfThumbnail from '@/components/PdfThumbnail'
 import FavoritoButton from '@/components/FavoritoButton'
+import AgregarAColeccion from '@/components/AgregarAColeccion'
 
 // SVG icons por formato (reemplazan emojis)
 function FormatIcon({ formato }: { formato: string }) {
@@ -85,11 +86,16 @@ export default function RecursoCard({ recurso, onClick, index = 0, esFavorito = 
           />
         </div>
 
+        {/* Botón agregar a colección */}
+        <div className="absolute top-2.5 right-2.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <AgregarAColeccion recursoId={recurso.id} size="sm" />
+        </div>
+
         {/* Badge destacado */}
         {recurso.estado === 'destacado' && (
-          <div className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold
+          <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold
                           bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white
-                          shadow-sm shadow-[#8B2252]/30">
+                          shadow-sm shadow-[#8B2252]/30 z-10">
             Destacado
           </div>
         )}

@@ -33,6 +33,7 @@ export default async function MisDescargasPage() {
         </Link>
         <div className="flex-1" />
         <span className="text-sm text-gray-400 font-medium">Mis descargas</span>
+        <Image src="/newman-logo.png" alt="Newman" width={32} height={32} className="shrink-0" />
       </header>
 
       <div className="flex-1 max-w-3xl mx-auto w-full px-5 py-8">

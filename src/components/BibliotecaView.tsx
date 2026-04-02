@@ -181,6 +181,8 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
         </Link>
 
         <UserMenu />
+
+        <Image src="/newman-logo.png" alt="Newman" width={36} height={36} className="shrink-0" />
       </header>
 
       {/* Barra de filtros activos */}

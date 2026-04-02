@@ -29,7 +29,19 @@ function LoginContent() {
 
       <div className="glass rounded-[32px] shadow-elevated border border-white/60
                       text-center max-w-md mx-auto px-12 py-14 relative z-10">
-        {/* Logo */}
+        {/* Logo Newman */}
+        <div className="mb-4">
+          <Image
+            src="/newman-logo.png"
+            alt="Newman"
+            width={80}
+            height={80}
+            className="mx-auto"
+            priority
+          />
+        </div>
+
+        {/* Logo LUMEN */}
         <div className="mb-6">
           <Image
             src="/logo.png"

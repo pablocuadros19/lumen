@@ -44,6 +44,7 @@ export default async function SolicitudesPage() {
         <span className="text-sm text-gray-400 font-medium">
           {esAdmin ? 'Solicitudes de material' : 'Mis solicitudes'}
         </span>
+        <Image src="/newman-logo.png" alt="Newman" width={32} height={32} className="shrink-0" />
       </header>
 
       <div className="flex-1 max-w-3xl mx-auto w-full px-5 py-8">

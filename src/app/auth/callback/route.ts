@@ -9,10 +9,11 @@ const DOMINIOS_PERMITIDOS = (process.env.ALLOWED_DOMAINS || '').split(',').filte
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const next = searchParams.get('next') || '/'
 
   if (code) {
     const supabase = await createClient()
-    await supabase.auth.exchangeCodeForSession(code)
+    const { data: sessionData } = await supabase.auth.exchangeCodeForSession(code)
 
     // Verificar dominio/email si hay restricciones configuradas
     if (DOMINIOS_PERMITIDOS.length > 0 || EMAILS_PERMITIDOS.length > 0) {
@@ -27,7 +28,19 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}/login?error=dominio`)
       }
     }
+
+    // Si viene con provider_token (Google), guardarlo para Drive
+    const providerToken = sessionData?.session?.provider_token
+    if (providerToken) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase
+          .from('perfiles')
+          .update({ google_token: providerToken })
+          .eq('id', user.id)
+      }
+    }
   }
 
-  return NextResponse.redirect(`${origin}/`)
+  return NextResponse.redirect(`${origin}${next}`)
 }
