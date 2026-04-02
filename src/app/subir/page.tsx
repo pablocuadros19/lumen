@@ -195,7 +195,7 @@ export default function SubirPage() {
         {/* Paso 1: Subir archivo */}
         {paso === 1 && (
           <div>
-            <h1 className="text-2xl font-bold text-[#1A3A5C] mb-2">Cargar recurso</h1>
+            <h1 className="text-2xl font-bold text-[#1A3A5C] mb-2">Subir recurso</h1>
             <p className="text-gray-500 text-sm mb-8">
               Subí un archivo o pegá un link. La IA va a sugerir la clasificación.
             </p>
