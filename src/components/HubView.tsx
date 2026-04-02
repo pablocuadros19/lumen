@@ -264,22 +264,22 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
                       href={`/area/${area.slug}`}
                       className="relative block h-52 cursor-pointer"
                     >
-                      {/* Fondo base con gradiente del área */}
+                      {/* Fondo base del color del área */}
                       <div
                         className="absolute inset-0"
                         style={{
-                          background: `linear-gradient(135deg, ${area.color}18 0%, ${area.color}08 40%, white 100%)`,
+                          background: `linear-gradient(135deg, ${area.color}50 0%, ${area.color}35 50%, ${area.color}60 100%)`,
                         }}
                       />
 
                       {/* Decoración SVG ilustrativa */}
                       <AreaDecoration slug={area.slug} color={area.color} />
 
-                      {/* Gradiente inferior para legibilidad del texto */}
+                      {/* Gradiente inferior más intenso para legibilidad del texto */}
                       <div
                         className="absolute inset-0"
                         style={{
-                          background: `linear-gradient(to top, ${area.color}f0 0%, ${area.color}cc 30%, ${area.color}40 60%, transparent 100%)`,
+                          background: `linear-gradient(to top, ${area.color}f0 0%, ${area.color}cc 35%, ${area.color}70 65%, transparent 100%)`,
                         }}
                       />
 
