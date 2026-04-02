@@ -261,6 +261,18 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
           <span className="text-xl font-bold tracking-tight text-gradient-lumen">LUMEN</span>
         </Link>
         <div className="flex-1" />
+        <Link
+          href="/subir"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl
+                     bg-gradient-to-r from-[#1A3A5C] to-[#2E6EA6] text-white text-sm font-semibold
+                     shadow-sm hover:shadow-md hover:-translate-y-0.5
+                     transition-all duration-200 shrink-0"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Cargar recurso
+        </Link>
         <UserMenu />
         <div className="w-px h-8 bg-gray-200 shrink-0" />
         <Image src="/newman-logo-2.jpg" alt="Newman" width={36} height={36} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
