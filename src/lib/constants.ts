@@ -8,11 +8,14 @@ export interface AreaConfig {
   nombre: string
   color: string
   description: string
+  proximamente?: boolean
 }
 
 export const AREAS: AreaConfig[] = [
   { slug: 'practicas-del-lenguaje', nombre: 'Prácticas del Lenguaje', color: '#8B2252', description: 'Lectura, escritura, oralidad y gramática' },
   { slug: 'ciencias-naturales', nombre: 'Ciencias Naturales', color: '#2E7D4F', description: 'Seres vivos, materiales, fenómenos y ambiente' },
+  { slug: 'matematica', nombre: 'Matemática', color: '#2E6EA6', description: 'Números, operaciones, geometría y medida', proximamente: true },
+  { slug: 'ciencias-sociales', nombre: 'Ciencias Sociales', color: '#C4972A', description: 'Historia, geografía, sociedad y ciudadanía', proximamente: true },
 ]
 
 // Ejes temáticos por área
