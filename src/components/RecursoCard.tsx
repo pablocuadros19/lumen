@@ -55,7 +55,7 @@ export default function RecursoCard({ recurso, onClick, index = 0 }: RecursoCard
             />
             <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/50 to-transparent" />
           </>
-        ) : recurso.archivo_url && recurso.formato === 'Documento' && recurso.archivo_url.endsWith('.pdf') ? (
+        ) : recurso.archivo_url && recurso.archivo_url.includes('.pdf') ? (
           <>
             <PdfThumbnail url={recurso.archivo_url} className="w-full h-full object-cover object-top" />
             <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/50 to-transparent" />
