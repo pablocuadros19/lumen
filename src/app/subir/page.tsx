@@ -5,6 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { GRADOS, TIPOS_RECURSO, AREAS, getEjesForArea } from '@/lib/constants'
+import * as pdfjsLib from 'pdfjs-dist'
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
 import DrivePickerModal from '@/components/DrivePickerModal'
 import ThankYouOverlay from '@/components/ThankYouOverlay'
 
@@ -173,6 +176,26 @@ function SubirContent() {
     setPaso(2)
   }
 
+  // Generar thumbnail de PDF en el browser
+  const generarThumbPDF = async (file: File): Promise<Blob | null> => {
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      const doc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+      const page = await doc.getPage(1)
+      const viewport = page.getViewport({ scale: 1.5 })
+      const canvas = document.createElement('canvas')
+      canvas.width = viewport.width
+      canvas.height = viewport.height
+      const ctx = canvas.getContext('2d')!
+      await page.render({ canvasContext: ctx, viewport }).promise
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.75)
+      })
+    } catch {
+      return null
+    }
+  }
+
   const handlePublicar = async () => {
     if (!form.titulo || form.grados.length === 0 || form.ejes_tematicos.length === 0 || !form.tipo_recurso) {
       alert('Completá todos los campos obligatorios')
@@ -186,6 +209,13 @@ function SubirContent() {
       const body = new FormData()
       if (archivo) {
         body.append('archivo', archivo)
+        // Generar thumbnail si es PDF
+        if (archivo.type === 'application/pdf') {
+          const thumbBlob = await generarThumbPDF(archivo)
+          if (thumbBlob) {
+            body.append('thumbnail', thumbBlob, 'thumb.jpg')
+          }
+        }
       }
       body.append('datos', JSON.stringify({
         ...form,
