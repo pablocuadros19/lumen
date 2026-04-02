@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { GRADOS, EJES_TEMATICOS, TIPOS_RECURSO } from '@/lib/constants'
 import DrivePickerModal from '@/components/DrivePickerModal'
 import ThankYouOverlay from '@/components/ThankYouOverlay'
@@ -20,8 +20,9 @@ type FormData = {
   thumbnail_url: string
 }
 
-export default function SubirPage() {
+function SubirContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [archivo, setArchivo] = useState<File | null>(null)
   const [arrastrando, setArrastrando] = useState(false)
   const [subiendo, setSubiendo] = useState(false)
@@ -37,6 +38,15 @@ export default function SubirPage() {
   const [efemeridesDisponibles, setEfemeridesDisponibles] = useState<{ id: string; nombre: string }[]>([])
   const [efemeridesSeleccionadas, setEfemeridesSeleccionadas] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Auto-abrir modal Drive si viene de OAuth
+  useEffect(() => {
+    if (searchParams.get('drive') === '1') {
+      setShowDriveModal(true)
+      // Limpiar el param de la URL sin recargar
+      window.history.replaceState({}, '', '/subir')
+    }
+  }, [searchParams])
 
   useEffect(() => {
     fetch('/api/efemerides').then(r => r.json()).then(data => {
@@ -658,5 +668,13 @@ export default function SubirPage() {
         <ThankYouOverlay onDone={() => router.push('/')} />
       )}
     </div>
+  )
+}
+
+export default function SubirPage() {
+  return (
+    <Suspense>
+      <SubirContent />
+    </Suspense>
   )
 }

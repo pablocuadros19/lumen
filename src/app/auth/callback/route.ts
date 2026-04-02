@@ -13,7 +13,12 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { data: sessionData } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (sessionError) {
+      console.error('Error exchanging code:', sessionError)
+      return NextResponse.redirect(`${origin}/login?error=auth`)
+    }
 
     // Verificar dominio/email si hay restricciones configuradas
     if (DOMINIOS_PERMITIDOS.length > 0 || EMAILS_PERMITIDOS.length > 0) {
@@ -29,15 +34,16 @@ export async function GET(request: Request) {
       }
     }
 
-    // Si viene con provider_token (Google), guardarlo para Drive
-    const providerToken = sessionData?.session?.provider_token
+    // Guardar provider_token (Google) para Drive
+    const providerToken = sessionData?.session?.provider_token ?? null
+
     if (providerToken) {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
+      const userId = sessionData?.session?.user?.id
+      if (userId) {
         await supabase
           .from('perfiles')
           .update({ google_token: providerToken })
-          .eq('id', user.id)
+          .eq('id', userId)
       }
     }
   }
