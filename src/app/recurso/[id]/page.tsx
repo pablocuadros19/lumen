@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { MOCK_RECURSOS } from '@/lib/mock-data'
 import BorrarRecursoButton from '@/components/BorrarRecursoButton'
+import FavoritoButton from '@/components/FavoritoButton'
+import CompartirButton from '@/components/CompartirButton'
 import type { Recurso } from '@/types/database'
 
 // Colores por eje temático
@@ -84,6 +86,17 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
   const { data: { user } } = await supabase.auth.getUser()
   const esAutor = user && recurso.subido_por === user.id
 
+  // Obtener recursos relacionados (mismo eje, grados similares)
+  const { data: relacionados } = await supabase
+    .from('recursos')
+    .select('id, titulo, formato, eje_tematico, grados, thumbnail_url, autor_nombre, tipo_recurso')
+    .eq('eje_tematico', recurso.eje_tematico)
+    .neq('id', recurso.id)
+    .in('estado', ['publicado', 'destacado'])
+    .overlaps('grados', recurso.grados)
+    .order('descargas', { ascending: false })
+    .limit(4)
+
   const ejeColor = EJE_COLORS[recurso.eje_tematico] || '#1A3A5C'
 
   return (
@@ -120,7 +133,10 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
                   Destacado
                 </span>
               )}
-              <h1 className="text-3xl font-bold tracking-tight text-[#1A3A5C] mb-3">{recurso.titulo}</h1>
+              <div className="flex items-start gap-3 mb-3">
+                <h1 className="text-3xl font-bold tracking-tight text-[#1A3A5C] flex-1">{recurso.titulo}</h1>
+                <FavoritoButton recursoId={recurso.id} size="md" />
+              </div>
               <div className="w-16 h-0.5 bg-gradient-to-r from-[#8B2252] to-transparent rounded-full mb-4" />
 
               <div className="flex flex-wrap gap-2 mb-4">
@@ -145,7 +161,7 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
 
-            {/* Preview: imagen real si es imagen, placeholder si no */}
+            {/* Preview: imagen real si es imagen, thumbnail de link, PDF embebido, o placeholder */}
             {recurso.archivo_url && recurso.formato === 'Imagen / Lámina' ? (
               <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
                 <img
@@ -160,6 +176,14 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
                   src={recurso.archivo_url}
                   className="w-full h-[600px]"
                   title={recurso.titulo}
+                />
+              </div>
+            ) : recurso.thumbnail_url && recurso.formato === 'Link externo' ? (
+              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                <img
+                  src={recurso.thumbnail_url}
+                  alt={recurso.titulo}
+                  className="w-full max-h-[500px] object-contain bg-[#f8f9fc]"
                 />
               </div>
             ) : (
@@ -218,6 +242,38 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
                 ))}
               </div>
             </div>
+
+            {/* Recursos relacionados */}
+            {relacionados && relacionados.length > 0 && (
+              <div>
+                <h3 className="text-sm font-bold text-[#1A3A5C] mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2E6EA6]" />
+                  Recursos relacionados
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {relacionados.map((rel) => (
+                    <Link
+                      key={rel.id}
+                      href={`/recurso/${rel.id}`}
+                      className="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm
+                                 hover:shadow-card hover:-translate-y-0.5
+                                 transition-all duration-200"
+                    >
+                      {/* Mini thumbnail */}
+                      <div className="h-20 rounded-xl bg-[#1A3A5C]/4 mb-2 overflow-hidden flex items-center justify-center">
+                        {rel.thumbnail_url ? (
+                          <img src={rel.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <TipoIcon tipo={rel.tipo_recurso} className="w-6 h-6 text-[#1A3A5C]/20" />
+                        )}
+                      </div>
+                      <p className="text-xs font-semibold text-[#1A3A5C] line-clamp-2">{rel.titulo}</p>
+                      <p className="text-[10px] text-gray-400 mt-1">{rel.autor_nombre || 'Anónimo'}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -225,7 +281,7 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
             <div className="rounded-3xl border border-gray-100 bg-white shadow-card p-5 space-y-3">
               {recurso.archivo_url && (
                 <a
-                  href={recurso.archivo_url}
+                  href={`/api/recurso/${recurso.id}/descargar`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full px-4 py-3.5 rounded-2xl
@@ -259,6 +315,8 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
               {!recurso.archivo_url && !recurso.link_editable && (
                 <p className="text-sm text-gray-400 text-center py-2">Sin archivo disponible</p>
               )}
+
+              <CompartirButton recursoId={recurso.id} titulo={recurso.titulo} />
             </div>
 
             <div className="rounded-3xl border border-gray-100 bg-white shadow-card p-5">

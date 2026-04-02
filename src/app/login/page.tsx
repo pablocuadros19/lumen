@@ -1,9 +1,14 @@
 'use client'
 
+import { Suspense } from 'react'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function LoginPage() {
+function LoginContent() {
+  const searchParams = useSearchParams()
+  const errorDominio = searchParams.get('error') === 'dominio'
+
   const handleLogin = async () => {
     const supabase = createClient()
     await supabase.auth.signInWithOAuth({
@@ -62,10 +67,24 @@ export default function LoginPage() {
           Iniciar sesión con Google
         </button>
 
+        {errorDominio && (
+          <div className="mt-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+            Solo se permiten cuentas institucionales del Newman. Contactá a la coordinadora si necesitás acceso.
+          </div>
+        )}
+
         <p className="text-sm text-gray-500 mt-6">
-          Usá tu cuenta de Google personal o institucional
+          Usá tu cuenta institucional del colegio
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   )
 }

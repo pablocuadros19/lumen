@@ -2,6 +2,7 @@
 
 import type { Recurso } from '@/types/database'
 import PdfThumbnail from '@/components/PdfThumbnail'
+import FavoritoButton from '@/components/FavoritoButton'
 
 // SVG icons por formato (reemplazan emojis)
 function FormatIcon({ formato }: { formato: string }) {
@@ -26,9 +27,12 @@ interface RecursoCardProps {
   recurso: Recurso
   onClick?: () => void
   index?: number
+  esFavorito?: boolean
+  onToggleFavorito?: (id: string, esFav: boolean) => void
+  esCoordinadora?: boolean
 }
 
-export default function RecursoCard({ recurso, onClick, index = 0 }: RecursoCardProps) {
+export default function RecursoCard({ recurso, onClick, index = 0, esFavorito = false, onToggleFavorito, esCoordinadora = false }: RecursoCardProps) {
   const gradoChips = recurso.grados.join(', ')
 
   return (
@@ -68,6 +72,18 @@ export default function RecursoCard({ recurso, onClick, index = 0 }: RecursoCard
             </span>
           </div>
         )}
+
+        {/* Botón favorito */}
+        <div className="absolute top-2.5 left-2.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          style={esFavorito ? { opacity: 1 } : {}}
+        >
+          <FavoritoButton
+            recursoId={recurso.id}
+            initialFavorito={esFavorito}
+            size="sm"
+            onToggle={onToggleFavorito}
+          />
+        </div>
 
         {/* Badge destacado */}
         {recurso.estado === 'destacado' && (
@@ -130,7 +146,12 @@ export default function RecursoCard({ recurso, onClick, index = 0 }: RecursoCard
             </svg>
             {recurso.descargas}
           </span>
-          <span className="font-semibold text-[#1A3A5C]/50">{recurso.autor_nombre}</span>
+          <span className={`font-semibold ${esCoordinadora ? 'text-[#8B2252]' : 'text-[#1A3A5C]/50'}`}>
+            {esCoordinadora && (
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#8B2252] mr-1 align-middle" />
+            )}
+            {recurso.autor_nombre}
+          </span>
           <span>{new Date(recurso.created_at).getFullYear()}</span>
         </div>
       </div>

@@ -15,6 +15,7 @@ type FormData = {
   editable: boolean
   idioma: 'es' | 'en'
   link_editable: string
+  thumbnail_url: string
 }
 
 export default function SubirPage() {
@@ -38,6 +39,7 @@ export default function SubirPage() {
     editable: false,
     idioma: 'es',
     link_editable: '',
+    thumbnail_url: '',
   })
 
   const detectarEditable = (nombre: string) => {
@@ -73,6 +75,7 @@ export default function SubirPage() {
           editable: esEditable,
           idioma: data.idioma || 'es',
           link_editable: '',
+          thumbnail_url: '',
         })
       } else {
         setForm(prev => ({
@@ -240,11 +243,30 @@ export default function SubirPage() {
                 className={inputClasses}
               />
               <button
-                onClick={() => {
+                onClick={async () => {
                   if (form.link_editable.trim()) {
                     setForm(prev => ({ ...prev, editable: true }))
                     setPaso(2)
                     setSugerenciasIA(false)
+                    // Intentar extraer thumbnail del link
+                    try {
+                      const res = await fetch('/api/link-preview', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: form.link_editable.trim() }),
+                      })
+                      if (res.ok) {
+                        const data = await res.json()
+                        if (data.thumbnail_url) {
+                          setForm(prev => ({ ...prev, thumbnail_url: data.thumbnail_url }))
+                        }
+                        if (data.title && !form.titulo) {
+                          setForm(prev => ({ ...prev, titulo: data.title }))
+                        }
+                      }
+                    } catch {
+                      // No bloquear si falla el preview
+                    }
                   }
                 }}
                 disabled={!form.link_editable.trim()}
@@ -311,6 +333,17 @@ export default function SubirPage() {
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
+              </div>
+            )}
+
+            {/* Preview del link */}
+            {!archivo && form.thumbnail_url && (
+              <div className="rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+                <img
+                  src={form.thumbnail_url}
+                  alt="Preview del link"
+                  className="w-full max-h-48 object-cover"
+                />
               </div>
             )}
 

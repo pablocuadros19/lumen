@@ -1,23 +1,31 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import FilterSidebar from '@/components/FilterSidebar'
 import RecursoCard from '@/components/RecursoCard'
 import UserMenu from '@/components/UserMenu'
+import SolicitarRecurso from '@/components/SolicitarRecurso'
 import type { Recurso } from '@/types/database'
 
 function toggleInArray(arr: string[], val: string): string[] {
   return arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val]
 }
 
-interface Props {
-  recursos: Recurso[]
+// Normalizar texto: quitar tildes e ignorar mayúsculas
+function normalizar(texto: string): string {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 }
 
-export default function BibliotecaView({ recursos }: Props) {
+interface Props {
+  recursos: Recurso[]
+  cantidadNuevos?: number
+  adminIds?: string[]
+}
+
+export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds = [] }: Props) {
   const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [gradosActivos, setGradosActivos] = useState<string[]>([])
@@ -26,18 +34,40 @@ export default function BibliotecaView({ recursos }: Props) {
   const [soloEditable, setSoloEditable] = useState<boolean | null>(null)
   const [ordenar, setOrdenar] = useState<'recientes' | 'descargas'>('recientes')
   const [sidebarAbierta, setSidebarAbierta] = useState(true)
+  const [favoritosIds, setFavoritosIds] = useState<string[]>([])
+  const [mostrarFavoritos, setMostrarFavoritos] = useState(false)
+  const [mostrarSolicitud, setMostrarSolicitud] = useState(false)
+
+  // Cargar IDs de favoritos del usuario
+  useEffect(() => {
+    fetch('/api/favorito')
+      .then(res => res.ok ? res.json() : { ids: [] })
+      .then(data => setFavoritosIds(data.ids || []))
+      .catch(() => {})
+  }, [])
+
+  const handleToggleFavorito = (recursoId: string, esFav: boolean) => {
+    setFavoritosIds(prev =>
+      esFav ? [...prev, recursoId] : prev.filter(id => id !== recursoId)
+    )
+  }
 
   const resultados = useMemo(() => {
     let filtered = recursos
 
+    // Filtro de favoritos
+    if (mostrarFavoritos) {
+      filtered = filtered.filter(r => favoritosIds.includes(r.id))
+    }
+
     if (busqueda.trim()) {
-      const q = busqueda.toLowerCase()
+      const q = normalizar(busqueda)
       filtered = filtered.filter(
         (r) =>
-          r.titulo.toLowerCase().includes(q) ||
-          (r.resumen && r.resumen.toLowerCase().includes(q)) ||
-          r.eje_tematico.toLowerCase().includes(q) ||
-          r.tipo_recurso.toLowerCase().includes(q)
+          normalizar(r.titulo).includes(q) ||
+          (r.resumen && normalizar(r.resumen).includes(q)) ||
+          normalizar(r.eje_tematico).includes(q) ||
+          normalizar(r.tipo_recurso).includes(q)
       )
     }
 
@@ -68,7 +98,7 @@ export default function BibliotecaView({ recursos }: Props) {
     }
 
     return filtered
-  }, [recursos, busqueda, gradosActivos, ejesActivos, tiposActivos, soloEditable, ordenar])
+  }, [recursos, busqueda, gradosActivos, ejesActivos, tiposActivos, soloEditable, ordenar, mostrarFavoritos, favoritosIds])
 
   const hayFiltros = gradosActivos.length > 0 || ejesActivos.length > 0 || tiposActivos.length > 0 || soloEditable !== null
 
@@ -109,6 +139,32 @@ export default function BibliotecaView({ recursos }: Props) {
             />
           </div>
         </div>
+
+        <button
+          onClick={() => setMostrarFavoritos(!mostrarFavoritos)}
+          className={`flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-medium
+                     transition-all duration-200 cursor-pointer shrink-0
+                     ${mostrarFavoritos
+                       ? 'bg-red-50 text-red-500 border border-red-200 shadow-sm'
+                       : 'text-gray-400 hover:text-red-400 hover:bg-red-50/50 border border-transparent'
+                     }`}
+          title={mostrarFavoritos ? 'Ver todos' : 'Mis favoritos'}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24"
+            fill={mostrarFavoritos ? 'currentColor' : 'none'}
+            stroke="currentColor" strokeWidth={1.5}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round"
+              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+          </svg>
+          <span className="hidden sm:inline">{mostrarFavoritos ? 'Favoritos' : 'Favoritos'}</span>
+          {favoritosIds.length > 0 && (
+            <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold
+              ${mostrarFavoritos ? 'bg-red-200 text-red-700' : 'bg-gray-200 text-gray-500'}`}>
+              {favoritosIds.length}
+            </span>
+          )}
+        </button>
 
         <Link
           href="/subir"
@@ -236,6 +292,21 @@ export default function BibliotecaView({ recursos }: Props) {
         </div>
 
         <main className="flex-1 p-5 overflow-y-auto bg-lumen-bg bg-grid-pattern">
+          {cantidadNuevos > 0 && (
+            <div className="mb-5 p-4 rounded-2xl bg-gradient-to-r from-[#2E6EA6]/8 to-[#8B2252]/8
+                            border border-[#2E6EA6]/15 shadow-sm flex items-center gap-3 animate-card-in">
+              <div className="w-8 h-8 rounded-full bg-[#2E6EA6]/15 flex items-center justify-center">
+                <svg className="w-4 h-4 text-[#2E6EA6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </div>
+              <span className="text-sm text-[#1A3A5C]">
+                <span className="font-bold">{cantidadNuevos} recurso{cantidadNuevos !== 1 ? 's' : ''} nuevo{cantidadNuevos !== 1 ? 's' : ''}</span>
+                {' '}desde tu última visita
+              </span>
+            </div>
+          )}
+
           {resultados.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {resultados.map((r, i) => (
@@ -243,6 +314,9 @@ export default function BibliotecaView({ recursos }: Props) {
                   key={r.id}
                   recurso={r}
                   index={i}
+                  esFavorito={favoritosIds.includes(r.id)}
+                  onToggleFavorito={handleToggleFavorito}
+                  esCoordinadora={adminIds.includes(r.subido_por)}
                   onClick={() => router.push(`/recurso/${r.id}`)}
                 />
               ))}
@@ -260,24 +334,41 @@ export default function BibliotecaView({ recursos }: Props) {
                   Probá ampliar la búsqueda o quitar algún filtro.
                   {hayFiltros && ' Hacé click en los chips de arriba para quitarlos.'}
                 </p>
-                <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white
+                <button
+                  onClick={() => setMostrarSolicitud(true)}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white
                                  text-sm font-medium shadow-button hover:shadow-lg hover:-translate-y-0.5
-                                 transition-all duration-200">
-                  Pedí material a la coordinadora
+                                 transition-all duration-200 cursor-pointer">
+                  Solicitar material
                 </button>
               </div>
             </div>
           )}
 
           {resultados.length > 0 && (
-            <div className="mt-6 p-5 rounded-2xl bg-gradient-to-r from-[#1A3A5C]/5 to-[#8B2252]/5
-                            border-l-4 border-l-[#8B2252] border border-[#1A3A5C]/8
-                            shadow-sm text-sm text-[#1A3A5C]">
-              <span className="font-semibold">Copiloto Pedagógico:</span> Seleccioná un recurso para adaptar a otro grado, crear evaluación, simplificar consignas...
+            <div className="mt-6 flex gap-4">
+              <div className="flex-1 p-5 rounded-2xl bg-gradient-to-r from-[#1A3A5C]/5 to-[#8B2252]/5
+                              border-l-4 border-l-[#8B2252] border border-[#1A3A5C]/8
+                              shadow-sm text-sm text-[#1A3A5C]">
+                <span className="font-semibold">Copiloto Pedagógico:</span> Seleccioná un recurso para adaptar a otro grado, crear evaluación, simplificar consignas...
+              </div>
+              <button
+                onClick={() => setMostrarSolicitud(true)}
+                className="px-4 py-3 rounded-2xl border border-gray-200 text-sm text-gray-500
+                           hover:border-[#8B2252] hover:text-[#8B2252] hover:bg-[#8B2252]/5
+                           transition-all duration-200 whitespace-nowrap cursor-pointer"
+              >
+                No encontré lo que busco
+              </button>
             </div>
           )}
         </main>
       </div>
+
+      {/* Modal solicitar recurso */}
+      {mostrarSolicitud && (
+        <SolicitarRecurso onClose={() => setMostrarSolicitud(false)} />
+      )}
     </div>
   )
 }

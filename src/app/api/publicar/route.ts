@@ -65,6 +65,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Si no hay thumbnail del archivo pero viene uno del link (OG image)
+    if (!thumbnailUrl && datos.thumbnail_url) {
+      thumbnailUrl = datos.thumbnail_url
+    }
+
     // Obtener nombre del perfil
     const { data: perfil } = await supabase
       .from('perfiles')
