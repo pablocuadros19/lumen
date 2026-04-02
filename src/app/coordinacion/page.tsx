@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { GRADOS, EJES_TEMATICOS } from '@/lib/constants'
+import PendientesRevision from '@/components/PendientesRevision'
 
 const MESES = ['', 'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 
@@ -95,6 +96,14 @@ export default async function CoordinacionPage() {
     // Tabla puede no existir aún
   }
 
+  // Recursos pendientes de revisión
+  const { data: pendientes } = await supabase
+    .from('recursos')
+    .select('id, titulo, autor_nombre, area, eje_tematico, grados, created_at')
+    .eq('estado', 'publicado')
+    .eq('revisado', false)
+    .order('created_at', { ascending: false })
+
   // Recursos recientes (últimos 5)
   const { data: recientes } = await supabase
     .from('recursos')
@@ -158,6 +167,9 @@ export default async function CoordinacionPage() {
             )}
           </div>
         </div>
+
+        {/* Pendientes de revisión */}
+        <PendientesRevision recursos={pendientes || []} />
 
         {/* Semáforo de cobertura */}
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 mb-10">

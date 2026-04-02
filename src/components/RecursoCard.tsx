@@ -102,12 +102,20 @@ export default function RecursoCard({ recurso, onClick, index = 0, esFavorito = 
           </div>
         )}
 
-        {/* Badge destacado */}
-        {recurso.estado === 'destacado' && (
+        {/* Badge destacado o aprobado */}
+        {recurso.estado === 'destacado' ? (
           <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold
                           bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white
                           shadow-sm shadow-[#8B2252]/30 z-10">
             Destacado
+          </div>
+        ) : recurso.revisado && (
+          <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold
+                          bg-emerald-500 text-white shadow-sm shadow-emerald-500/30 z-10">
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+            Aprobado
           </div>
         )}
       </div>

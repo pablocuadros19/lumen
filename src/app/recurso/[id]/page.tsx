@@ -7,6 +7,7 @@ import CompartirButton from '@/components/CompartirButton'
 import AgregarAColeccion from '@/components/AgregarAColeccion'
 import CopilotoSection from '@/components/CopilotoSection'
 import NotasPrivadas from '@/components/NotasPrivadas'
+import BannerRevision from '@/components/BannerRevision'
 import type { Recurso } from '@/types/database'
 
 // Colores por eje temático
@@ -75,6 +76,29 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
   const { data: { user } } = await supabase.auth.getUser()
   const esAutor = user && recurso.subido_por === user.id
 
+  // Verificar si es admin
+  let esAdmin = false
+  if (user) {
+    const { data: perfilUser } = await supabase.from('perfiles').select('rol').eq('id', user.id).single()
+    esAdmin = perfilUser?.rol === 'admin'
+  }
+
+  // Si está en revisión y no es autor ni admin → no mostrar
+  if (recurso.estado === 'revision' && !esAutor && !esAdmin) {
+    return (
+      <div className="min-h-screen bg-lumen-bg flex items-center justify-center">
+        <div className="text-center bg-gradient-to-br from-[#1A3A5C]/5 via-transparent to-[#8B2252]/5 rounded-3xl p-16">
+          <svg className="w-16 h-16 mx-auto text-[#1A3A5C]/20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <h2 className="text-xl font-bold text-[#1A3A5C] mb-2">Recurso en revisión</h2>
+          <p className="text-sm text-gray-400 mb-4">Este recurso no está disponible en este momento.</p>
+          <Link href="/" className="text-sm text-[#8B2252] hover:underline">Volver a la biblioteca</Link>
+        </div>
+      </div>
+    )
+  }
+
   // Obtener recursos relacionados (mismo eje, grados similares)
   const { data: relacionados } = await supabase
     .from('recursos')
@@ -113,6 +137,11 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
           </svg>
           Volver a la biblioteca
         </Link>
+
+        {/* Banner de revisión para el autor */}
+        {recurso.estado === 'revision' && esAutor && (
+          <BannerRevision recursoId={recurso.id} comentario={recurso.comentario_revision} />
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Columna principal */}
@@ -337,12 +366,14 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
               <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
                 ${recurso.estado === 'publicado' ? 'bg-green-50 text-green-700 border border-green-200' : ''}
                 ${recurso.estado === 'destacado' ? 'bg-[#8B2252]/8 text-[#8B2252] border border-[#8B2252]/15' : ''}
+                ${recurso.estado === 'revision' ? 'bg-amber-50 text-amber-700 border border-amber-200' : ''}
                 ${recurso.estado === 'borrador' ? 'bg-gray-100 text-gray-500 border border-gray-200' : ''}
                 ${recurso.estado === 'archivado' ? 'bg-gray-100 text-gray-400 border border-gray-200' : ''}
               `}>
                 <span className={`w-2 h-2 rounded-full
                   ${recurso.estado === 'publicado' ? 'bg-green-500' : ''}
                   ${recurso.estado === 'destacado' ? 'bg-[#8B2252]' : ''}
+                  ${recurso.estado === 'revision' ? 'bg-amber-500' : ''}
                   ${recurso.estado === 'borrador' ? 'bg-gray-400' : ''}
                   ${recurso.estado === 'archivado' ? 'bg-gray-300' : ''}
                 `} />
@@ -350,7 +381,7 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
               </span>
             </div>
 
-            {esAutor && (
+            {(esAutor || esAdmin) && (
               <div className="rounded-3xl border border-gray-100 bg-white shadow-card p-4">
                 <BorrarRecursoButton recursoId={recurso.id} />
               </div>

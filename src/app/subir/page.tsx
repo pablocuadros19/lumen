@@ -41,6 +41,7 @@ function SubirContent() {
   const [driveFileName, setDriveFileName] = useState('')
   const [efemeridesDisponibles, setEfemeridesDisponibles] = useState<{ id: string; nombre: string }[]>([])
   const [efemeridesSeleccionadas, setEfemeridesSeleccionadas] = useState<string[]>([])
+  const [recursosEnRevision, setRecursosEnRevision] = useState<{ id: string; titulo: string; comentario_revision: string | null }[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Auto-abrir modal Drive si viene de OAuth
@@ -56,6 +57,24 @@ function SubirContent() {
     fetch('/api/efemerides').then(r => r.json()).then(data => {
       if (Array.isArray(data)) setEfemeridesDisponibles(data)
     }).catch(() => {})
+  }, [])
+
+  // Cargar recursos propios en revisión
+  useEffect(() => {
+    import('@/lib/supabase/client').then(({ createClient }) => {
+      const supabase = createClient()
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) return
+        supabase
+          .from('recursos')
+          .select('id, titulo, comentario_revision')
+          .eq('subido_por', user.id)
+          .eq('estado', 'revision')
+          .then(({ data }) => {
+            if (data && data.length > 0) setRecursosEnRevision(data)
+          })
+      })
+    })
   }, [])
 
   const [form, setForm] = useState<FormData>({
@@ -269,6 +288,32 @@ function SubirContent() {
       </header>
 
       <div className="flex-1 max-w-2xl mx-auto w-full px-5 py-8">
+        {/* Banner recursos en revisión */}
+        {recursosEnRevision.length > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 animate-card-in">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              <p className="text-sm font-semibold text-amber-800">
+                Tenés {recursosEnRevision.length} recurso{recursosEnRevision.length > 1 ? 's' : ''} observado{recursosEnRevision.length > 1 ? 's' : ''}
+              </p>
+            </div>
+            {recursosEnRevision.map(r => (
+              <a
+                key={r.id}
+                href={`/recurso/${r.id}`}
+                className="block text-sm text-amber-700 hover:text-amber-900 py-1 pl-6"
+              >
+                <span className="font-medium">{r.titulo}</span>
+                {r.comentario_revision && (
+                  <span className="text-amber-500 ml-2">— &ldquo;{r.comentario_revision}&rdquo;</span>
+                )}
+              </a>
+            ))}
+          </div>
+        )}
+
         {/* Paso 1: Subir archivo */}
         {paso === 1 && (
           <div className="animate-card-in">

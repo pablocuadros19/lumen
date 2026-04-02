@@ -90,12 +90,14 @@ export async function POST(request: NextRequest) {
       thumbnailUrl = datos.thumbnail_url
     }
 
-    // Obtener nombre del perfil
+    // Obtener nombre y rol del perfil
     const { data: perfil } = await supabase
       .from('perfiles')
-      .select('nombre')
+      .select('nombre, rol')
       .eq('id', user.id)
       .single()
+
+    const esAdmin = perfil?.rol === 'admin'
 
     // Insertar recurso en la tabla
     const recurso = {
@@ -109,6 +111,8 @@ export async function POST(request: NextRequest) {
       editable: datos.editable,
       estado: 'publicado',
       idioma: datos.idioma || 'es',
+      revisado: esAdmin,
+      revisado_por: esAdmin ? user.id : null,
       archivo_url: archivoUrl,
       thumbnail_url: thumbnailUrl,
       link_editable: datos.link_editable || null,

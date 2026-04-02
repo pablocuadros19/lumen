@@ -54,7 +54,7 @@ export type Formato =
   | 'Audio'
   | 'Link externo'
 
-export type EstadoRecurso = 'borrador' | 'publicado' | 'destacado' | 'archivado'
+export type EstadoRecurso = 'borrador' | 'publicado' | 'revision' | 'destacado' | 'archivado'
 
 export interface Recurso {
   id: string
@@ -76,6 +76,9 @@ export interface Recurso {
   subido_por: string
   autor_nombre: string | null
   descargas: number
+  revisado: boolean
+  revisado_por: string | null
+  comentario_revision: string | null
   created_at: string
   updated_at: string
 }
@@ -85,6 +88,7 @@ export interface Perfil {
   email: string
   nombre: string
   rol: 'admin' | 'docente'
+  area: string | null
   grados_asignados: Grado[]
   avatar_url: string | null
   created_at: string
