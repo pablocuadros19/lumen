@@ -26,8 +26,16 @@ export async function DELETE(
       return NextResponse.json({ error: 'Recurso no encontrado' }, { status: 404 })
     }
 
+    // Admins pueden borrar cualquier recurso
     if (recurso.subido_por !== user.id) {
-      return NextResponse.json({ error: 'Solo el autor puede borrar este recurso' }, { status: 403 })
+      const { data: perfil } = await supabase
+        .from('perfiles')
+        .select('rol')
+        .eq('id', user.id)
+        .single()
+      if (perfil?.rol !== 'admin') {
+        return NextResponse.json({ error: 'Solo el autor o un admin puede borrar este recurso' }, { status: 403 })
+      }
     }
 
     // Borrar archivo de Storage si existe

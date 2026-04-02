@@ -291,7 +291,7 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
 
               {recurso.link_editable && (
                 <a
-                  href={recurso.link_editable}
+                  href={`/api/recurso/${recurso.id}/descargar?tipo=editable`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full px-4 py-3.5 rounded-2xl bg-white border-2 border-[#8B2252] text-[#8B2252]

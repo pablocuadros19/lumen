@@ -15,7 +15,7 @@ function normalizar(texto: string): string {
   return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 }
 
-// Iconos por área
+// Iconos por área (usados en el botón grande)
 function AreaIcon({ slug, className, style }: { slug: string; className?: string; style?: React.CSSProperties }) {
   if (slug === 'practicas-del-lenguaje') {
     return (
@@ -24,10 +24,94 @@ function AreaIcon({ slug, className, style }: { slug: string; className?: string
       </svg>
     )
   }
-  // Ciencias Naturales — microscopio/flask
   return (
     <svg className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3A2.25 2.25 0 0 1 21 17.25c0 1.243-1.007 2.25-2.25 2.25H5.25A2.25 2.25 0 0 1 3 17.25c0-.795.418-1.522 1.097-1.943L19.8 15.3z" />
+    </svg>
+  )
+}
+
+// Decoración SVG de fondo por área
+function AreaDecoration({ slug, color }: { slug: string; color: string }) {
+  if (slug === 'practicas-del-lenguaje') {
+    return (
+      <svg className="absolute inset-0 w-full h-full group-hover:scale-110 transition-transform duration-500" viewBox="0 0 400 220" fill="none" preserveAspectRatio="xMidYMid slice">
+        {/* Letras dispersas */}
+        <text x="30" y="55" fontSize="64" fontWeight="900" fill={color} opacity="0.1" transform="rotate(-12 30 55)">A</text>
+        <text x="320" y="45" fontSize="48" fontWeight="900" fill={color} opacity="0.08" transform="rotate(15 320 45)">B</text>
+        <text x="180" y="40" fontSize="36" fontWeight="700" fill={color} opacity="0.07" transform="rotate(-5 180 40)">C</text>
+        <text x="280" y="170" fontSize="52" fontWeight="900" fill={color} opacity="0.09" transform="rotate(8 280 170)">?</text>
+        <text x="70" y="180" fontSize="40" fontWeight="900" fill={color} opacity="0.07" transform="rotate(-10 70 180)">¡</text>
+        <text x="350" y="110" fontSize="28" fontWeight="700" fill={color} opacity="0.06" transform="rotate(20 350 110)">abc</text>
+        {/* Libro abierto */}
+        <g transform="translate(130, 90) rotate(-8)" opacity="0.1" stroke={color} strokeWidth="2" fill="none">
+          <path d="M0 40 Q25 30 50 40 L50 0 Q25 10 0 0 Z" />
+          <path d="M50 0 Q75 10 100 0 L100 40 Q75 30 50 40 Z" />
+          <line x1="15" y1="12" x2="40" y2="8" strokeWidth="1" />
+          <line x1="15" y1="20" x2="40" y2="16" strokeWidth="1" />
+          <line x1="15" y1="28" x2="35" y2="24" strokeWidth="1" />
+          <line x1="60" y1="8" x2="85" y2="12" strokeWidth="1" />
+          <line x1="60" y1="16" x2="85" y2="20" strokeWidth="1" />
+        </g>
+        {/* Lápiz */}
+        <g transform="translate(300, 60) rotate(35)" opacity="0.09" stroke={color} strokeWidth="1.5" fill="none">
+          <rect x="0" y="0" width="8" height="50" rx="1" />
+          <polygon points="0,50 8,50 4,62" fill={color} opacity="0.5" />
+        </g>
+        {/* Líneas de texto */}
+        <g opacity="0.06" stroke={color} strokeWidth="1.5">
+          <line x1="20" y1="120" x2="80" y2="118" />
+          <line x1="20" y1="128" x2="65" y2="126" />
+          <line x1="20" y1="136" x2="75" y2="134" />
+        </g>
+      </svg>
+    )
+  }
+  // Ciencias Naturales
+  return (
+    <svg className="absolute inset-0 w-full h-full group-hover:scale-110 transition-transform duration-500" viewBox="0 0 400 220" fill="none" preserveAspectRatio="xMidYMid slice">
+      {/* Átomo */}
+      <g transform="translate(60, 50)" opacity="0.1" stroke={color} strokeWidth="1.5">
+        <ellipse cx="0" cy="0" rx="45" ry="18" transform="rotate(0)" />
+        <ellipse cx="0" cy="0" rx="45" ry="18" transform="rotate(60)" />
+        <ellipse cx="0" cy="0" rx="45" ry="18" transform="rotate(-60)" />
+        <circle cx="0" cy="0" r="5" fill={color} opacity="0.3" />
+      </g>
+      {/* Matraz / tubo de ensayo */}
+      <g transform="translate(310, 40) rotate(10)" opacity="0.1" stroke={color} strokeWidth="2" fill="none">
+        <rect x="8" y="0" width="16" height="35" rx="2" />
+        <path d="M8 35 Q0 50 4 65 Q12 80 20 80 Q28 80 28 65 Q32 50 24 35" />
+        <path d="M4 65 Q16 55 28 65" strokeWidth="1" opacity="0.5" />
+        <circle cx="12" cy="58" r="2" fill={color} opacity="0.3" />
+        <circle cx="20" cy="62" r="1.5" fill={color} opacity="0.3" />
+      </g>
+      {/* Hoja */}
+      <g transform="translate(200, 30) rotate(15)" opacity="0.09">
+        <path d="M0 30 Q15 -5 40 0 Q45 15 30 35 Q15 50 0 30Z" fill={color} opacity="0.15" />
+        <path d="M0 30 Q20 15 35 5" stroke={color} strokeWidth="1" fill="none" opacity="0.3" />
+        <path d="M10 28 Q18 18 28 12" stroke={color} strokeWidth="0.8" fill="none" opacity="0.2" />
+      </g>
+      {/* Lupa */}
+      <g transform="translate(140, 140)" opacity="0.09" stroke={color} strokeWidth="2" fill="none">
+        <circle cx="18" cy="18" r="18" />
+        <line x1="30" y1="30" x2="48" y2="48" strokeWidth="3" strokeLinecap="round" />
+      </g>
+      {/* Molécula */}
+      <g transform="translate(280, 155)" opacity="0.08" stroke={color} strokeWidth="1.5">
+        <circle cx="0" cy="0" r="6" fill={color} opacity="0.2" />
+        <circle cx="25" cy="-15" r="4" fill={color} opacity="0.2" />
+        <circle cx="30" cy="15" r="5" fill={color} opacity="0.2" />
+        <line x1="5" y1="-3" x2="21" y2="-13" />
+        <line x1="5" y1="3" x2="26" y2="12" />
+      </g>
+      {/* ADN helix hints */}
+      <g transform="translate(370, 80)" opacity="0.06" stroke={color} strokeWidth="1.5">
+        <path d="M0 0 Q8 10 0 20 Q-8 30 0 40 Q8 50 0 60" />
+        <path d="M12 0 Q4 10 12 20 Q20 30 12 40 Q4 50 12 60" />
+        <line x1="2" y1="10" x2="10" y2="10" strokeWidth="1" />
+        <line x1="1" y1="30" x2="11" y2="30" strokeWidth="1" />
+        <line x1="2" y1="50" x2="10" y2="50" strokeWidth="1" />
+      </g>
     </svg>
   )
 }
@@ -165,49 +249,65 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
         {/* Contenido debajo del buscador (oculto cuando busca) */}
         {!buscando && (
           <>
-            {/* Botones de áreas */}
-            <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+            {/* Botones de áreas — cards visuales con ilustración de fondo */}
+            <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
               {AREAS.map((area) => {
                 const count = areaCounts[area.nombre] || 0
                 return (
                   <Link
                     key={area.slug}
                     href={`/area/${area.slug}`}
-                    className="group relative p-6 rounded-3xl bg-white border border-gray-100
-                               shadow-card hover:shadow-card-hover hover:-translate-y-2
-                               transition-all duration-300 ease-[var(--ease-smooth)]
-                               overflow-hidden"
+                    className="group relative h-52 rounded-3xl overflow-hidden cursor-pointer
+                               shadow-lg hover:shadow-2xl hover:-translate-y-3
+                               transition-all duration-300 ease-[var(--ease-spring)]"
+                    style={{ borderBottom: `4px solid ${area.color}` }}
                   >
-                    {/* Gradiente de fondo sutil */}
+                    {/* Fondo base con gradiente del área */}
                     <div
-                      className="absolute inset-0 opacity-[0.04] group-hover:opacity-[0.08] transition-opacity duration-300"
-                      style={{ background: `linear-gradient(135deg, ${area.color}, ${area.color}80)` }}
+                      className="absolute inset-0"
+                      style={{
+                        background: `linear-gradient(135deg, ${area.color}18 0%, ${area.color}08 40%, white 100%)`,
+                      }}
                     />
 
-                    <div className="relative flex items-center gap-4">
-                      <div
-                        className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0
-                                   shadow-sm group-hover:scale-110 transition-transform duration-300"
-                        style={{ backgroundColor: `${area.color}12` }}
-                      >
-                        <AreaIcon slug={area.slug} className="w-7 h-7" style={{ color: area.color } as React.CSSProperties} />
+                    {/* Decoración SVG ilustrativa */}
+                    <AreaDecoration slug={area.slug} color={area.color} />
+
+                    {/* Gradiente inferior para legibilidad del texto */}
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background: `linear-gradient(to top, ${area.color}f0 0%, ${area.color}cc 30%, ${area.color}40 60%, transparent 100%)`,
+                      }}
+                    />
+
+                    {/* Contenido */}
+                    <div className="relative h-full flex flex-col justify-end p-7">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center
+                                        group-hover:scale-110 transition-transform duration-300">
+                          <AreaIcon slug={area.slug} className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-white leading-tight drop-shadow-sm">
+                            {area.nombre}
+                          </h3>
+                          <p className="text-white/70 text-xs mt-0.5">{area.description}</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-[#1A3A5C] group-hover:text-[#1A3A5C] mb-0.5">
-                          {area.nombre}
-                        </h3>
-                        <p className="text-xs text-gray-400">{area.description}</p>
-                        <p className="text-xs font-semibold mt-1.5" style={{ color: area.color }}>
+
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
                           {count} {count === 1 ? 'recurso' : 'recursos'}
-                        </p>
+                        </span>
+                        <div className="flex items-center gap-1 text-white/60 group-hover:text-white group-hover:translate-x-1
+                                        transition-all duration-300">
+                          <span className="text-xs font-medium">Explorar</span>
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
                       </div>
-                      <svg
-                        className="w-5 h-5 text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1
-                                   transition-all duration-300 shrink-0"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
                     </div>
                   </Link>
                 )
