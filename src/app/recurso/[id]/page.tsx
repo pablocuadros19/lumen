@@ -178,6 +178,22 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
                   title={recurso.titulo}
                 />
               </div>
+            ) : recurso.archivo_url && recurso.formato === 'Documento' ? (
+              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                <iframe
+                  src={`https://docs.google.com/gview?url=${encodeURIComponent(recurso.archivo_url)}&embedded=true`}
+                  className="w-full h-[600px]"
+                  title={recurso.titulo}
+                />
+              </div>
+            ) : recurso.archivo_url && recurso.formato === 'Presentación slides' ? (
+              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                <iframe
+                  src={`https://docs.google.com/gview?url=${encodeURIComponent(recurso.archivo_url)}&embedded=true`}
+                  className="w-full h-[600px]"
+                  title={recurso.titulo}
+                />
+              </div>
             ) : recurso.thumbnail_url && recurso.formato === 'Link externo' ? (
               <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
                 <img
