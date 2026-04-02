@@ -23,12 +23,7 @@ Analizá el contenido y devolvé un JSON con estas claves:
 
 - "titulo": título claro, descriptivo y profesional (máx 80 caracteres). Debe reflejar el contenido real y el tema específico, no ser genérico.
 
-- "resumen": descripción detallada de 3-4 oraciones que responda:
-  * ¿Qué contiene concretamente? (ejercicios, explicaciones, consignas, preguntas, etc.)
-  * ¿Para qué sirve y en qué momento de la secuencia didáctica se usaría?
-  * ¿Qué habilidades o contenidos específicos trabaja?
-  * ¿Qué tipo de actividades propone? (completar, unir, escribir, leer, clasificar, etc.)
-  El resumen debe ser útil para que una docente decida si le sirve SIN abrir el archivo.
+- "resumen": 1-2 oraciones breves. Qué contiene y para qué sirve. Máximo 150 caracteres. Sé conciso y directo.
 
 - "ejes_tematicos": array con uno o más de estos valores EXACTOS: ${JSON.stringify(EJES_VALIDOS)}
 
