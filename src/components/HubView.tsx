@@ -254,62 +254,65 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
               {AREAS.map((area) => {
                 const count = areaCounts[area.nombre] || 0
                 return (
-                  <Link
+                  <div
                     key={area.slug}
-                    href={`/area/${area.slug}`}
-                    className="group relative h-52 rounded-3xl overflow-hidden isolate cursor-pointer
-                               shadow-lg hover:shadow-2xl hover:-translate-y-3
-                               transition-all duration-300 ease-[var(--ease-spring)]"
+                    className="group rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl
+                               hover:-translate-y-3 transition-all duration-300 ease-[var(--ease-spring)]"
                     style={{ borderBottom: `4px solid ${area.color}` }}
                   >
-                    {/* Fondo base con gradiente del área */}
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        background: `linear-gradient(135deg, ${area.color}18 0%, ${area.color}08 40%, white 100%)`,
-                      }}
-                    />
+                    <Link
+                      href={`/area/${area.slug}`}
+                      className="relative block h-52 cursor-pointer"
+                    >
+                      {/* Fondo base con gradiente del área */}
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: `linear-gradient(135deg, ${area.color}18 0%, ${area.color}08 40%, white 100%)`,
+                        }}
+                      />
 
-                    {/* Decoración SVG ilustrativa */}
-                    <AreaDecoration slug={area.slug} color={area.color} />
+                      {/* Decoración SVG ilustrativa */}
+                      <AreaDecoration slug={area.slug} color={area.color} />
 
-                    {/* Gradiente inferior para legibilidad del texto */}
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        background: `linear-gradient(to top, ${area.color}f0 0%, ${area.color}cc 30%, ${area.color}40 60%, transparent 100%)`,
-                      }}
-                    />
+                      {/* Gradiente inferior para legibilidad del texto */}
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: `linear-gradient(to top, ${area.color}f0 0%, ${area.color}cc 30%, ${area.color}40 60%, transparent 100%)`,
+                        }}
+                      />
 
-                    {/* Contenido */}
-                    <div className="relative h-full flex flex-col justify-end p-7">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center
-                                        group-hover:scale-110 transition-transform duration-300">
-                          <AreaIcon slug={area.slug} className="w-6 h-6 text-white" />
+                      {/* Contenido */}
+                      <div className="relative h-full flex flex-col justify-end p-7">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center
+                                          group-hover:scale-110 transition-transform duration-300">
+                            <AreaIcon slug={area.slug} className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold text-white leading-tight drop-shadow-sm">
+                              {area.nombre}
+                            </h3>
+                            <p className="text-white/70 text-xs mt-0.5">{area.description}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-white leading-tight drop-shadow-sm">
-                            {area.nombre}
-                          </h3>
-                          <p className="text-white/70 text-xs mt-0.5">{area.description}</p>
+
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                            {count} {count === 1 ? 'recurso' : 'recursos'}
+                          </span>
+                          <div className="flex items-center gap-1 text-white/60 group-hover:text-white group-hover:translate-x-1
+                                          transition-all duration-300">
+                            <span className="text-xs font-medium">Explorar</span>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
                         </div>
                       </div>
-
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
-                          {count} {count === 1 ? 'recurso' : 'recursos'}
-                        </span>
-                        <div className="flex items-center gap-1 text-white/60 group-hover:text-white group-hover:translate-x-1
-                                        transition-all duration-300">
-                          <span className="text-xs font-medium">Explorar</span>
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 )
               })}
             </div>
