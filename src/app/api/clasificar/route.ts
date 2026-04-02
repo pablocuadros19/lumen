@@ -37,8 +37,7 @@ REGLAS:
 - Elegí SOLO valores de las listas dadas
 - Basá tu análisis en el CONTENIDO REAL, no inventes
 - Si el contenido es escaso, describí lo que ves sin rellenar
-IMÁGENES: Si el recurso es una imagen (foto, lámina, captura de pantalla, escaneo), describí lo que ves visualmente: tipo de actividad representada, tema, elementos visuales (ilustraciones, texto impreso, ejercicios, tablas, etc.), texto legible, nivel estimado. NUNCA digas que no podés clasificar una imagen. SIEMPRE generá el JSON con tu mejor interpretación visual.
-
+- Si es una imagen o PDF visual, describí lo que ves y clasificalo. NUNCA digas que no podés clasificar.
 - Respondé SOLO con el JSON, sin explicaciones ni markdown`
 
 export async function POST(request: NextRequest) {
@@ -48,29 +47,32 @@ export async function POST(request: NextRequest) {
     const nombreArchivo = formData.get('nombre') as string || ''
 
     let textoExtraido = ''
-    let esImagen = false
 
     if (archivo) {
       const buffer = Buffer.from(await archivo.arrayBuffer())
-      esImagen = archivo.type.startsWith('image/')
+      const base64 = buffer.toString('base64')
+      const esImagen = archivo.type.startsWith('image/')
+      const esPDF = archivo.name.toLowerCase().endsWith('.pdf')
 
-      if (archivo.name.toLowerCase().endsWith('.pdf')) {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
-          const data = await pdfParse(buffer)
-          textoExtraido = data.text.slice(0, 6000)
-        } catch {
-          textoExtraido = `[No se pudo extraer texto del PDF: ${archivo.name}]`
-        }
-      } else if (archivo.type.startsWith('text/')) {
-        textoExtraido = new TextDecoder().decode(buffer).slice(0, 6000)
-      }
-
-      // Si es imagen, usar visión de Haiku
-      if (esImagen) {
-        const base64 = buffer.toString('base64')
-        const mediaType = archivo.type as 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp'
+      // Imágenes y PDFs: enviar directo a Haiku como contenido visual
+      if (esImagen || esPDF) {
+        const contentBlock = esImagen
+          ? {
+              type: 'image' as const,
+              source: {
+                type: 'base64' as const,
+                media_type: archivo.type as 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp',
+                data: base64,
+              },
+            }
+          : {
+              type: 'document' as const,
+              source: {
+                type: 'base64' as const,
+                media_type: 'application/pdf' as const,
+                data: base64,
+              },
+            }
 
         const message = await anthropic.messages.create({
           model: 'claude-haiku-4-5-20251001',
@@ -79,17 +81,10 @@ export async function POST(request: NextRequest) {
             {
               role: 'user',
               content: [
-                {
-                  type: 'image',
-                  source: {
-                    type: 'base64',
-                    media_type: mediaType,
-                    data: base64,
-                  },
-                },
+                contentBlock,
                 {
                   type: 'text',
-                  text: `Este recurso es una IMAGEN subida por una docente. Describí visualmente lo que ves y clasificalo según las instrucciones. NUNCA respondas que no podés analizar la imagen.\n\n${PROMPT_SISTEMA}`,
+                  text: `Clasificá este recurso pedagógico. Describí lo que ves.\n\n${PROMPT_SISTEMA}`,
                 },
               ],
             },
@@ -99,9 +94,14 @@ export async function POST(request: NextRequest) {
         const respuestaTexto = message.content[0].type === 'text' ? message.content[0].text : ''
         return responderConClasificacion(respuestaTexto, nombreArchivo, '')
       }
+
+      // Archivos de texto plano
+      if (archivo.type.startsWith('text/')) {
+        textoExtraido = new TextDecoder().decode(buffer).slice(0, 6000)
+      }
     }
 
-    // Para archivos de texto/PDF: usar el texto extraído
+    // Para archivos de texto: usar el texto extraído
     const contexto = textoExtraido.length > 50
       ? textoExtraido
       : `Nombre del archivo: ${nombreArchivo}`

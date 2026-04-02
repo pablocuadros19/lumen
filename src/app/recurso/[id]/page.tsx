@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { MOCK_RECURSOS } from '@/lib/mock-data'
+import BorrarRecursoButton from '@/components/BorrarRecursoButton'
 import type { Recurso } from '@/types/database'
 
 // Colores por eje temático
@@ -78,6 +79,10 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
       </div>
     )
   }
+
+  // Obtener usuario actual para mostrar botón borrar
+  const { data: { user } } = await supabase.auth.getUser()
+  const esAutor = user && recurso.subido_por === user.id
 
   const ejeColor = EJE_COLORS[recurso.eje_tematico] || '#1A3A5C'
 
@@ -290,6 +295,12 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
                 {recurso.estado.charAt(0).toUpperCase() + recurso.estado.slice(1)}
               </span>
             </div>
+
+            {esAutor && (
+              <div className="rounded-3xl border border-gray-100 bg-white shadow-card p-4">
+                <BorrarRecursoButton recursoId={recurso.id} />
+              </div>
+            )}
           </div>
         </div>
       </div>
