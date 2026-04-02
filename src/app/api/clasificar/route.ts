@@ -42,6 +42,8 @@ REGLAS:
 - Elegí SOLO valores de las listas dadas
 - Basá tu análisis en el CONTENIDO REAL, no inventes
 - Si el contenido es escaso, describí lo que ves sin rellenar
+IMÁGENES: Si el recurso es una imagen (foto, lámina, captura de pantalla, escaneo), describí lo que ves visualmente: tipo de actividad representada, tema, elementos visuales (ilustraciones, texto impreso, ejercicios, tablas, etc.), texto legible, nivel estimado. NUNCA digas que no podés clasificar una imagen. SIEMPRE generá el JSON con tu mejor interpretación visual.
+
 - Respondé SOLO con el JSON, sin explicaciones ni markdown`
 
 export async function POST(request: NextRequest) {
@@ -92,7 +94,7 @@ export async function POST(request: NextRequest) {
                 },
                 {
                   type: 'text',
-                  text: PROMPT_SISTEMA,
+                  text: `Este recurso es una IMAGEN subida por una docente. Describí visualmente lo que ves y clasificalo según las instrucciones. NUNCA respondas que no podés analizar la imagen.\n\n${PROMPT_SISTEMA}`,
                 },
               ],
             },

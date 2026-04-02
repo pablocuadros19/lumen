@@ -72,19 +72,28 @@ export default function BibliotecaView({ recursos }: Props) {
 
   const hayFiltros = gradosActivos.length > 0 || ejesActivos.length > 0 || tiposActivos.length > 0 || soloEditable !== null
 
+  // Colores para chips de filtro activo
+  const chipColors: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+    grado: { bg: '#1A3A5C/8', text: '#1A3A5C', border: '#1A3A5C/15', dot: '#1A3A5C' },
+    eje: { bg: '#8B2252/8', text: '#8B2252', border: '#8B2252/15', dot: '#8B2252' },
+    tipo: { bg: '#2E6EA6/8', text: '#2E6EA6', border: '#2E6EA6/15', dot: '#2E6EA6' },
+  }
+
   return (
     <div className="min-h-screen bg-lumen-bg flex flex-col">
       {/* Header */}
-      <header className="bg-gradient-to-r from-white via-white to-[#1A3A5C]/3
-                         border-b border-gray-200/60 shadow-sm px-5 py-3 flex items-center gap-5">
+      <header className="bg-white border-b border-gray-200/60 shadow-sm px-5 py-4 flex items-center gap-5 relative">
+        {/* Gradient line inferior */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#1A3A5C] via-[#2E6EA6] to-[#8B2252] opacity-20" />
+
         <div className="flex items-center gap-3 shrink-0">
           <Image src="/logo.png" alt="LUMEN" width={40} height={40} className="rounded" />
-          <span className="text-xl font-bold tracking-tight text-[#1A3A5C]">LUMEN</span>
+          <span className="text-xl font-bold tracking-tight text-gradient-lumen">LUMEN</span>
         </div>
 
         <div className="flex-1 max-w-xl">
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B2252]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B2252]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -92,16 +101,18 @@ export default function BibliotecaView({ recursos }: Props) {
               placeholder="Buscar recursos..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg text-sm bg-white text-[#1a1a2e]
+              className="w-full pl-10 pr-4 py-3 rounded-xl text-sm bg-[#f8f9fc] text-[#1a1a2e]
                          border border-gray-200 placeholder-gray-400
-                         focus:outline-none focus:border-[#1A3A5C] focus:ring-1 focus:ring-[#1A3A5C]/20"
+                         focus:outline-none focus:border-[#1A3A5C] focus:bg-white
+                         focus:shadow-[var(--shadow-input-focus)]
+                         transition-all duration-200"
             />
           </div>
         </div>
 
         <Link
           href="/subir"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl
+          className="flex items-center gap-2.5 px-5 py-3 rounded-2xl
                      bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white
                      text-sm font-semibold shadow-button
                      hover:shadow-lg hover:shadow-[#8B2252]/30 hover:-translate-y-0.5
@@ -117,58 +128,66 @@ export default function BibliotecaView({ recursos }: Props) {
       </header>
 
       {/* Barra de filtros activos */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-100/60 px-5 py-2 flex items-center gap-2 flex-wrap min-h-[44px]">
+      <div className="bg-white/90 backdrop-blur-sm border-b border-gray-100/60 px-5 py-2.5 flex items-center gap-2 flex-wrap min-h-[48px]">
         {gradosActivos.map((g) => (
           <span
             key={g}
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium
-                       bg-[#1A3A5C]/5 text-[#1A3A5C] border border-[#1A3A5C]/15 cursor-pointer
-                       hover:bg-[#1A3A5C]/10 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium
+                       bg-[#1A3A5C]/6 text-[#1A3A5C] border border-[#1A3A5C]/12 cursor-pointer
+                       hover:bg-[#1A3A5C]/12 transition-all duration-200"
             onClick={() => setGradosActivos(toggleInArray(gradosActivos, g))}
           >
-            {g} <span className="opacity-40 ml-0.5">✕</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1A3A5C]" />
+            {g}
+            <svg className="w-3 h-3 opacity-40 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </span>
         ))}
         {ejesActivos.map((e) => (
           <span
             key={e}
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium
-                       bg-[#8B2252]/5 text-[#8B2252] border border-[#8B2252]/15 cursor-pointer
-                       hover:bg-[#8B2252]/10 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium
+                       bg-[#8B2252]/6 text-[#8B2252] border border-[#8B2252]/12 cursor-pointer
+                       hover:bg-[#8B2252]/12 transition-all duration-200"
             onClick={() => setEjesActivos(toggleInArray(ejesActivos, e))}
           >
-            {e} <span className="opacity-40 ml-0.5">✕</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8B2252]" />
+            {e}
+            <svg className="w-3 h-3 opacity-40 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </span>
         ))}
         {tiposActivos.map((t) => (
           <span
             key={t}
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium
-                       bg-[#2E6EA6]/5 text-[#2E6EA6] border border-[#2E6EA6]/15 cursor-pointer
-                       hover:bg-[#2E6EA6]/10 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium
+                       bg-[#2E6EA6]/6 text-[#2E6EA6] border border-[#2E6EA6]/12 cursor-pointer
+                       hover:bg-[#2E6EA6]/12 transition-all duration-200"
             onClick={() => setTiposActivos(toggleInArray(tiposActivos, t))}
           >
-            {t} <span className="opacity-40 ml-0.5">✕</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2E6EA6]" />
+            {t}
+            <svg className="w-3 h-3 opacity-40 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </span>
         ))}
         {soloEditable !== null && (
           <span
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium
-                       bg-[#1A3A5C]/5 text-[#1A3A5C] border border-[#1A3A5C]/15 cursor-pointer
-                       hover:bg-[#1A3A5C]/10 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium
+                       bg-[#1A3A5C]/6 text-[#1A3A5C] border border-[#1A3A5C]/12 cursor-pointer
+                       hover:bg-[#1A3A5C]/12 transition-all duration-200"
             onClick={() => setSoloEditable(null)}
           >
-            {soloEditable ? 'Editable' : 'No editable'} <span className="opacity-40 ml-0.5">✕</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1A3A5C]" />
+            {soloEditable ? 'Editable' : 'No editable'}
+            <svg className="w-3 h-3 opacity-40 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </span>
         )}
 
         <div className="ml-auto flex items-center gap-4 text-sm text-gray-400">
-          <span className="font-medium text-[#1A3A5C]">{resultados.length}</span>
+          <span className="font-bold text-[#1A3A5C]">{resultados.length}</span>
           <span>recurso{resultados.length !== 1 ? 's' : ''}</span>
           <select
             value={ordenar}
             onChange={(e) => setOrdenar(e.target.value as 'recientes' | 'descargas')}
-            className="text-sm text-gray-500 bg-transparent border-none focus:outline-none cursor-pointer"
+            className="text-sm font-medium text-[#1A3A5C] bg-transparent border-none focus:outline-none cursor-pointer"
           >
             <option value="recientes">Más recientes</option>
             <option value="descargas">Más descargados</option>
@@ -179,7 +198,7 @@ export default function BibliotecaView({ recursos }: Props) {
       {/* Contenido */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar con collapse */}
-        <div className={`relative transition-all duration-300 ease-in-out
+        <div className={`relative transition-all duration-300 ease-[var(--ease-smooth)]
                         ${sidebarAbierta ? 'w-56' : 'w-0'} shrink-0`}>
           <div className={`absolute inset-0 overflow-hidden
                           ${sidebarAbierta ? 'opacity-100' : 'opacity-0 pointer-events-none'}
@@ -202,7 +221,7 @@ export default function BibliotecaView({ recursos }: Props) {
                        bg-white shadow-card border border-gray-200
                        flex items-center justify-center
                        hover:shadow-card-hover hover:border-[#8B2252]/30
-                       transition-all duration-200
+                       transition-all duration-200 cursor-pointer
                        ${sidebarAbierta ? '-right-3.5' : '-right-3.5 left-1'}`}
             title={sidebarAbierta ? 'Ocultar filtros' : 'Mostrar filtros'}
           >
@@ -218,36 +237,43 @@ export default function BibliotecaView({ recursos }: Props) {
 
         <main className="flex-1 p-5 overflow-y-auto bg-lumen-bg bg-grid-pattern">
           {resultados.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {resultados.map((r) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {resultados.map((r, i) => (
                 <RecursoCard
                   key={r.id}
                   recurso={r}
+                  index={i}
                   onClick={() => router.push(`/recurso/${r.id}`)}
                 />
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center py-20">
-              <span className="text-5xl mb-4">🔍</span>
-              <h3 className="text-lg font-bold text-[#1A3A5C] mb-2">
-                No hay recursos con esos filtros
-              </h3>
-              <p className="text-gray-400 text-sm max-w-md mb-6">
-                Probá ampliar la búsqueda o quitar algún filtro.
-                {hayFiltros && ' Hacé click en los chips de arriba para quitarlos.'}
-              </p>
-              <button className="px-5 py-2.5 rounded-lg bg-[#8B2252] text-white
-                               text-sm font-medium hover:bg-[#7a1e48] transition-colors">
-                📩 Pedí material a la coordinadora
-              </button>
+              <div className="bg-gradient-to-br from-[#1A3A5C]/5 via-transparent to-[#8B2252]/5 rounded-3xl p-16 max-w-lg">
+                <svg className="w-16 h-16 mx-auto text-[#1A3A5C]/20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <h3 className="text-lg font-bold text-[#1A3A5C] mb-2">
+                  No hay recursos con esos filtros
+                </h3>
+                <p className="text-gray-400 text-sm max-w-md mb-6">
+                  Probá ampliar la búsqueda o quitar algún filtro.
+                  {hayFiltros && ' Hacé click en los chips de arriba para quitarlos.'}
+                </p>
+                <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white
+                                 text-sm font-medium shadow-button hover:shadow-lg hover:-translate-y-0.5
+                                 transition-all duration-200">
+                  Pedí material a la coordinadora
+                </button>
+              </div>
             </div>
           )}
 
           {resultados.length > 0 && (
-            <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#1A3A5C]/5 to-[#8B2252]/5
-                            border border-[#1A3A5C]/10 shadow-sm text-sm text-[#1A3A5C]">
-              💡 Seleccioná un recurso para usar el Copiloto Pedagógico: adaptar a otro grado, crear evaluación, simplificar consignas...
+            <div className="mt-6 p-5 rounded-2xl bg-gradient-to-r from-[#1A3A5C]/5 to-[#8B2252]/5
+                            border-l-4 border-l-[#8B2252] border border-[#1A3A5C]/8
+                            shadow-sm text-sm text-[#1A3A5C]">
+              <span className="font-semibold">Copiloto Pedagógico:</span> Seleccioná un recurso para adaptar a otro grado, crear evaluación, simplificar consignas...
             </div>
           )}
         </main>

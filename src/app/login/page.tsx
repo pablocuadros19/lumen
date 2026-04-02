@@ -15,15 +15,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-[#f8f9fc] to-[#1A3A5C]/8
-                    flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f8f9fc] to-[#1A3A5C]/10
+                    flex items-center justify-center relative overflow-hidden bg-grid-pattern">
       {/* Decoraciones de fondo */}
-      <div className="absolute top-20 -left-20 w-72 h-72 rounded-full bg-[#8B2252]/5 blur-3xl" />
-      <div className="absolute -bottom-20 -right-20 w-96 h-96 rounded-full bg-[#1A3A5C]/5 blur-3xl" />
+      <div className="absolute top-10 -left-32 w-96 h-96 rounded-full bg-[#8B2252]/6 blur-3xl" />
+      <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#1A3A5C]/6 blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#2E6EA6]/3 blur-3xl" />
 
-      <div className="glass rounded-3xl shadow-elevated border border-white/60
-                      text-center max-w-md mx-auto px-10 py-12 relative z-10">
-        {/* Logo grande */}
+      <div className="glass rounded-[32px] shadow-elevated border border-white/60
+                      text-center max-w-md mx-auto px-12 py-14 relative z-10">
+        {/* Logo */}
         <div className="mb-6">
           <Image
             src="/logo.png"
@@ -35,19 +36,19 @@ export default function LoginPage() {
           />
         </div>
 
-        <p className="text-[#2E6EA6] text-lg font-medium mb-8">
+        <p className="text-xl font-medium mb-8 text-gradient-lumen">
           Biblioteca Pedagógica Inteligente
         </p>
 
         {/* Línea decorativa */}
-        <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-[#8B2252] to-transparent
+        <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-[#8B2252] to-transparent
                         mx-auto mb-8 rounded-full" />
 
         {/* Botón Google */}
         <button
           onClick={handleLogin}
-          className="flex items-center justify-center gap-3 w-full px-6 py-3.5
-                     bg-white border border-gray-200 rounded-xl
+          className="flex items-center justify-center gap-3 w-full px-6 py-4
+                     bg-white border border-gray-200 rounded-2xl
                      text-[#1A3A5C] font-semibold text-base
                      shadow-card hover:shadow-card-hover hover:-translate-y-0.5
                      active:scale-[0.98] transition-all duration-200 cursor-pointer"
@@ -61,7 +62,7 @@ export default function LoginPage() {
           Iniciar sesión con Google
         </button>
 
-        <p className="text-sm text-gray-400 mt-6">
+        <p className="text-sm text-gray-500 mt-6">
           Usá tu cuenta de Google personal o institucional
         </p>
       </div>

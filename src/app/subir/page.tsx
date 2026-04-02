@@ -23,7 +23,7 @@ export default function SubirPage() {
   const [arrastrando, setArrastrando] = useState(false)
   const [subiendo, setSubiendo] = useState(false)
   const [clasificando, setClasificando] = useState(false)
-  const [paso, setPaso] = useState<1 | 2>(1) // 1: subir archivo, 2: clasificar
+  const [paso, setPaso] = useState<1 | 2>(1)
   const [sugerenciasIA, setSugerenciasIA] = useState(false)
   const [textoExtraido, setTextoExtraido] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
@@ -40,29 +40,14 @@ export default function SubirPage() {
     link_editable: '',
   })
 
-  // Detectar formato por extensión
-  const detectarFormato = (nombre: string) => {
-    const ext = nombre.split('.').pop()?.toLowerCase()
-    if (['pdf', 'doc', 'docx', 'txt'].includes(ext || '')) return 'Documento'
-    if (['pptx', 'ppt'].includes(ext || '')) return 'Presentación slides'
-    if (['mp4', 'mov', 'avi'].includes(ext || '')) return 'Video'
-    if (['png', 'jpg', 'jpeg', 'svg', 'gif'].includes(ext || '')) return 'Imagen / Lámina'
-    if (['mp3', 'wav', 'ogg'].includes(ext || '')) return 'Audio'
-    return 'Documento'
-  }
-
-  // Detectar si NO es editable (solo escaneos o fotos)
   const detectarEditable = (nombre: string) => {
     const ext = nombre.split('.').pop()?.toLowerCase()
-    // Solo marcar como no editable si es un escaneo evidente
     if (['jpg', 'jpeg', 'gif', 'bmp', 'tiff'].includes(ext || '')) return false
-    return true // Por defecto editable
+    return true
   }
 
-  // Clasificación con IA (Claude Haiku)
   const clasificarConIA = async (file: File) => {
     setClasificando(true)
-
     const esEditable = detectarEditable(file.name)
 
     try {
@@ -82,7 +67,7 @@ export default function SubirPage() {
         setForm({
           titulo: data.titulo || file.name.replace(/\.[^.]+$/, ''),
           resumen: data.resumen || '',
-          grados: [], // La docente elige siempre
+          grados: [],
           ejes_tematicos: data.ejes_tematicos || [],
           tipo_recurso: data.tipo_recurso || 'Actividad',
           editable: esEditable,
@@ -90,7 +75,6 @@ export default function SubirPage() {
           link_editable: '',
         })
       } else {
-        // Fallback: título del nombre de archivo
         setForm(prev => ({
           ...prev,
           titulo: file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
@@ -98,7 +82,6 @@ export default function SubirPage() {
         }))
       }
     } catch {
-      // Fallback silencioso
       setForm(prev => ({
         ...prev,
         titulo: file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '),
@@ -181,22 +164,25 @@ export default function SubirPage() {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   }
 
+  const inputClasses = "w-full px-4 py-3 rounded-xl border border-gray-200 text-sm bg-white shadow-sm focus:outline-none focus:border-[#1A3A5C] focus:shadow-[var(--shadow-input-focus)] transition-all duration-200"
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-lumen-bg flex flex-col">
+    <div className="min-h-screen bg-lumen-bg bg-grid-pattern flex flex-col">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/60 shadow-sm px-5 py-3 flex items-center gap-3">
+      <header className="bg-white border-b border-gray-200/60 shadow-sm px-5 py-4 flex items-center gap-3 relative">
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#1A3A5C] via-[#2E6EA6] to-[#8B2252] opacity-20" />
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image src="/logo.png" alt="LUMEN" width={36} height={36} className="rounded" />
-          <span className="text-xl font-bold tracking-tight text-[#1A3A5C]">LUMEN</span>
+          <span className="text-xl font-bold tracking-tight text-gradient-lumen">LUMEN</span>
         </Link>
         <div className="flex-1" />
-        <span className="text-sm text-gray-400">Cargar recurso</span>
+        <span className="text-sm text-gray-400 font-medium">Cargar recurso</span>
       </header>
 
       <div className="flex-1 max-w-2xl mx-auto w-full px-5 py-8">
         {/* Paso 1: Subir archivo */}
         {paso === 1 && (
-          <div>
+          <div className="animate-card-in">
             <h1 className="text-2xl font-bold text-[#1A3A5C] mb-2">Subir recurso</h1>
             <p className="text-gray-500 text-sm mb-8">
               Subí un archivo o pegá un link. La IA va a sugerir la clasificación.
@@ -208,12 +194,13 @@ export default function SubirPage() {
               onDragLeave={() => setArrastrando(false)}
               onDrop={handleDrop}
               onClick={() => inputRef.current?.click()}
-              className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer
-                transition-all duration-300
+              className={`border-2 border-dashed rounded-3xl p-14 text-center cursor-pointer
+                transition-all duration-300 ease-[var(--ease-smooth)]
                 ${arrastrando
-                  ? 'border-[#8B2252] bg-gradient-to-br from-[#8B2252]/5 to-[#8B2252]/10 shadow-card scale-[1.01]'
-                  : 'border-gray-300 hover:border-[#1A3A5C] hover:bg-gray-50 hover:shadow-card'
+                  ? 'border-[#8B2252] bg-gradient-to-br from-[#8B2252]/5 to-[#8B2252]/10 shadow-card-hover scale-[1.01]'
+                  : 'border-gray-200 bg-white/50 hover:border-[#1A3A5C]/40 hover:bg-white hover:shadow-card'
                 }`}
+              style={arrastrando ? { animation: 'pulseGlow 2s ease-in-out infinite' } : {}}
             >
               <input
                 ref={inputRef}
@@ -222,9 +209,9 @@ export default function SubirPage() {
                 accept=".pdf,.doc,.docx,.pptx,.ppt,.png,.jpg,.jpeg,.svg,.mp4,.mp3,.txt"
                 onChange={handleInputChange}
               />
-              <div className="text-4xl mb-4">
-                {arrastrando ? '📥' : '📄'}
-              </div>
+              <svg className={`w-12 h-12 mx-auto mb-4 transition-colors duration-300 ${arrastrando ? 'text-[#8B2252]' : 'text-[#1A3A5C]/25'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
               <p className="text-[#1A3A5C] font-semibold mb-1">
                 {arrastrando ? 'Soltá el archivo acá' : 'Arrastrá un archivo o hacé click'}
               </p>
@@ -238,9 +225,9 @@ export default function SubirPage() {
 
             {/* Separador */}
             <div className="flex items-center gap-4 my-6">
-              <div className="flex-1 h-px bg-gray-200" />
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
               <span className="text-sm text-gray-400">o pegá un link</span>
-              <div className="flex-1 h-px bg-gray-200" />
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
             </div>
 
             {/* Link directo */}
@@ -250,8 +237,7 @@ export default function SubirPage() {
                 placeholder="https://www.canva.com/design/... o link de Google Docs"
                 value={form.link_editable}
                 onChange={(e) => setForm(prev => ({ ...prev, link_editable: e.target.value }))}
-                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 text-sm
-                           focus:outline-none focus:border-[#1A3A5C] focus:ring-1 focus:ring-[#1A3A5C]/20"
+                className={inputClasses}
               />
               <button
                 onClick={() => {
@@ -262,8 +248,9 @@ export default function SubirPage() {
                   }
                 }}
                 disabled={!form.link_editable.trim()}
-                className="px-6 py-3 rounded-lg bg-[#1A3A5C] text-white text-sm font-medium
-                           hover:bg-[#15304d] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-6 py-3 rounded-xl bg-[#1A3A5C] text-white text-sm font-medium
+                           hover:bg-[#15304d] shadow-sm transition-all duration-200
+                           disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Continuar
               </button>
@@ -273,10 +260,10 @@ export default function SubirPage() {
 
         {/* Paso 2: Clasificar */}
         {paso === 2 && (
-          <div>
+          <div className="animate-card-in">
             <button
               onClick={() => { setPaso(1); setArchivo(null); setSugerenciasIA(false) }}
-              className="flex items-center gap-1 text-sm text-gray-400 hover:text-[#1A3A5C] mb-4 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#1A3A5C] mb-4 transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -287,17 +274,17 @@ export default function SubirPage() {
             <h1 className="text-2xl font-bold text-[#1A3A5C] mb-1">Clasificar recurso</h1>
 
             {clasificando && (
-              <div className="flex items-center gap-3 mb-6 px-4 py-3 rounded-lg bg-[#1A3A5C]/5 border border-[#1A3A5C]/15">
-                <div className="w-4 h-4 border-2 border-[#8B2252] border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-[#1A3A5C]">
+              <div className="flex items-center gap-3 mb-6 px-4 py-3.5 rounded-xl bg-gradient-to-r from-[#1A3A5C]/5 to-[#8B2252]/5 border border-[#1A3A5C]/10">
+                <div className="w-5 h-5 border-2 border-[#8B2252] border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm text-[#1A3A5C] font-medium">
                   La IA está analizando el recurso...
                 </span>
               </div>
             )}
 
             {sugerenciasIA && !clasificando && (
-              <div className="flex items-center gap-2 mb-6 px-3 py-2 rounded-lg bg-[#8B2252]/5 border border-[#8B2252]/15">
-                <span className="text-sm">✨</span>
+              <div className="flex items-center gap-2.5 mb-6 px-4 py-3 rounded-xl bg-[#8B2252]/5 border border-[#8B2252]/12">
+                <svg className="w-4 h-4 text-[#8B2252]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
                 <span className="text-sm text-[#8B2252]">
                   La IA sugirió la clasificación. Revisá y ajustá lo que necesites.
                 </span>
@@ -310,9 +297,9 @@ export default function SubirPage() {
 
             {/* Archivo cargado */}
             {archivo && (
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200 mb-6">
-                <div className="w-10 h-10 rounded-lg bg-[#1A3A5C]/10 flex items-center justify-center text-lg">
-                  📄
+              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-gray-200 shadow-sm mb-6">
+                <div className="w-10 h-10 rounded-xl bg-[#1A3A5C]/8 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-[#1A3A5C]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#1A3A5C] truncate">{archivo.name}</p>
@@ -320,9 +307,9 @@ export default function SubirPage() {
                 </div>
                 <button
                   onClick={() => { setArchivo(null); setPaso(1) }}
-                  className="text-gray-300 hover:text-gray-500 text-lg"
+                  className="text-gray-300 hover:text-gray-500 transition-colors cursor-pointer"
                 >
-                  ✕
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
             )}
@@ -339,8 +326,7 @@ export default function SubirPage() {
                   value={form.titulo}
                   onChange={(e) => setForm(prev => ({ ...prev, titulo: e.target.value }))}
                   placeholder="Ej: Signos de puntuación — ejercicios"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm
-                             focus:outline-none focus:border-[#1A3A5C] focus:ring-1 focus:ring-[#1A3A5C]/20"
+                  className={inputClasses}
                 />
               </div>
 
@@ -352,10 +338,9 @@ export default function SubirPage() {
                 <textarea
                   value={form.resumen}
                   onChange={(e) => setForm(prev => ({ ...prev, resumen: e.target.value }))}
-                  placeholder="Breve descripción del recurso (la IA puede completar esto automáticamente después)"
+                  placeholder="Breve descripción del recurso"
                   rows={3}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm resize-none
-                             focus:outline-none focus:border-[#1A3A5C] focus:ring-1 focus:ring-[#1A3A5C]/20"
+                  className={`${inputClasses} resize-none`}
                 />
               </div>
 
@@ -370,10 +355,11 @@ export default function SubirPage() {
                     <button
                       key={g}
                       onClick={() => toggleGrado(g)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer
+                        hover:scale-105
                         ${form.grados.includes(g)
-                          ? 'bg-[#1A3A5C] text-white shadow-sm shadow-[#1A3A5C]/30'
-                          : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#1A3A5C]'
+                          ? 'bg-[#1A3A5C] text-white shadow-md shadow-[#1A3A5C]/25'
+                          : 'bg-white text-gray-600 border border-gray-200 hover:border-[#1A3A5C] shadow-sm'
                         }`}
                     >
                       {g}
@@ -398,10 +384,11 @@ export default function SubirPage() {
                           ? prev.ejes_tematicos.filter(x => x !== e)
                           : [...prev.ejes_tematicos, e],
                       }))}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all
+                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer
+                        hover:scale-105
                         ${form.ejes_tematicos.includes(e)
-                          ? 'bg-[#8B2252] text-white shadow-sm shadow-[#8B2252]/30'
-                          : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#8B2252]'
+                          ? 'bg-[#8B2252] text-white shadow-md shadow-[#8B2252]/25'
+                          : 'bg-white text-gray-600 border border-gray-200 hover:border-[#8B2252] shadow-sm'
                         }`}
                     >
                       {e}
@@ -418,8 +405,7 @@ export default function SubirPage() {
                 <select
                   value={form.tipo_recurso}
                   onChange={(e) => setForm(prev => ({ ...prev, tipo_recurso: e.target.value }))}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm bg-white
-                             focus:outline-none focus:border-[#1A3A5C] focus:ring-1 focus:ring-[#1A3A5C]/20"
+                  className={inputClasses}
                 >
                   <option value="">Seleccioná un tipo</option>
                   {TIPOS_RECURSO.map((t) => (
@@ -434,26 +420,19 @@ export default function SubirPage() {
                   Idioma
                 </label>
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => setForm(prev => ({ ...prev, idioma: 'es' }))}
-                    className={`px-5 py-2 rounded-lg text-sm font-medium transition-all
-                      ${form.idioma === 'es'
-                        ? 'bg-[#1A3A5C] text-white'
-                        : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#1A3A5C]'
-                      }`}
-                  >
-                    Español
-                  </button>
-                  <button
-                    onClick={() => setForm(prev => ({ ...prev, idioma: 'en' }))}
-                    className={`px-5 py-2 rounded-lg text-sm font-medium transition-all
-                      ${form.idioma === 'en'
-                        ? 'bg-[#1A3A5C] text-white'
-                        : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-[#1A3A5C]'
-                      }`}
-                  >
-                    English
-                  </button>
+                  {(['es', 'en'] as const).map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setForm(prev => ({ ...prev, idioma: lang }))}
+                      className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer
+                        ${form.idioma === lang
+                          ? 'bg-[#1A3A5C] text-white shadow-md shadow-[#1A3A5C]/25'
+                          : 'bg-white text-gray-600 border border-gray-200 hover:border-[#1A3A5C] shadow-sm'
+                        }`}
+                    >
+                      {lang === 'es' ? 'Español' : 'English'}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -468,24 +447,18 @@ export default function SubirPage() {
                   value={form.link_editable}
                   onChange={(e) => setForm(prev => ({ ...prev, link_editable: e.target.value }))}
                   placeholder="https://..."
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm
-                             focus:outline-none focus:border-[#1A3A5C] focus:ring-1 focus:ring-[#1A3A5C]/20"
+                  className={inputClasses}
                 />
-                {!archivo && !form.link_editable && (
-                  <p className="text-xs text-gray-400 mt-1">
-                    Si solo tenés el link, subí también el PDF para facilitar la búsqueda y clasificación.
-                  </p>
-                )}
               </div>
 
               {/* Editable */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setForm(prev => ({ ...prev, editable: !prev.editable }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors
+                  className={`relative w-12 h-7 rounded-full transition-colors duration-200 cursor-pointer
                     ${form.editable ? 'bg-[#8B2252]' : 'bg-gray-300'}`}
                 >
-                  <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform
+                  <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-transform duration-200
                     ${form.editable ? 'translate-x-[22px]' : 'translate-x-0.5'}`}
                   />
                 </button>
@@ -496,7 +469,8 @@ export default function SubirPage() {
 
               {/* Error */}
               {errorMsg && (
-                <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                <div className="px-4 py-3.5 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 flex items-center gap-2">
+                  <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
                   {errorMsg}
                 </div>
               )}
@@ -505,21 +479,24 @@ export default function SubirPage() {
               <div className="flex gap-3 pt-4 border-t border-gray-100">
                 <button
                   onClick={() => { setPaso(1); setArchivo(null); setSugerenciasIA(false) }}
-                  className="px-6 py-3 rounded-lg border border-gray-200 text-sm text-gray-600
-                             hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3.5 rounded-xl border border-gray-200 text-sm text-gray-600
+                             hover:bg-gray-50 shadow-sm transition-all duration-200 cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handlePublicar}
                   disabled={subiendo || !form.titulo || form.grados.length === 0 || form.ejes_tematicos.length === 0 || !form.tipo_recurso}
-                  className="flex-1 px-6 py-3 rounded-xl
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl
                              bg-gradient-to-r from-[#8B2252] to-[#6d1b41] text-white text-sm font-semibold
-                             shadow-button hover:shadow-lg hover:shadow-[#8B2252]/30
-                             active:scale-[0.97] transition-all duration-200
-                             disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                             shadow-button hover:shadow-lg hover:shadow-[#8B2252]/30 hover:-translate-y-0.5
+                             active:scale-[0.97] transition-all duration-200 cursor-pointer
+                             disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:hover:translate-y-0"
                 >
-                  {subiendo ? 'Subiendo...' : 'Publicar recurso'}
+                  {subiendo && (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  )}
+                  {subiendo ? 'Publicando...' : 'Publicar recurso'}
                 </button>
               </div>
             </div>
