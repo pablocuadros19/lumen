@@ -140,34 +140,44 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
 
+            {/* Preview: imagen real si es imagen, placeholder si no */}
+            {recurso.archivo_url && recurso.formato === 'Imagen / Lámina' ? (
+              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                <img
+                  src={recurso.archivo_url}
+                  alt={recurso.titulo}
+                  className="w-full max-h-[600px] object-contain bg-[#f8f9fc]"
+                />
+              </div>
+            ) : (
+              <div className="rounded-3xl border border-gray-100 bg-gradient-to-br from-[#1A3A5C]/4 via-[#2E6EA6]/2 to-[#8B2252]/4
+                              shadow-sm p-10 flex flex-col items-center justify-center min-h-[300px]">
+                <TipoIcon tipo={recurso.tipo_recurso} className="w-16 h-16 text-[#1A3A5C]/20 mb-4" />
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#1A3A5C]/30 mb-2">{recurso.formato}</span>
+                {!recurso.archivo_url && (
+                  <p className="text-xs text-gray-300">Preview no disponible</p>
+                )}
+                {recurso.archivo_url && (
+                  <a
+                    href={recurso.archivo_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 px-4 py-2 rounded-xl text-sm text-[#2E6EA6] font-medium
+                               bg-white/80 border border-[#2E6EA6]/15 shadow-sm
+                               hover:shadow-card hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    Ver archivo completo
+                  </a>
+                )}
+              </div>
+            )}
+
             {recurso.resumen && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <h3 className="text-sm font-semibold text-[#1A3A5C] mb-2">Resumen</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{recurso.resumen}</p>
               </div>
             )}
-
-            {/* Preview */}
-            <div className="rounded-3xl border border-gray-100 bg-gradient-to-br from-[#1A3A5C]/4 via-[#2E6EA6]/2 to-[#8B2252]/4
-                            shadow-sm p-10 flex flex-col items-center justify-center min-h-[300px]">
-              <TipoIcon tipo={recurso.tipo_recurso} className="w-16 h-16 text-[#1A3A5C]/20 mb-4" />
-              <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#1A3A5C]/30 mb-2">{recurso.formato}</span>
-              {!recurso.archivo_url && (
-                <p className="text-xs text-gray-300">Preview no disponible</p>
-              )}
-              {recurso.archivo_url && (
-                <a
-                  href={recurso.archivo_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2 px-4 py-2 rounded-xl text-sm text-[#2E6EA6] font-medium
-                             bg-white/80 border border-[#2E6EA6]/15 shadow-sm
-                             hover:shadow-card hover:-translate-y-0.5 transition-all duration-200"
-                >
-                  Ver archivo completo
-                </a>
-              )}
-            </div>
 
             {/* Copiloto pedagógico */}
             <div className="rounded-2xl border border-[#8B2252]/12 bg-gradient-to-br from-[#8B2252]/3 to-white
