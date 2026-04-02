@@ -77,5 +77,9 @@ export default async function HomePage() {
     // Tabla puede no existir aún
   }
 
-  return <BibliotecaView recursos={recursos} cantidadNuevos={cantidadNuevos} adminIds={adminIds} efemerideProxima={efemerideProxima} />
+  // Datos del usuario para welcome
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || ''
+  const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''
+
+  return <BibliotecaView recursos={recursos} cantidadNuevos={cantidadNuevos} adminIds={adminIds} efemerideProxima={efemerideProxima} userName={userName} userAvatar={userAvatar} />
 }

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { GRADOS, EJES_TEMATICOS, TIPOS_RECURSO } from '@/lib/constants'
 import DrivePickerModal from '@/components/DrivePickerModal'
+import ThankYouOverlay from '@/components/ThankYouOverlay'
 
 type FormData = {
   titulo: string
@@ -30,6 +31,7 @@ export default function SubirPage() {
   const [textoExtraido, setTextoExtraido] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
   const [showDriveModal, setShowDriveModal] = useState(false)
+  const [showThankYou, setShowThankYou] = useState(false)
   const [archivoUrl, setArchivoUrl] = useState<string | null>(null)
   const [driveFileName, setDriveFileName] = useState('')
   const [efemeridesDisponibles, setEfemeridesDisponibles] = useState<{ id: string; nombre: string }[]>([])
@@ -191,7 +193,8 @@ export default function SubirPage() {
         return
       }
 
-      router.push('/')
+      setSubiendo(false)
+      setShowThankYou(true)
     } catch {
       setErrorMsg('Error de conexión. Intentá de nuevo.')
       setSubiendo(false)
@@ -649,6 +652,10 @@ export default function SubirPage() {
           onClose={() => setShowDriveModal(false)}
           onFileImported={handleDriveImport}
         />
+      )}
+
+      {showThankYou && (
+        <ThankYouOverlay onDone={() => router.push('/')} />
       )}
     </div>
   )

@@ -9,6 +9,7 @@ import RecursoCard from '@/components/RecursoCard'
 import UserMenu from '@/components/UserMenu'
 import SolicitarRecurso from '@/components/SolicitarRecurso'
 import EfemeridesBanner from '@/components/EfemeridesBanner'
+import WelcomeOverlay from '@/components/WelcomeOverlay'
 import type { Recurso } from '@/types/database'
 
 function toggleInArray(arr: string[], val: string): string[] {
@@ -34,9 +35,11 @@ interface Props {
   cantidadNuevos?: number
   adminIds?: string[]
   efemerideProxima?: EfemerideProxima | null
+  userName?: string
+  userAvatar?: string
 }
 
-export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds = [], efemerideProxima }: Props) {
+export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds = [], efemerideProxima, userName = '', userAvatar = '' }: Props) {
   const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [gradosActivos, setGradosActivos] = useState<string[]>([])
@@ -389,6 +392,8 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
       {mostrarSolicitud && (
         <SolicitarRecurso onClose={() => setMostrarSolicitud(false)} />
       )}
+
+      {userName && <WelcomeOverlay nombre={userName} avatar={userAvatar} />}
     </div>
   )
 }
