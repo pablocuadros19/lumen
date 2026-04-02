@@ -51,10 +51,12 @@ export default function SubirPage() {
     return 'Documento'
   }
 
-  // Detectar si es editable por extensión
+  // Detectar si NO es editable (solo escaneos o fotos)
   const detectarEditable = (nombre: string) => {
     const ext = nombre.split('.').pop()?.toLowerCase()
-    return ['docx', 'doc', 'pptx', 'ppt', 'txt'].includes(ext || '')
+    // Solo marcar como no editable si es un escaneo evidente
+    if (['jpg', 'jpeg', 'gif', 'bmp', 'tiff'].includes(ext || '')) return false
+    return true // Por defecto editable
   }
 
   // Clasificación con IA (Claude Haiku)

@@ -28,11 +28,13 @@ export async function POST(request: NextRequest) {
     const datos = JSON.parse(datosJson)
 
     let archivoUrl: string | null = null
+    let thumbnailUrl: string | null = null
 
     // Subir archivo a Storage si existe
     if (archivo) {
       const ext = archivo.name.split('.').pop()
-      const fileName = `${user.id}/${crypto.randomUUID()}.${ext}`
+      const fileId = crypto.randomUUID()
+      const fileName = `${user.id}/${fileId}.${ext}`
       const buffer = Buffer.from(await archivo.arrayBuffer())
 
       const { error: uploadError } = await supabase.storage
@@ -56,6 +58,11 @@ export async function POST(request: NextRequest) {
         .getPublicUrl(fileName)
 
       archivoUrl = urlData.publicUrl
+
+      // Si es imagen, usar como thumbnail
+      if (archivo.type.startsWith('image/')) {
+        thumbnailUrl = archivoUrl
+      }
     }
 
     // Obtener nombre del perfil
@@ -78,6 +85,7 @@ export async function POST(request: NextRequest) {
       estado: 'publicado',
       idioma: datos.idioma || 'es',
       archivo_url: archivoUrl,
+      thumbnail_url: thumbnailUrl,
       link_editable: datos.link_editable || null,
       texto_extraido: datos.texto_extraido || null,
       subido_por: user.id,
