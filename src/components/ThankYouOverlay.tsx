@@ -44,7 +44,7 @@ export default function ThankYouOverlay({ onDone }: Props) {
                        ${saliendo ? 'scale-95 translate-y-4' : 'scale-100 translate-y-0 animate-[welcomeIn_0.8s_ease-out]'}`}>
         {/* Logo Newman */}
         <div className="w-20 h-20 rounded-2xl bg-white shadow-lg ring-1 ring-gray-100 flex items-center justify-center mb-6">
-          <Image src="/newman-logo.png" alt="Newman" width={52} height={52} />
+          <Image src="/newman-logo-2.jpg" alt="Newman" width={52} height={52} />
         </div>
 
         {/* Mensaje */}

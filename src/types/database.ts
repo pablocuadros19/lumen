@@ -2,7 +2,10 @@
 
 export type Grado = '1ro' | '2do' | '3ro' | '4to' | '5to' | '6to'
 
+export type Area = 'Prácticas del Lenguaje' | 'Ciencias Naturales'
+
 export type EjeTematico =
+  // Prácticas del Lenguaje
   | 'Plan lector'
   | 'Gramática'
   | 'Ortografía'
@@ -10,6 +13,14 @@ export type EjeTematico =
   | 'Producción escrita'
   | 'Oralidad'
   | 'Vocabulario'
+  // Ciencias Naturales
+  | 'Seres vivos'
+  | 'Cuerpo humano'
+  | 'Materiales'
+  | 'Fenómenos naturales'
+  | 'La Tierra y el universo'
+  | 'Ambiente y cuidado'
+  | 'Experimentación'
 
 export type TipoRecurso =
   | 'Actividad'
@@ -36,7 +47,7 @@ export interface Recurso {
   titulo: string
   resumen: string | null
   grados: Grado[]
-  area: string
+  area: Area
   eje_tematico: EjeTematico
   tipo_recurso: TipoRecurso
   formato: Formato

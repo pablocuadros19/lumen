@@ -1,52 +1,81 @@
 import { createClient } from '@/lib/supabase/server'
-import { MOCK_RECURSOS } from '@/lib/mock-data'
-import BibliotecaView from '@/components/BibliotecaView'
+import HubView from '@/components/HubView'
+import { AREAS } from '@/lib/constants'
 import type { Recurso } from '@/types/database'
 
 export default async function HomePage() {
   const supabase = await createClient()
-
-  const { data } = await supabase
-    .from('recursos')
-    .select('*')
-    .in('estado', ['publicado', 'destacado'])
-    .order('created_at', { ascending: false })
-
-  // Si hay recursos reales, usarlos. Si no, fallback a mock.
-  const recursos: Recurso[] = data && data.length > 0 ? data : MOCK_RECURSOS
-
-  // Contar recursos nuevos desde la última visita
-  let cantidadNuevos = 0
   const { data: { user } } = await supabase.auth.getUser()
-  if (user) {
-    const { data: perfil } = await supabase
-      .from('perfiles')
-      .select('last_seen_at')
-      .eq('id', user.id)
-      .single()
 
-    if (perfil?.last_seen_at) {
-      cantidadNuevos = recursos.filter(
-        r => new Date(r.created_at) > new Date(perfil.last_seen_at)
-      ).length
-    }
-
-    // Actualizar last_seen_at
-    await supabase
-      .from('perfiles')
-      .update({ last_seen_at: new Date().toISOString() })
-      .eq('id', user.id)
+  // Counts por área
+  const areaCounts: Record<string, number> = {}
+  for (const area of AREAS) {
+    const { count } = await supabase
+      .from('recursos')
+      .select('*', { count: 'exact', head: true })
+      .eq('area', area.nombre)
+      .in('estado', ['publicado', 'destacado'])
+    areaCounts[area.nombre] = count || 0
   }
 
-  // Obtener IDs de admins para badge en cards
+  // Recientes del usuario (últimos descargados)
+  let recientes: Recurso[] = []
+  if (user) {
+    try {
+      const { data: historial } = await supabase
+        .from('historial_descargas')
+        .select('recurso_id')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(8)
+
+      if (historial && historial.length > 0) {
+        const ids = [...new Set(historial.map(h => h.recurso_id))]
+        const { data: recursos } = await supabase
+          .from('recursos')
+          .select('*')
+          .in('id', ids)
+          .in('estado', ['publicado', 'destacado'])
+        if (recursos) {
+          // Mantener orden del historial
+          recientes = ids
+            .map(id => recursos.find(r => r.id === id))
+            .filter((r): r is Recurso => r !== undefined)
+            .slice(0, 8)
+        }
+      }
+    } catch {
+      // Tabla puede no existir
+    }
+
+    // Si no hay historial, mostrar los más recientes
+    if (recientes.length === 0) {
+      const { data } = await supabase
+        .from('recursos')
+        .select('*')
+        .in('estado', ['publicado', 'destacado'])
+        .order('created_at', { ascending: false })
+        .limit(8)
+      recientes = data || []
+    }
+  }
+
+  // Recursos lightweight para búsqueda global
+  const { data: todosRecursos } = await supabase
+    .from('recursos')
+    .select('id, titulo, area, eje_tematico, thumbnail_url')
+    .in('estado', ['publicado', 'destacado'])
+    .order('created_at', { ascending: false })
+    .limit(200)
+
+  // IDs de admins
   const { data: admins } = await supabase
     .from('perfiles')
     .select('id')
     .eq('rol', 'admin')
-
   const adminIds = (admins || []).map(a => a.id)
 
-  // Efeméride próxima (next 14 días)
+  // Efeméride próxima
   let efemerideProxima: { id: string; nombre: string; mes: number; dia: number; cantidadRecursos: number; diasRestantes: number } | null = null
   try {
     const { data: efemerides } = await supabase.from('efemerides').select('*')
@@ -69,17 +98,24 @@ export default async function HomePage() {
         .filter(e => e.diasRestantes >= 0 && e.diasRestantes <= 14)
         .sort((a, b) => a.diasRestantes - b.diasRestantes)
 
-      if (candidatas.length > 0) {
-        efemerideProxima = candidatas[0]
-      }
+      if (candidatas.length > 0) efemerideProxima = candidatas[0]
     }
   } catch {
-    // Tabla puede no existir aún
+    // Tabla puede no existir
   }
 
-  // Datos del usuario para welcome
   const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || ''
   const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''
 
-  return <BibliotecaView recursos={recursos} cantidadNuevos={cantidadNuevos} adminIds={adminIds} efemerideProxima={efemerideProxima} userName={userName} userAvatar={userAvatar} />
+  return (
+    <HubView
+      userName={userName}
+      userAvatar={userAvatar}
+      areaCounts={areaCounts}
+      recientes={recientes}
+      todosRecursos={todosRecursos || []}
+      efemerideProxima={efemerideProxima}
+      adminIds={adminIds}
+    />
+  )
 }

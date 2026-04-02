@@ -11,6 +11,7 @@ interface FilterSidebarProps {
   onToggleEje: (eje: string) => void
   onToggleTipo: (tipo: string) => void
   onToggleEditable: (val: boolean | null) => void
+  ejesTematicos?: readonly string[]
 }
 
 function PillGroup({
@@ -66,7 +67,9 @@ export default function FilterSidebar({
   onToggleEje,
   onToggleTipo,
   onToggleEditable,
+  ejesTematicos,
 }: FilterSidebarProps) {
+  const ejes = ejesTematicos || EJES_TEMATICOS
   return (
     <aside className="w-56 shrink-0 bg-white border-r border-gray-100/60 p-5 overflow-y-auto">
       <h2 className="text-sm font-bold text-[#1A3A5C] mb-1">Filtros</h2>
@@ -82,7 +85,7 @@ export default function FilterSidebar({
 
       <PillGroup
         title="Eje temático"
-        options={EJES_TEMATICOS}
+        options={ejes}
         activos={ejesActivos}
         onToggle={onToggleEje}
         activeColor="#8B2252"

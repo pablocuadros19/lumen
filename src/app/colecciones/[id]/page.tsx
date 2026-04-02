@@ -97,7 +97,7 @@ export default async function ColeccionPage({ params }: { params: Promise<{ id: 
           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#2E6EA6]/10 text-[#2E6EA6]">Compartida</span>
         )}
         <div className="w-px h-8 bg-gray-200 shrink-0" />
-        <Image src="/newman-logo.png" alt="Newman" width={36} height={36} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
+        <Image src="/newman-logo-2.jpg" alt="Newman" width={36} height={36} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
       </header>
 
       <div className="flex-1 max-w-4xl mx-auto w-full px-5 py-8">

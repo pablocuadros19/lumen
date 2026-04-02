@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       titulo: datos.titulo,
       resumen: datos.resumen || null,
       grados: datos.grados,
-      area: 'Prácticas del Lenguaje',
+      area: datos.area || 'Prácticas del Lenguaje',
       eje_tematico: datos.ejes_tematicos[0], // DB usa singular
       tipo_recurso: datos.tipo_recurso,
       formato: archivo ? detectarFormato(archivo.name) : 'Link externo',

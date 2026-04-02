@@ -39,13 +39,16 @@ export default function RecursoCard({ recurso, onClick, index = 0, esFavorito = 
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-3xl overflow-hidden cursor-pointer
+      className={`rounded-3xl overflow-hidden cursor-pointer
                  shadow-card border border-gray-100/80
-                 border-l-[3px] border-l-transparent
+                 border-l-[3px]
                  hover:shadow-card-hover hover:-translate-y-1.5
-                 hover:border-l-[#8B2252]
                  transition-all duration-300 ease-[var(--ease-smooth)] group
-                 animate-card-in"
+                 animate-card-in
+                 ${esCoordinadora
+                   ? 'bg-[#8B2252]/[0.03] border-l-[#8B2252]'
+                   : 'bg-white border-l-transparent hover:border-l-[#8B2252]'
+                 }`}
       style={{ animationDelay: `${index * 60}ms` }}
     >
       {/* Preview area */}
@@ -90,6 +93,14 @@ export default function RecursoCard({ recurso, onClick, index = 0, esFavorito = 
         <div className="absolute top-2.5 right-2.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <AgregarAColeccion recursoId={recurso.id} size="sm" />
         </div>
+
+        {/* Badge coordinación */}
+        {esCoordinadora && (
+          <div className="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold
+                          bg-[#8B2252] text-white shadow-sm shadow-[#8B2252]/30 z-10">
+            Coordinación
+          </div>
+        )}
 
         {/* Badge destacado */}
         {recurso.estado === 'destacado' && (

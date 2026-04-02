@@ -9,7 +9,6 @@ import RecursoCard from '@/components/RecursoCard'
 import UserMenu from '@/components/UserMenu'
 import SolicitarRecurso from '@/components/SolicitarRecurso'
 import EfemeridesBanner from '@/components/EfemeridesBanner'
-import WelcomeOverlay from '@/components/WelcomeOverlay'
 import type { Recurso } from '@/types/database'
 
 function toggleInArray(arr: string[], val: string): string[] {
@@ -37,9 +36,12 @@ interface Props {
   efemerideProxima?: EfemerideProxima | null
   userName?: string
   userAvatar?: string
+  area?: string
+  areaEjes?: readonly string[]
+  areaColor?: string
 }
 
-export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds = [], efemerideProxima, userName = '', userAvatar = '' }: Props) {
+export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds = [], efemerideProxima, userName = '', userAvatar = '', area, areaEjes, areaColor }: Props) {
   const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [gradosActivos, setGradosActivos] = useState<string[]>([])
@@ -130,10 +132,18 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
         {/* Gradient line inferior */}
         <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#1A3A5C] via-[#2E6EA6] to-[#8B2252] opacity-50" />
 
-        <div className="flex items-center gap-3 shrink-0">
+        <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image src="/logo.png" alt="LUMEN" width={40} height={40} className="rounded" />
           <span className="text-xl font-bold tracking-tight text-gradient-lumen">LUMEN</span>
-        </div>
+        </Link>
+        {area && (
+          <div className="flex items-center gap-2 shrink-0">
+            <svg className="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+            <span className="text-sm font-semibold" style={{ color: areaColor || '#1A3A5C' }}>{area}</span>
+          </div>
+        )}
 
         <div className="flex-1 max-w-xl">
           <div className="relative">
@@ -197,7 +207,7 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
         <UserMenu />
 
         <div className="w-px h-8 bg-gray-200 shrink-0" />
-        <Image src="/newman-logo.png" alt="Newman" width={40} height={40} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
+        <Image src="/newman-logo-2.jpg" alt="Newman" width={40} height={40} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
       </header>
 
       {/* Barra de filtros activos */}
@@ -285,6 +295,7 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
               onToggleEje={(e) => setEjesActivos(toggleInArray(ejesActivos, e))}
               onToggleTipo={(t) => setTiposActivos(toggleInArray(tiposActivos, t))}
               onToggleEditable={setSoloEditable}
+              ejesTematicos={areaEjes}
             />
           </div>
           {/* Botón collapse */}
@@ -393,7 +404,6 @@ export default function BibliotecaView({ recursos, cantidadNuevos = 0, adminIds 
         <SolicitarRecurso onClose={() => setMostrarSolicitud(false)} />
       )}
 
-      {userName && <WelcomeOverlay nombre={userName} avatar={userAvatar} />}
     </div>
   )
 }

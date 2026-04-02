@@ -4,13 +4,14 @@ import { useState, useRef, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { GRADOS, EJES_TEMATICOS, TIPOS_RECURSO } from '@/lib/constants'
+import { GRADOS, TIPOS_RECURSO, AREAS, getEjesForArea } from '@/lib/constants'
 import DrivePickerModal from '@/components/DrivePickerModal'
 import ThankYouOverlay from '@/components/ThankYouOverlay'
 
 type FormData = {
   titulo: string
   resumen: string
+  area: string
   grados: string[]
   ejes_tematicos: string[]
   tipo_recurso: string
@@ -57,6 +58,7 @@ function SubirContent() {
   const [form, setForm] = useState<FormData>({
     titulo: '',
     resumen: '',
+    area: 'Prácticas del Lenguaje',
     grados: [],
     ejes_tematicos: [],
     tipo_recurso: '',
@@ -90,9 +92,10 @@ function SubirContent() {
         const data = await res.json()
         setSugerenciasIA(true)
         setTextoExtraido(data.texto_extraido || '')
-        setForm({
+        setForm(prev => ({
           titulo: data.titulo || file.name.replace(/\.[^.]+$/, ''),
           resumen: data.resumen || '',
+          area: data.area || prev.area,
           grados: [],
           ejes_tematicos: data.ejes_tematicos || [],
           tipo_recurso: data.tipo_recurso || 'Actividad',
@@ -100,7 +103,7 @@ function SubirContent() {
           idioma: data.idioma || 'es',
           link_editable: '',
           thumbnail_url: '',
-        })
+        }))
       } else {
         setForm(prev => ({
           ...prev,
@@ -154,9 +157,10 @@ function SubirContent() {
     setDriveFileName(data.fileName)
     setTextoExtraido(data.texto_extraido || '')
     setSugerenciasIA(true)
-    setForm({
+    setForm(prev => ({
       titulo: data.titulo,
       resumen: data.resumen,
+      area: prev.area,
       grados: [],
       ejes_tematicos: data.ejes_tematicos || [],
       tipo_recurso: data.tipo_recurso || 'Actividad',
@@ -164,7 +168,7 @@ function SubirContent() {
       idioma: (data.idioma as 'es' | 'en') || 'es',
       link_editable: '',
       thumbnail_url: data.thumbnail_url || '',
-    })
+    }))
     setShowDriveModal(false)
     setPaso(2)
   }
@@ -231,7 +235,7 @@ function SubirContent() {
         <div className="flex-1" />
         <span className="text-sm text-gray-400 font-medium">Cargar recurso</span>
         <div className="w-px h-8 bg-gray-200 shrink-0" />
-        <Image src="/newman-logo.png" alt="Newman" width={36} height={36} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
+        <Image src="/newman-logo-2.jpg" alt="Newman" width={36} height={36} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
       </header>
 
       <div className="flex-1 max-w-2xl mx-auto w-full px-5 py-8">
@@ -470,6 +474,34 @@ function SubirContent() {
                 />
               </div>
 
+              {/* Área */}
+              <div>
+                <label className="block text-sm font-medium text-[#1A3A5C] mb-2">
+                  Área <span className="text-[#8B2252]">*</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {AREAS.map((a) => (
+                    <button
+                      key={a.slug}
+                      onClick={() => setForm(prev => ({
+                        ...prev,
+                        area: a.nombre,
+                        ejes_tematicos: [], // Reset ejes al cambiar área
+                      }))}
+                      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer
+                        hover:scale-105
+                        ${form.area === a.nombre
+                          ? 'text-white shadow-md'
+                          : 'bg-white text-gray-600 border border-gray-200 shadow-sm'
+                        }`}
+                      style={form.area === a.nombre ? { backgroundColor: a.color, boxShadow: `0 4px 6px ${a.color}40` } : {}}
+                    >
+                      {a.nombre}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Grados */}
               <div>
                 <label className="block text-sm font-medium text-[#1A3A5C] mb-2">
@@ -501,7 +533,7 @@ function SubirContent() {
                   <span className="text-xs text-gray-400 ml-2 font-normal">Podés elegir varios</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {EJES_TEMATICOS.map((e) => (
+                  {getEjesForArea(form.area).map((e) => (
                     <button
                       key={e}
                       onClick={() => setForm(prev => ({

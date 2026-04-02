@@ -32,7 +32,7 @@ function LoginContent() {
         {/* Logos: Newman + LUMEN en fila en mobile, columna en desktop */}
         <div className="flex flex-col items-center gap-3 mb-4 sm:mb-6">
           <Image
-            src="/newman-logo.png"
+            src="/newman-logo-2.jpg"
             alt="Newman"
             width={56}
             height={56}

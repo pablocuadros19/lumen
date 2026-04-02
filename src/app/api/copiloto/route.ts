@@ -98,7 +98,8 @@ export async function POST(request: NextRequest) {
       recurso.texto_extraido ? `\n**Contenido extraído:**\n${recurso.texto_extraido.slice(0, 3000)}` : '',
     ].filter(Boolean).join('\n')
 
-    let prompt = PROMPTS[accion]
+    // Regla gramatical obligatoria para español rioplatense
+    let prompt = 'REGLA OBLIGATORIA: En español, usá "e" en lugar de "y" cuando la palabra siguiente empiece con "i" o "hi" (ej: "creatividad e imaginación", "gramática e historia"). Nunca escribas "y imaginación", "y historia", etc.\n\n' + PROMPTS[accion]
 
     // Para adaptar, agregar grado destino
     if (accion === 'adaptar' && grado_destino) {

@@ -121,7 +121,7 @@ export default async function CoordinacionPage() {
         <div className="flex-1" />
         <span className="text-sm text-gray-400 font-medium">Panel de coordinación</span>
         <div className="w-px h-8 bg-gray-200 shrink-0" />
-        <Image src="/newman-logo.png" alt="Newman" width={36} height={36} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
+        <Image src="/newman-logo-2.jpg" alt="Newman" width={36} height={36} className="shrink-0 rounded-lg ring-1 ring-gray-100" />
       </header>
 
       <div className="flex-1 max-w-6xl mx-auto w-full px-5 py-8">

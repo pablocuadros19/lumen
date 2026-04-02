@@ -5,36 +5,49 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
-const EJES_VALIDOS = [
+const EJES_LENGUAJE = [
   'Plan lector', 'Gramática', 'Ortografía', 'Comprensión lectora',
   'Producción escrita', 'Oralidad', 'Vocabulario',
 ]
+
+const EJES_CIENCIAS = [
+  'Seres vivos', 'Cuerpo humano', 'Materiales', 'Fenómenos naturales',
+  'La Tierra y el universo', 'Ambiente y cuidado', 'Experimentación',
+]
+
+const AREAS_VALIDAS = ['Prácticas del Lenguaje', 'Ciencias Naturales']
 
 const TIPOS_VALIDOS = [
   'Actividad', 'Evaluación', 'Rúbrica', 'Planificación',
   'Presentación', 'Teoría / Marco', 'Ideas / Inspiración',
 ]
 
-const PROMPT_SISTEMA = `Sos un bibliotecario pedagógico experto en educación primaria argentina (1ro a 6to grado), especializado en el área de Prácticas del Lenguaje según el Diseño Curricular de la Provincia de Buenos Aires.
+const PROMPT_SISTEMA = `Sos un bibliotecario pedagógico experto en educación primaria argentina (1ro a 6to grado) según el Diseño Curricular de la Provincia de Buenos Aires.
 
 Tu tarea es clasificar un recurso pedagógico para la biblioteca escolar LUMEN. El recurso fue subido por una docente y será usado por otras docentes del colegio.
 
 Analizá el contenido y devolvé un JSON con estas claves:
 
-- "titulo": título claro, descriptivo y profesional (máx 80 caracteres). Debe reflejar el contenido real y el tema específico, no ser genérico.
+- "area": una de estas EXACTAS: ${JSON.stringify(AREAS_VALIDAS)}
+  Prácticas del Lenguaje = lectura, escritura, gramática, oralidad, vocabulario, textos literarios.
+  Ciencias Naturales = seres vivos, cuerpo humano, materiales, fenómenos, ambiente, experimentación.
 
-- "resumen": 1-2 oraciones breves. Qué contiene y para qué sirve. Máximo 150 caracteres. Sé conciso y directo.
+- "titulo": título claro, descriptivo y profesional (máx 80 caracteres).
 
-- "ejes_tematicos": array con uno o más de estos valores EXACTOS: ${JSON.stringify(EJES_VALIDOS)}
+- "resumen": 1-2 oraciones breves. Máximo 150 caracteres.
+
+- "ejes_tematicos": array con uno o más ejes según el área:
+  Si área es "Prácticas del Lenguaje": ${JSON.stringify(EJES_LENGUAJE)}
+  Si área es "Ciencias Naturales": ${JSON.stringify(EJES_CIENCIAS)}
 
 - "tipo_recurso": uno de estos valores EXACTOS: ${JSON.stringify(TIPOS_VALIDOS)}
-  Guía: "Actividad" = consignas para alumnos. "Evaluación" = para calificar. "Rúbrica" = criterios de evaluación. "Planificación" = organización docente. "Teoría / Marco" = consulta docente. "Presentación" = slides para clase.
 
 - "idioma": "es" o "en"
 
 REGLAS:
 - NO sugieras grado
 - Elegí SOLO valores de las listas dadas
+- Los ejes deben corresponder al área elegida
 - Basá tu análisis en el CONTENIDO REAL, no inventes
 - Si el contenido es escaso, describí lo que ves sin rellenar
 - Si es una imagen o PDF visual, describí lo que ves y clasificalo. NUNCA digas que no podés clasificar.
@@ -144,8 +157,9 @@ function responderConClasificacion(respuestaTexto: string, nombreArchivo: string
   }
 
   if (clasificacion.ejes_tematicos) {
+    const todosEjes = [...EJES_LENGUAJE, ...EJES_CIENCIAS]
     clasificacion.ejes_tematicos = clasificacion.ejes_tematicos.filter(
-      (e: string) => EJES_VALIDOS.includes(e)
+      (e: string) => todosEjes.includes(e)
     )
   }
 
