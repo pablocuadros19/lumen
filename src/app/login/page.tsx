@@ -28,45 +28,41 @@ function LoginContent() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#2E6EA6]/3 blur-3xl" />
 
       <div className="glass rounded-[32px] shadow-elevated border border-white/60
-                      text-center max-w-md mx-auto px-12 py-14 relative z-10">
-        {/* Logo Newman */}
-        <div className="mb-4">
+                      text-center max-w-md mx-auto px-8 sm:px-12 py-8 sm:py-14 relative z-10">
+        {/* Logos: Newman + LUMEN en fila en mobile, columna en desktop */}
+        <div className="flex flex-col items-center gap-3 mb-4 sm:mb-6">
           <Image
             src="/newman-logo.png"
             alt="Newman"
-            width={80}
-            height={80}
-            className="mx-auto"
+            width={56}
+            height={56}
+            className="sm:w-[80px] sm:h-[80px]"
             priority
           />
-        </div>
-
-        {/* Logo LUMEN */}
-        <div className="mb-6">
           <Image
             src="/logo.png"
             alt="LUMEN"
-            width={280}
-            height={280}
-            className="mx-auto drop-shadow-sm"
+            width={180}
+            height={180}
+            className="drop-shadow-sm sm:w-[280px] sm:h-[280px]"
             priority
           />
         </div>
 
-        <p className="text-xl font-medium mb-8 text-gradient-lumen">
+        <p className="text-lg sm:text-xl font-medium mb-5 sm:mb-8 text-gradient-lumen">
           Biblioteca Pedagógica Inteligente
         </p>
 
         {/* Línea decorativa */}
         <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-[#8B2252] to-transparent
-                        mx-auto mb-8 rounded-full" />
+                        mx-auto mb-5 sm:mb-8 rounded-full" />
 
         {/* Botón Google */}
         <button
           onClick={handleLogin}
-          className="flex items-center justify-center gap-3 w-full px-6 py-4
+          className="flex items-center justify-center gap-3 w-full px-5 py-3.5 sm:px-6 sm:py-4
                      bg-white border border-gray-200 rounded-2xl
-                     text-[#1A3A5C] font-semibold text-base
+                     text-[#1A3A5C] font-semibold text-sm sm:text-base
                      shadow-card hover:shadow-card-hover hover:-translate-y-0.5
                      active:scale-[0.98] transition-all duration-200 cursor-pointer"
         >
@@ -85,7 +81,7 @@ function LoginContent() {
           </div>
         )}
 
-        <p className="text-sm text-gray-500 mt-6">
+        <p className="text-xs sm:text-sm text-gray-500 mt-4 sm:mt-6">
           Usá tu cuenta institucional del colegio
         </p>
       </div>
