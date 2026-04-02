@@ -257,7 +257,7 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
                   <Link
                     key={area.slug}
                     href={`/area/${area.slug}`}
-                    className="group relative h-52 rounded-3xl overflow-hidden cursor-pointer
+                    className="group relative h-52 rounded-3xl overflow-hidden isolate cursor-pointer
                                shadow-lg hover:shadow-2xl hover:-translate-y-3
                                transition-all duration-300 ease-[var(--ease-spring)]"
                     style={{ borderBottom: `4px solid ${area.color}` }}
