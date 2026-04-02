@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import sharp from 'sharp'
 
 // Detectar formato por extensión
 function detectarFormato(nombre: string): string {
@@ -62,6 +63,40 @@ export async function POST(request: NextRequest) {
       // Si es imagen, usar como thumbnail
       if (archivo.type.startsWith('image/')) {
         thumbnailUrl = archivoUrl
+      }
+
+      // Si es PDF, generar thumbnail de la primera página
+      if (archivo.type === 'application/pdf') {
+        try {
+          const { pdf } = await import('pdf-to-img')
+          const pages = await pdf(buffer, { scale: 2 })
+
+          // Solo la primera página
+          for await (const page of pages) {
+            const thumbBuffer = await sharp(page)
+              .resize(400, 300, { fit: 'cover' })
+              .jpeg({ quality: 75 })
+              .toBuffer()
+
+            const thumbName = `${user.id}/thumb_${fileId}.jpg`
+            const { error: thumbError } = await supabase.storage
+              .from('recursos')
+              .upload(thumbName, thumbBuffer, {
+                contentType: 'image/jpeg',
+                upsert: false,
+              })
+
+            if (!thumbError) {
+              const { data: thumbUrlData } = supabase.storage
+                .from('recursos')
+                .getPublicUrl(thumbName)
+              thumbnailUrl = thumbUrlData.publicUrl
+            }
+            break // Solo primera página
+          }
+        } catch (e) {
+          console.error('Error generando thumbnail PDF:', e)
+        }
       }
     }
 
