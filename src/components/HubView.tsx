@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import UserMenu from '@/components/UserMenu'
 import WelcomeOverlay from '@/components/WelcomeOverlay'
 import EfemeridesBanner from '@/components/EfemeridesBanner'
-import { AREAS } from '@/lib/constants'
+import { AREAS, getColorForArea } from '@/lib/constants'
 import type { Recurso } from '@/types/database'
 
 // Normalizar texto: quitar tildes e ignorar mayúsculas
@@ -307,28 +307,44 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
                 </div>
               ) : (
                 <div className="max-h-80 overflow-y-auto">
-                  {resultadosBusqueda.map((r) => (
-                    <button
-                      key={r.id}
-                      onClick={() => router.push(`/recurso/${r.id}`)}
-                      className="w-full px-5 py-3 flex items-center gap-3 text-left
-                                 hover:bg-gray-50 transition-colors cursor-pointer"
-                    >
-                      {r.thumbnail_url ? (
-                        <img src={r.thumbnail_url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-[#1A3A5C]/6 flex items-center justify-center shrink-0">
-                          <svg className="w-4 h-4 text-[#1A3A5C]/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                          </svg>
+                  {resultadosBusqueda.map((r) => {
+                    const areaColor = getColorForArea(r.area)
+                    return (
+                      <button
+                        key={r.id}
+                        onClick={() => router.push(`/recurso/${r.id}`)}
+                        className="w-full px-5 py-3 flex items-center gap-3 text-left
+                                   transition-colors cursor-pointer border-l-4"
+                        style={{
+                          borderLeftColor: areaColor,
+                          backgroundColor: 'transparent',
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = `${areaColor}0a`}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        {r.thumbnail_url ? (
+                          <img src={r.thumbnail_url} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                        ) : (
+                          <div
+                            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: `${areaColor}10` }}
+                          >
+                            <AreaIcon slug={AREAS.find(a => a.nombre === r.area)?.slug || ''} className="w-4 h-4" style={{ color: areaColor }} />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#1A3A5C] truncate">{r.titulo}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span
+                              className="inline-block w-2 h-2 rounded-full shrink-0"
+                              style={{ backgroundColor: areaColor }}
+                            />
+                            <p className="text-xs text-gray-400 truncate">{r.area} · {r.eje_tematico}</p>
+                          </div>
                         </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1A3A5C] truncate">{r.titulo}</p>
-                        <p className="text-xs text-gray-400">{r.area} · {r.eje_tematico}</p>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -339,7 +355,7 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
         {!buscando && (
           <>
             {/* Botones de áreas — cards visuales con ilustración de fondo */}
-            <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+            <div className="w-full max-w-5xl grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
               {AREAS.map((area) => {
                 const count = areaCounts[area.nombre] || 0
                 const contenido = (
@@ -373,14 +389,14 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
                     )}
 
                     {/* Contenido */}
-                    <div className="relative h-full flex flex-col justify-end p-7">
+                    <div className="relative h-full flex flex-col justify-end p-5">
                       <div className="flex items-center gap-3 mb-2">
                         <div className={`w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center
                                         ${!area.proximamente ? 'group-hover:scale-110' : ''} transition-transform duration-300`}>
                           <AreaIcon slug={area.slug} className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-white leading-tight drop-shadow-sm">
+                          <h3 className="text-base font-bold text-white leading-tight drop-shadow-sm">
                             {area.nombre}
                           </h3>
                           <p className="text-white/70 text-xs mt-0.5">{area.description}</p>
@@ -418,7 +434,7 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
                       className="group rounded-3xl overflow-hidden opacity-75"
                       style={{ boxShadow: `0 4px 12px rgba(0,0,0,0.08), 0 4px 0 ${area.color}` }}
                     >
-                      <div className="relative block h-52">
+                      <div className="relative block h-48">
                         {contenido}
                       </div>
                     </div>
@@ -434,7 +450,7 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
                   >
                     <Link
                       href={`/area/${area.slug}`}
-                      className="relative block h-52 cursor-pointer"
+                      className="relative block h-48 cursor-pointer"
                     >
                       {contenido}
                     </Link>
@@ -452,7 +468,7 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
 
             {/* Recientes */}
             {recientes.length > 0 && (
-              <div className="w-full max-w-4xl">
+              <div className="w-full max-w-5xl">
                 <h2 className="text-sm font-bold text-[#1A3A5C] uppercase tracking-wider mb-4 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#2E6EA6]" />
                   Recientes

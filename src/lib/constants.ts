@@ -56,6 +56,10 @@ export function getSlugForArea(nombre: string): string {
   return AREAS.find(a => a.nombre === nombre)?.slug || 'practicas-del-lenguaje'
 }
 
+export function getColorForArea(nombre: string): string {
+  return AREAS.find(a => a.nombre === nombre)?.color || '#1A3A5C'
+}
+
 export const TIPOS_RECURSO = [
   'Actividad',
   'Evaluación',
