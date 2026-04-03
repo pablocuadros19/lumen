@@ -4,6 +4,10 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "LUMEN — Biblioteca Pedagógica Inteligente",
   description: "Encontrá el recurso justo en segundos, entendé qué es sin abrirlo, y usá IA para adaptarlo a tu clase.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 }
 
 export default function RootLayout({
