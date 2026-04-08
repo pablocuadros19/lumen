@@ -25,14 +25,18 @@ export async function POST(request: NextRequest) {
     let finalMimeType = mimeType
     let finalFileName = fileName
 
+    let googleLink: string | null = null
+
     if (mimeType === 'application/vnd.google-apps.document') {
       downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/pdf`
       finalMimeType = 'application/pdf'
       finalFileName = fileName.replace(/\.[^.]+$/, '') + '.pdf'
+      googleLink = `https://docs.google.com/document/d/${fileId}/edit`
     } else if (mimeType === 'application/vnd.google-apps.presentation') {
       downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/pdf`
       finalMimeType = 'application/pdf'
       finalFileName = fileName.replace(/\.[^.]+$/, '') + '.pdf'
+      googleLink = `https://docs.google.com/presentation/d/${fileId}/edit`
     } else {
       downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`
     }
@@ -90,6 +94,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       archivo_url: archivoUrl,
       thumbnail_url: thumbnailUrl,
+      google_link: googleLink,
       fileName: finalFileName,
       mimeType: finalMimeType,
       ...clasificacion,

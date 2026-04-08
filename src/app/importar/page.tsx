@@ -21,6 +21,7 @@ interface ImportedFile {
   fileName: string
   archivo_url: string
   thumbnail_url: string | null
+  google_link: string | null
   titulo: string
   resumen: string
   ejes_tematicos: string[]
@@ -120,6 +121,7 @@ export default function ImportarPage() {
             fileName: files[i].name,
             archivo_url: data.archivo_url,
             thumbnail_url: data.thumbnail_url,
+            google_link: data.google_link || null,
             titulo: data.titulo || files[i].name,
             resumen: data.resumen || '',
             ejes_tematicos: data.ejes_tematicos || [],
@@ -160,7 +162,7 @@ export default function ImportarPage() {
           tipo_recurso: item.tipo_recurso,
           editable: item.editable,
           idioma: item.idioma,
-          link_editable: '',
+          link_editable: item.google_link || '',
           texto_extraido: item.texto_extraido || '',
           // archivo_url ya existe en storage, pasarlo como dato
           existing_archivo_url: item.archivo_url,
