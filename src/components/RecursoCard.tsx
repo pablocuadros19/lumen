@@ -74,25 +74,37 @@ export default function RecursoCard({ recurso, onClick, index = 0, esFavorito = 
           const slideMatch = link.match(/docs\.google\.com\/presentation\/d\/([^/]+)/)
           const docMatch = link.match(/docs\.google\.com\/document\/d\/([^/]+)/)
           if (slideMatch) {
+            const sid = slideMatch[1]
             return (
               <>
                 <img
-                  src={`https://docs.google.com/presentation/d/${slideMatch[1]}/export/png?pageid=p1`}
+                  src={`https://drive.google.com/thumbnail?id=${sid}&sz=w800`}
                   alt={recurso.titulo}
                   className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement
+                    if (!img.dataset.fallback) {
+                      img.dataset.fallback = '1'
+                      img.src = `https://docs.google.com/presentation/d/${sid}/export/png?pageid=p1`
+                    } else {
+                      img.style.display = 'none'
+                    }
+                  }}
                 />
                 <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/50 to-transparent" />
               </>
             )
           }
           if (docMatch) {
+            const did = docMatch[1]
             return (
               <>
                 <img
-                  src={`https://docs.google.com/document/d/${docMatch[1]}/export/png?pageid=p1`}
+                  src={`https://drive.google.com/thumbnail?id=${did}&sz=w800`}
                   alt={recurso.titulo}
                   className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                 />
                 <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/50 to-transparent" />
