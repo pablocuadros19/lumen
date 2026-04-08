@@ -26,7 +26,7 @@ export default function LandingPage() {
           </div>
 
           <p className="text-sm font-semibold tracking-[4px] uppercase text-[#8B2252] mb-6">
-            Biblioteca Pedagogica Inteligente
+            Biblioteca Pedagógica Inteligente
           </p>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black leading-tight mb-8 tracking-tight">
@@ -37,7 +37,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-12 leading-relaxed">
-            LUMEN centraliza, clasifica con IA y potencia los materiales pedagogicos
+            LUMEN centraliza, clasifica con IA y potencia los materiales pedagógicos
             de tu colegio. Para que cada docente encuentre lo que necesita en segundos.
           </p>
 
@@ -63,7 +63,7 @@ export default function LandingPage() {
                          hover:border-[#1A3A5C]/40 hover:bg-[#1A3A5C]/[0.03]
                          transition-all duration-300"
             >
-              Conoce mas
+              Conocé más
             </a>
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function LandingPage() {
               El problema
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-              Los recursos de tu escuela estan{' '}
+              Los recursos de tu escuela están{' '}
               <span className="text-[#8B2252]">dispersos</span>
             </h2>
           </div>
@@ -98,11 +98,11 @@ export default function LandingPage() {
               },
               {
                 title: 'Invisibles',
-                text: 'El recurso excelente que una docente creo el ano pasado no existe para el resto del equipo.',
+                text: 'El recurso excelente que una docente creó el año pasado no existe para el resto del equipo.',
               },
               {
                 title: 'Sin potencial',
-                text: 'Materiales valiosos que podrian adaptarse a otros grados quedan estancados donde se crearon.',
+                text: 'Materiales valiosos que podrían adaptarse a otros grados quedan estancados donde se crearon.',
               },
             ].map((item) => (
               <div
@@ -130,7 +130,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-xs font-bold tracking-[3px] uppercase text-[#2E6EA6] mb-4">
-              La solucion
+              La solución
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6">
               Una biblioteca inteligente{' '}
@@ -138,8 +138,8 @@ export default function LandingPage() {
             </h2>
             <p className="text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed">
               LUMEN es una plataforma web privada donde el equipo docente organiza,
-              comparte y potencia sus recursos pedagogicos con inteligencia artificial.
-              Disenada para educacion primaria argentina, alineada al Diseno Curricular
+              comparte y potencia sus recursos pedagógicos con inteligencia artificial.
+              Diseñada para educación primaria argentina, alineada al Diseño Curricular
               de la Provincia de Buenos Aires.
             </p>
           </div>
@@ -150,8 +150,8 @@ export default function LandingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                title: 'Clasificacion automatica con IA',
-                text: 'Subis un PDF y la inteligencia artificial lo clasifica por area, eje tematico, grado y tipo. Solo revisas y confirmas.',
+                title: 'Clasificación automática con IA',
+                text: 'Subís un PDF y la inteligencia artificial lo clasifica por área, eje temático, grado y tipo. Solo revisás y confirmás.',
                 color: '#2E6EA6',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -160,8 +160,8 @@ export default function LandingPage() {
                 ),
               },
               {
-                title: 'Busqueda inteligente',
-                text: 'Encontra el recurso justo en segundos. Busca por titulo, eje tematico, tipo o grado con resultados instantaneos.',
+                title: 'Búsqueda inteligente',
+                text: 'Encontrá el recurso justo en segundos. Buscá por título, eje temático, tipo o grado con resultados instantáneos.',
                 color: '#1A3A5C',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -170,8 +170,8 @@ export default function LandingPage() {
                 ),
               },
               {
-                title: 'Copiloto pedagogico',
-                text: 'Adapta recursos a otro grado, genera evaluaciones, crea rubricas, simplifica consignas y arma guias docentes.',
+                title: 'Copiloto pedagógico',
+                text: 'Adaptá recursos a otro grado, generá evaluaciones, creá rúbricas, simplificá consignas y armá guías docentes.',
                 color: '#8B2252',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -181,7 +181,7 @@ export default function LandingPage() {
               },
               {
                 title: 'Colecciones y favoritos',
-                text: 'Cada docente organiza su biblioteca personal. Marca favoritos, crea colecciones tematicas y compartilas con colegas.',
+                text: 'Cada docente organiza su biblioteca personal. Marcá favoritos, creá colecciones temáticas y compartilas con colegas.',
                 color: '#1A3A5C',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -190,8 +190,8 @@ export default function LandingPage() {
                 ),
               },
               {
-                title: 'Panel de coordinacion',
-                text: 'Semaforo de cobertura curricular, metricas de uso, recursos mas descargados y gestion de contenido destacado.',
+                title: 'Panel de coordinación',
+                text: 'Semáforo de cobertura curricular, métricas de uso, recursos más descargados y gestión de contenido destacado.',
                 color: '#2E6EA6',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -200,7 +200,7 @@ export default function LandingPage() {
                 ),
               },
               {
-                title: 'Sistema de revision',
+                title: 'Sistema de revisión',
                 text: 'La coordinadora aprueba u observa cada recurso antes de publicarlo. Control de calidad garantizado.',
                 color: '#8B2252',
                 icon: (
@@ -250,13 +250,13 @@ export default function LandingPage() {
             {[
               {
                 step: '1',
-                title: 'Subi un recurso',
-                text: 'Arrastra un PDF, Word o imagen. Tambien podes importar directo desde Google Drive.',
+                title: 'Subí un recurso',
+                text: 'Arrastrá un PDF, Word o imagen. También podés importar directo desde Google Drive.',
               },
               {
                 step: '2',
                 title: 'La IA lo clasifica',
-                text: 'En segundos, la inteligencia artificial analiza el contenido y sugiere area, eje, grado y tipo.',
+                text: 'En segundos, la inteligencia artificial analiza el contenido y sugiere área, eje, grado y tipo.',
               },
               {
                 step: '3',
@@ -293,7 +293,7 @@ export default function LandingPage() {
         <div className="relative z-10 max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-xs font-bold tracking-[3px] uppercase text-[#8B2252] mb-4">
-              Inversion
+              Inversión
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6">
               Transparente y accesible
@@ -310,7 +310,7 @@ export default function LandingPage() {
               Primer mes gratis
             </h3>
             <p className="text-gray-500 max-w-xl mx-auto">
-              Proba LUMEN con tu equipo docente durante 30 dias sin costo ni compromiso.
+              Probá LUMEN con tu equipo docente durante 30 días sin costo ni compromiso.
               Si funciona para tu colegio, seguimos. Si no, sin vueltas.
             </p>
           </div>
@@ -323,7 +323,7 @@ export default function LandingPage() {
               <div className="absolute -top-3 left-1/2 -translate-x-1/2
                               bg-[#8B2252] text-white text-xs font-bold tracking-wider uppercase
                               px-5 py-1.5 rounded-full shadow-md">
-                Mas elegido
+                Más elegido
               </div>
 
               <p className="text-xs font-bold tracking-[2px] uppercase text-white/50 mb-6">
@@ -333,17 +333,17 @@ export default function LandingPage() {
                 <span className="text-5xl font-black">$250</span>
                 <span className="text-white/50 font-medium">USD/mes</span>
               </div>
-              <p className="text-sm text-white/40 mb-8">Ideal para la mayoria de los colegios</p>
+              <p className="text-sm text-white/40 mb-8">Ideal para la mayoría de los colegios</p>
 
               <ul className="space-y-3 mb-8">
                 {[
                   'Hasta 50 docentes y coordinadores',
-                  'IA integrada sin limite de uso',
-                  'Clasificacion automatica con IA',
-                  'Copiloto pedagogico',
-                  'Panel de coordinacion',
-                  'Sistema de revision y aprobacion',
-                  'Soporte y capacitacion incluidos',
+                  'IA integrada sin límite de uso',
+                  'Clasificación automática con IA',
+                  'Copiloto pedagógico',
+                  'Panel de coordinación',
+                  'Sistema de revisión y aprobación',
+                  'Soporte y capacitación incluidos',
                   'Actualizaciones continuas',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-[15px] text-white/80">
@@ -383,7 +383,7 @@ export default function LandingPage() {
                 {[
                   'Todo lo del plan base',
                   'Usuarios ilimitados',
-                  'Multiples niveles y sedes',
+                  'Múltiples niveles y sedes',
                   'Onboarding personalizado',
                   'SLA de soporte dedicado',
                   'Integraciones a medida',
@@ -412,16 +412,16 @@ export default function LandingPage() {
           {/* Que incluye */}
           <div className="mt-12 text-center">
             <p className="text-sm text-gray-400 mb-4 font-semibold uppercase tracking-wider">
-              Todos los planes incluyen
+              Qué incluyen todos los planes
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {[
                 'Plataforma 24/7',
                 'Hosting y base de datos',
                 'IA integrada',
-                'Backups automaticos',
+                'Backups automáticos',
                 'Actualizaciones continuas',
-                'Capacitacion inicial',
+                'Capacitación inicial',
               ].map((item) => (
                 <span
                   key={item}
@@ -440,7 +440,7 @@ export default function LandingPage() {
       <section className="py-24 sm:py-32 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6">
-            Queres transformar la biblioteca{' '}
+            ¿Querés transformar la biblioteca{' '}
             <span className="text-gradient-lumen">de tu escuela?</span>
           </h2>
           <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10">
@@ -485,7 +485,7 @@ export default function LandingPage() {
               height={40}
             />
             <span className="font-bold text-[#1A3A5C]">LUMEN</span>
-            <span className="text-gray-400 text-sm">Biblioteca Pedagogica Inteligente</span>
+            <span className="text-gray-400 text-sm">Biblioteca Pedagógica Inteligente</span>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-400">
