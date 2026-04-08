@@ -68,12 +68,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Indicador scroll */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 landing-fade-in-delayed">
-          <div className="w-6 h-10 border-2 border-[#1A3A5C]/20 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-2 bg-[#1A3A5C]/30 rounded-full landing-scroll-indicator" />
-          </div>
-        </div>
       </section>
 
       {/* ===================== PROBLEMA ===================== */}
@@ -504,9 +498,6 @@ export default function LandingPage() {
         .landing-fade-in {
           animation: landingFadeIn 1s ease-out both;
         }
-        .landing-fade-in-delayed {
-          animation: landingFadeIn 1s ease-out 0.5s both;
-        }
         @keyframes landingFadeIn {
           from {
             opacity: 0;
@@ -515,19 +506,6 @@ export default function LandingPage() {
           to {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-        .landing-scroll-indicator {
-          animation: landingScroll 2s ease-in-out infinite;
-        }
-        @keyframes landingScroll {
-          0%, 100% {
-            opacity: 0;
-            transform: translateY(0);
-          }
-          50% {
-            opacity: 1;
-            transform: translateY(8px);
           }
         }
       `}</style>
