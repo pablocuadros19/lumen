@@ -184,6 +184,31 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* Preview: imagen real si es imagen, thumbnail de link, PDF embebido, o placeholder */}
+            {(() => {
+              // Detectar Google Slides/Docs en link_editable o archivo_url
+              const linkSrc = recurso.link_editable || recurso.archivo_url || ''
+              const isSlidesLink = linkSrc.includes('docs.google.com/presentation')
+              const isDocsLink = linkSrc.includes('docs.google.com/document')
+              const isSheetsLink = linkSrc.includes('docs.google.com/spreadsheets')
+              const embedUrl = isSlidesLink
+                ? linkSrc.replace(/\/(edit|view|pub).*$/, '/embed')
+                : isDocsLink
+                ? linkSrc.replace(/\/(edit|view).*$/, '/preview')
+                : isSheetsLink
+                ? linkSrc.replace(/\/(edit|view).*$/, '/preview')
+                : null
+              if (embedUrl) return (
+                <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                  <iframe
+                    src={embedUrl}
+                    className="w-full h-[500px]"
+                    title={recurso.titulo}
+                    allowFullScreen
+                  />
+                </div>
+              )
+              return null
+            })()}
             {recurso.archivo_url && recurso.formato === 'Imagen / Lámina' ? (
               <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
                 <img
