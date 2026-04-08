@@ -209,68 +209,70 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
               )
               return null
             })()}
-            {recurso.archivo_url && recurso.formato === 'Imagen / Lámina' ? (
-              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
-                <img
-                  src={recurso.archivo_url}
-                  alt={recurso.titulo}
-                  className="w-full max-h-[600px] object-contain bg-[#f8f9fc]"
-                />
-              </div>
-            ) : recurso.archivo_url && recurso.formato === 'Documento' && recurso.archivo_url.endsWith('.pdf') ? (
-              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
-                <iframe
-                  src={recurso.archivo_url}
-                  className="w-full h-[600px]"
-                  title={recurso.titulo}
-                />
-              </div>
-            ) : recurso.archivo_url && recurso.formato === 'Documento' ? (
-              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
-                <iframe
-                  src={`https://docs.google.com/gview?url=${encodeURIComponent(recurso.archivo_url)}&embedded=true`}
-                  className="w-full h-[600px]"
-                  title={recurso.titulo}
-                />
-              </div>
-            ) : recurso.archivo_url && recurso.formato === 'Presentación slides' ? (
-              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
-                <iframe
-                  src={`https://docs.google.com/gview?url=${encodeURIComponent(recurso.archivo_url)}&embedded=true`}
-                  className="w-full h-[600px]"
-                  title={recurso.titulo}
-                />
-              </div>
-            ) : recurso.thumbnail_url && recurso.formato === 'Link externo' ? (
-              <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
-                <img
-                  src={recurso.thumbnail_url}
-                  alt={recurso.titulo}
-                  className="w-full max-h-[500px] object-contain bg-[#f8f9fc]"
-                />
-              </div>
-            ) : (
-              <div className="rounded-3xl border border-gray-100 bg-gradient-to-br from-[#1A3A5C]/4 via-[#2E6EA6]/2 to-[#8B2252]/4
-                              shadow-sm p-10 flex flex-col items-center justify-center min-h-[300px]">
-                <TipoIcon tipo={recurso.tipo_recurso} className="w-16 h-16 text-[#1A3A5C]/20 mb-4" />
-                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#1A3A5C]/30 mb-2">{recurso.formato}</span>
-                {!recurso.archivo_url && (
-                  <p className="text-xs text-gray-300">Preview no disponible</p>
-                )}
-                {recurso.archivo_url && (
-                  <a
-                    href={recurso.archivo_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 px-4 py-2 rounded-xl text-sm text-[#2E6EA6] font-medium
-                               bg-white/80 border border-[#2E6EA6]/15 shadow-sm
-                               hover:shadow-card hover:-translate-y-0.5 transition-all duration-200"
-                  >
-                    Ver archivo completo
-                  </a>
-                )}
-              </div>
-            )}
+            {(() => {
+              // No mostrar preview secundario si ya hay embed de Google
+              const linkSrc2 = recurso.link_editable || recurso.archivo_url || ''
+              const hasGoogleEmbed = linkSrc2.includes('docs.google.com/presentation') || linkSrc2.includes('docs.google.com/document') || linkSrc2.includes('docs.google.com/spreadsheets')
+              if (hasGoogleEmbed) return null
+
+              if (recurso.archivo_url && recurso.formato === 'Imagen / Lámina') return (
+                <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                  <img
+                    src={recurso.archivo_url}
+                    alt={recurso.titulo}
+                    className="w-full max-h-[600px] object-contain bg-[#f8f9fc]"
+                  />
+                </div>
+              )
+              if (recurso.archivo_url && recurso.formato === 'Documento' && recurso.archivo_url.endsWith('.pdf')) return (
+                <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                  <iframe
+                    src={recurso.archivo_url}
+                    className="w-full h-[600px]"
+                    title={recurso.titulo}
+                  />
+                </div>
+              )
+              if (recurso.archivo_url && (recurso.formato === 'Documento' || recurso.formato === 'Presentación slides')) return (
+                <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                  <iframe
+                    src={`https://docs.google.com/gview?url=${encodeURIComponent(recurso.archivo_url)}&embedded=true`}
+                    className="w-full h-[600px]"
+                    title={recurso.titulo}
+                  />
+                </div>
+              )
+              if (recurso.thumbnail_url && recurso.formato === 'Link externo') return (
+                <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden bg-white">
+                  <img
+                    src={recurso.thumbnail_url}
+                    alt={recurso.titulo}
+                    className="w-full max-h-[500px] object-contain bg-[#f8f9fc]"
+                  />
+                </div>
+              )
+              return (
+                <div className="rounded-3xl border border-gray-100 bg-gradient-to-br from-[#1A3A5C]/4 via-[#2E6EA6]/2 to-[#8B2252]/4
+                                shadow-sm p-10 flex flex-col items-center justify-center min-h-[300px]">
+                  <TipoIcon tipo={recurso.tipo_recurso} className="w-16 h-16 text-[#1A3A5C]/20 mb-4" />
+                  <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#1A3A5C]/30 mb-2">{recurso.formato}</span>
+                  {recurso.archivo_url ? (
+                    <a
+                      href={recurso.archivo_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 px-4 py-2 rounded-xl text-sm text-[#2E6EA6] font-medium
+                                 bg-white/80 border border-[#2E6EA6]/15 shadow-sm
+                                 hover:shadow-card hover:-translate-y-0.5 transition-all duration-200"
+                    >
+                      Ver archivo completo
+                    </a>
+                  ) : (
+                    <p className="text-xs text-gray-300">Preview no disponible</p>
+                  )}
+                </div>
+              )
+            })()}
 
             {recurso.resumen && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
