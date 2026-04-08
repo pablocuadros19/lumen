@@ -287,44 +287,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ===================== SOCIAL PROOF ===================== */}
-      <section className="py-24 sm:py-32 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-[#1A3A5C] to-[#2E6EA6] rounded-3xl p-10 sm:p-16
-                          text-white text-center relative overflow-hidden">
-            {/* Decoraciones */}
-            <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/[0.04] blur-[60px] translate-x-1/3 -translate-y-1/3" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-[#8B2252]/20 blur-[60px] -translate-x-1/3 translate-y-1/3" />
-
-            <div className="relative z-10">
-              <p className="text-xs font-bold tracking-[3px] uppercase text-white/60 mb-6">
-                Piloto activo
-              </p>
-
-              <div className="flex justify-center mb-8">
-                <div className="bg-white rounded-2xl p-3 shadow-lg">
-                  <Image
-                    src="/newman-logo-2.jpg"
-                    alt="Colegio Newman"
-                    width={80}
-                    height={80}
-                    className="rounded-lg"
-                  />
-                </div>
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-                Colegio Newman ya usa LUMEN
-              </h2>
-              <p className="text-white/70 text-lg max-w-xl mx-auto leading-relaxed">
-                Implementacion activa con el equipo docente de nivel primario.
-                Practicas del Lenguaje, Ciencias Naturales, Matematica y Ciencias Sociales.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ===================== PRICING ===================== */}
       <section className="relative py-24 sm:py-32 px-6">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f8f9fc] to-transparent" />
@@ -348,81 +310,41 @@ export default function LandingPage() {
               Implementacion bonificada
             </h3>
             <p className="text-gray-500 max-w-xl mx-auto">
-              Los primeros 3 meses solo abona el consumo real de inteligencia artificial:
-              entre USD 5 y USD 15/mes segun la actividad de las docentes.
+              Los primeros 3 meses solo abona el consumo real de inteligencia artificial
+              al costo, sin markup. Despues, tarifa fija predecible.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            {/* Plan mensual */}
-            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-200
-                            shadow-[0_2px_8px_rgba(26,58,92,0.04)]
-                            hover:shadow-[0_8px_24px_rgba(26,58,92,0.08)]
-                            transition-all duration-300">
-              <p className="text-xs font-bold tracking-[2px] uppercase text-gray-400 mb-6">
-                Mensual
-              </p>
-              <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-5xl font-black">$180</span>
-                <span className="text-gray-400 font-medium">USD</span>
-              </div>
-              <p className="text-sm text-gray-400 mb-8">por mes / sin compromiso</p>
-
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Todo lo incluido en el servicio',
-                  'Cancelacion libre mes a mes',
-                  'Soporte estandar (48hs)',
-                  'Hasta 2 horas de mejoras/mes',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-[15px] text-gray-600">
-                    <svg className="w-5 h-5 text-[#2E6EA6] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href="mailto:pablocuadros19@gmail.com?subject=Demo LUMEN"
-                className="block w-full text-center px-6 py-3.5 rounded-xl border-2 border-[#1A3A5C]/20
-                           text-[#1A3A5C] font-semibold
-                           hover:border-[#1A3A5C]/40 hover:bg-[#1A3A5C]/[0.03]
-                           transition-all duration-300"
-              >
-                Agenda una demo
-              </a>
-            </div>
-
-            {/* Plan anual */}
+            {/* Hasta 50 usuarios */}
             <div className="relative bg-gradient-to-br from-[#1A3A5C] to-[#2E6EA6]
                             rounded-3xl p-8 sm:p-10 text-white
                             shadow-[0_8px_32px_rgba(26,58,92,0.25)]">
-              {/* Badge recomendado */}
               <div className="absolute -top-3 left-1/2 -translate-x-1/2
                               bg-[#8B2252] text-white text-xs font-bold tracking-wider uppercase
                               px-5 py-1.5 rounded-full shadow-md">
-                Recomendado
+                Mas elegido
               </div>
 
               <p className="text-xs font-bold tracking-[2px] uppercase text-white/50 mb-6">
-                Anual
+                Hasta 50 usuarios
               </p>
               <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-5xl font-black">$150</span>
-                <span className="text-white/50 font-medium">USD</span>
+                <span className="text-5xl font-black">$250</span>
+                <span className="text-white/50 font-medium">USD/mes</span>
               </div>
-              <p className="text-sm text-white/50 mb-2">por mes / compromiso anual</p>
-              <p className="text-sm text-white/40 mb-8">$1.800 USD/ano — Ahorras $360</p>
+              <p className="text-sm text-white/40 mb-8">Ideal para la mayoria de los colegios</p>
 
               <ul className="space-y-3 mb-8">
                 {[
-                  'Todo lo incluido en el servicio',
-                  'Precio preferencial garantizado',
-                  'Soporte prioritario (24hs)',
-                  'Hasta 4 horas de mejoras/mes',
-                  'Features nuevas con prioridad',
+                  'Hasta 50 docentes y coordinadores',
+                  'IA integrada sin limite de uso',
+                  'Clasificacion automatica con IA',
+                  'Copiloto pedagogico',
+                  'Panel de coordinacion',
+                  'Sistema de revision y aprobacion',
+                  'Soporte y capacitacion incluidos',
+                  'Actualizaciones continuas',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-[15px] text-white/80">
                     <svg className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -434,7 +356,7 @@ export default function LandingPage() {
               </ul>
 
               <a
-                href="mailto:pablocuadros19@gmail.com?subject=Demo LUMEN - Plan Anual"
+                href="mailto:pablocuadros19@gmail.com?subject=Demo LUMEN"
                 className="block w-full text-center px-6 py-3.5 rounded-xl
                            bg-white text-[#1A3A5C] font-semibold
                            hover:bg-white/90 hover:shadow-lg
@@ -443,19 +365,60 @@ export default function LandingPage() {
                 Agenda una demo
               </a>
             </div>
+
+            {/* +50 usuarios */}
+            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-200
+                            shadow-[0_2px_8px_rgba(26,58,92,0.04)]
+                            hover:shadow-[0_8px_24px_rgba(26,58,92,0.08)]
+                            transition-all duration-300 flex flex-col">
+              <p className="text-xs font-bold tracking-[2px] uppercase text-gray-400 mb-6">
+                +50 usuarios
+              </p>
+              <div className="mb-2">
+                <span className="text-4xl font-black text-[#1A3A5C]">A medida</span>
+              </div>
+              <p className="text-sm text-gray-400 mb-8">Para colegios grandes o redes educativas</p>
+
+              <ul className="space-y-3 mb-8 flex-1">
+                {[
+                  'Todo lo del plan base',
+                  'Usuarios ilimitados',
+                  'Multiples niveles y sedes',
+                  'Onboarding personalizado',
+                  'SLA de soporte dedicado',
+                  'Integraciones a medida',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-[15px] text-gray-600">
+                    <svg className="w-5 h-5 text-[#2E6EA6] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href="mailto:pablocuadros19@gmail.com?subject=LUMEN - Plan a medida"
+                className="block w-full text-center px-6 py-3.5 rounded-xl border-2 border-[#1A3A5C]/20
+                           text-[#1A3A5C] font-semibold
+                           hover:border-[#1A3A5C]/40 hover:bg-[#1A3A5C]/[0.03]
+                           transition-all duration-300"
+              >
+                Hablemos
+              </a>
+            </div>
           </div>
 
           {/* Que incluye */}
           <div className="mt-12 text-center">
             <p className="text-sm text-gray-400 mb-4 font-semibold uppercase tracking-wider">
-              Ambos planes incluyen
+              Todos los planes incluyen
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {[
                 'Plataforma 24/7',
                 'Hosting y base de datos',
                 'IA integrada',
-                'Usuarios ilimitados',
                 'Backups automaticos',
                 'Actualizaciones continuas',
                 'Capacitacion inicial',
