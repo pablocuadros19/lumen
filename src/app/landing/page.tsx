@@ -30,7 +30,7 @@ export default function LandingPage() {
           </p>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black leading-tight mb-8 tracking-tight">
-            Todos los recursos de tu escuela.{' '}
+            Todos los recursos de tu colegio.{' '}
             <span className="text-gradient-lumen">
               Un solo lugar.
             </span>
@@ -79,7 +79,7 @@ export default function LandingPage() {
               El problema
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-              Los recursos de tu escuela están{' '}
+              Los recursos de tu colegio están{' '}
               <span className="text-[#8B2252]">dispersos</span>
             </h2>
           </div>
@@ -435,7 +435,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6">
             ¿Querés transformar la biblioteca{' '}
-            <span className="text-gradient-lumen">de tu escuela?</span>
+            <span className="text-gradient-lumen">de tu colegio?</span>
           </h2>
           <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10">
             Escribinos y coordinamos una demo personalizada para tu colegio.
