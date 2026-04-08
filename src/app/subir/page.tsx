@@ -399,20 +399,38 @@ function SubirContent() {
                     setForm(prev => ({ ...prev, editable: true }))
                     setPaso(2)
                     setSugerenciasIA(false)
-                    // Intentar extraer thumbnail del link
+                    // Intentar capturar thumbnail
+                    const linkUrl = form.link_editable.trim()
+                    const isGoogleLink = linkUrl.includes('docs.google.com/')
                     try {
-                      const res = await fetch('/api/link-preview', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ url: form.link_editable.trim() }),
-                      })
-                      if (res.ok) {
-                        const data = await res.json()
-                        if (data.thumbnail_url) {
-                          setForm(prev => ({ ...prev, thumbnail_url: data.thumbnail_url }))
+                      if (isGoogleLink) {
+                        // Capturar thumbnail via Drive API (requiere token de Google)
+                        const res = await fetch('/api/capturar-thumbnail', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ url: linkUrl }),
+                        })
+                        if (res.ok) {
+                          const data = await res.json()
+                          if (data.thumbnail_url) {
+                            setForm(prev => ({ ...prev, thumbnail_url: data.thumbnail_url }))
+                          }
                         }
-                        if (data.title && !form.titulo) {
-                          setForm(prev => ({ ...prev, titulo: data.title }))
+                      } else {
+                        // Link genérico: intentar link-preview
+                        const res = await fetch('/api/link-preview', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ url: linkUrl }),
+                        })
+                        if (res.ok) {
+                          const data = await res.json()
+                          if (data.thumbnail_url) {
+                            setForm(prev => ({ ...prev, thumbnail_url: data.thumbnail_url }))
+                          }
+                          if (data.title && !form.titulo) {
+                            setForm(prev => ({ ...prev, titulo: data.title }))
+                          }
                         }
                       }
                     } catch {

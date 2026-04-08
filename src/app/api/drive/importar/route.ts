@@ -85,10 +85,37 @@ export async function POST(request: NextRequest) {
     const clasRes = await fetch(clasificarUrl, { method: 'POST', body: formData })
     const clasificacion = clasRes.ok ? await clasRes.json() : { titulo: finalFileName, resumen: '', ejes_tematicos: [], tipo_recurso: 'Actividad', idioma: 'es' }
 
-    // Thumbnail: si es imagen, usar la URL directa
+    // Thumbnail
     let thumbnailUrl: string | null = null
     if (finalMimeType.startsWith('image/')) {
       thumbnailUrl = archivoUrl
+    } else {
+      // Intentar capturar thumbnail desde Drive API
+      try {
+        const thumbMeta = await fetch(
+          `https://www.googleapis.com/drive/v3/files/${fileId}?fields=thumbnailLink`,
+          { headers: { Authorization: `Bearer ${perfil.google_token}` } }
+        )
+        const thumbData = await thumbMeta.json()
+        if (thumbData.thumbnailLink) {
+          const thumbSrc = thumbData.thumbnailLink.replace(/=s\d+/, '=s800')
+          const thumbImgRes = await fetch(thumbSrc, {
+            headers: { Authorization: `Bearer ${perfil.google_token}` }
+          })
+          if (thumbImgRes.ok) {
+            const thumbBuffer = Buffer.from(await thumbImgRes.arrayBuffer())
+            const thumbPath = `${user.id}/thumb_${storageId}.png`
+            await supabase.storage.from('recursos').upload(thumbPath, thumbBuffer, {
+              contentType: 'image/png',
+              upsert: false,
+            })
+            const { data: thumbUrlData } = supabase.storage.from('recursos').getPublicUrl(thumbPath)
+            thumbnailUrl = thumbUrlData.publicUrl
+          }
+        }
+      } catch {
+        // Si falla, seguir sin thumbnail
+      }
     }
 
     return NextResponse.json({
