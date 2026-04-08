@@ -307,11 +307,11 @@ export default function LandingPage() {
           <div className="bg-gradient-to-r from-[#1A3A5C]/[0.05] to-[#2E6EA6]/[0.05]
                           border border-[#2E6EA6]/20 rounded-2xl p-8 mb-12 text-center">
             <h3 className="text-xl font-bold mb-2 text-[#1A3A5C]">
-              Implementacion bonificada
+              Primer mes gratis
             </h3>
             <p className="text-gray-500 max-w-xl mx-auto">
-              Los primeros 3 meses solo abona el consumo real de inteligencia artificial
-              al costo, sin markup. Despues, tarifa fija predecible.
+              Proba LUMEN con tu equipo docente durante 30 dias sin costo ni compromiso.
+              Si funciona para tu colegio, seguimos. Si no, sin vueltas.
             </p>
           </div>
 
