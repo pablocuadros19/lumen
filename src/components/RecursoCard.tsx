@@ -68,7 +68,39 @@ export default function RecursoCard({ recurso, onClick, index = 0, esFavorito = 
             <PdfThumbnail url={recurso.archivo_url} className="w-full h-full object-cover object-top" />
             <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/50 to-transparent" />
           </>
-        ) : (
+        ) : (() => {
+          // Detectar Google Slides/Docs/Sheets para generar thumbnail
+          const link = recurso.link_editable || recurso.archivo_url || ''
+          const slideMatch = link.match(/docs\.google\.com\/presentation\/d\/([^/]+)/)
+          const docMatch = link.match(/docs\.google\.com\/document\/d\/([^/]+)/)
+          if (slideMatch) {
+            return (
+              <>
+                <img
+                  src={`https://docs.google.com/presentation/d/${slideMatch[1]}/export/png?pageid=p1`}
+                  alt={recurso.titulo}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+                <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/50 to-transparent" />
+              </>
+            )
+          }
+          if (docMatch) {
+            return (
+              <>
+                <img
+                  src={`https://docs.google.com/document/d/${docMatch[1]}/export/png?pageid=p1`}
+                  alt={recurso.titulo}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+                <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/50 to-transparent" />
+              </>
+            )
+          }
+          return null
+        })() || (
           <div className="text-center relative z-10 flex flex-col items-center">
             <FormatIcon formato={recurso.formato} />
             <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#1A3A5C]/20 mt-2.5">
