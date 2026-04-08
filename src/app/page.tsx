@@ -1,11 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import HubView from '@/components/HubView'
+import LandingPage from '@/app/landing/page'
 import { AREAS } from '@/lib/constants'
 import type { Recurso } from '@/types/database'
 
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Si no está logueado, mostrar landing
+  if (!user) return <LandingPage />
 
   // Counts por área
   const areaCounts: Record<string, number> = {}
