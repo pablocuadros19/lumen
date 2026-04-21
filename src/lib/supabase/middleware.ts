@@ -27,12 +27,16 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Si no hay sesión y no está en login ni callback, redirigir a login
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
+  // Rutas públicas (no requieren sesión)
+  const path = request.nextUrl.pathname
+  const esRutaPublica =
+    path.startsWith('/login') ||
+    path.startsWith('/auth') ||
+    path.startsWith('/landing') ||
+    path.startsWith('/privacidad') ||
+    path === '/'
+
+  if (!user && !esRutaPublica) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
