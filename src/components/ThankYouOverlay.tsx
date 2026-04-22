@@ -5,13 +5,13 @@ import Image from 'next/image'
 
 const AGRADECIMIENTOS = [
   'Gracias por compartir. El aula de alguien va a ser mejor por esto.',
-  'Material nuevo para la biblioteca. Los chicos te lo van a agradecer.',
+  'Material nuevo para la plataforma. Los chicos te lo van a agradecer.',
   'Otro recurso más que suma. Gracias por ser parte.',
   'Esto es lo que hace grande a LUMEN: docentes como vos.',
   'Guardado y listo. Ahora otro docente puede usarlo también.',
   'Gracias por tu tiempo y dedicación. Se nota.',
   'Un recurso más, una clase mejor. Así se construye.',
-  'La biblioteca crece gracias a vos. Gracias de verdad.',
+  'La plataforma crece gracias a vos. Gracias de verdad.',
   'Compartir es multiplicar. Gracias por sumar.',
   'Listo. Lo que subiste hoy puede cambiar una clase mañana.',
 ]

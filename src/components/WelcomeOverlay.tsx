@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 
 const SALUDOS = [
   (n: string) => `Hola ${n}, ¿qué vamos a enseñar hoy?`,
-  (n: string) => `¡${n}! Tu biblioteca te esperaba.`,
+  (n: string) => `¡${n}! Tu plataforma te esperaba.`,
   (n: string) => `Buenas, ${n}. Los chicos no saben la suerte que tienen.`,
   (n: string) => `Hola ${n}, ¿preparamos algo lindo para el aula?`,
   (n: string) => `¡Qué bueno verte, ${n}! ¿Arrancamos?`,

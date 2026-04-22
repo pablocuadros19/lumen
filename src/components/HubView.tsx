@@ -230,7 +230,7 @@ const PLACEHOLDERS = [
   '¿Qué vas a enseñar hoy?',
   'Buscá por tema, eje o tipo de recurso...',
   '¿Necesitás algo para la clase de mañana?',
-  'Explorá la biblioteca pedagógica...',
+  'Explorá la plataforma pedagógica...',
   '¿Comprensión lectora? ¿Gramática? ¿Ciencias?',
   'Todo lo que necesitás para el aula...',
 ]
@@ -290,7 +290,7 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
           className="mb-3 drop-shadow-sm"
           priority
         />
-        <p className="text-sm text-gray-400 font-medium tracking-wide mb-8">Biblioteca Pedagógica Inteligente</p>
+        <p className="text-sm text-gray-400 font-medium tracking-wide mb-8">Plataforma Pedagógica Inteligente</p>
 
         {/* Buscador grande estilo ChatGPT */}
         <div className="w-full max-w-2xl mb-10 relative">

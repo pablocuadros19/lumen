@@ -26,7 +26,7 @@ export default function LandingPage() {
           </div>
 
           <p className="text-sm font-semibold tracking-[4px] uppercase text-[#8B2252] mb-6">
-            Biblioteca Pedagógica Inteligente
+            Plataforma Pedagógica Inteligente
           </p>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-black leading-tight mb-8 tracking-tight">
@@ -127,7 +127,7 @@ export default function LandingPage() {
               La solución
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6">
-              Una biblioteca inteligente{' '}
+              Una plataforma inteligente{' '}
               <span className="text-gradient-lumen">para tu colegio</span>
             </h2>
             <p className="text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed">
@@ -175,7 +175,7 @@ export default function LandingPage() {
               },
               {
                 title: 'Colecciones y favoritos',
-                text: 'Cada docente organiza su biblioteca personal. Marcá favoritos, creá colecciones temáticas y compartilas con colegas.',
+                text: 'Cada docente organiza su plataforma personal. Marcá favoritos, creá colecciones temáticas y compartilas con colegas.',
                 color: '#1A3A5C',
                 icon: (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -434,7 +434,7 @@ export default function LandingPage() {
       <section className="py-24 sm:py-32 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-6">
-            ¿Querés transformar la biblioteca{' '}
+            ¿Querés transformar la plataforma{' '}
             <span className="text-gradient-lumen">de tu colegio?</span>
           </h2>
           <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10">
@@ -479,7 +479,7 @@ export default function LandingPage() {
               height={40}
             />
             <span className="font-bold text-[#1A3A5C]">LUMEN</span>
-            <span className="text-gray-400 text-sm">Biblioteca Pedagógica Inteligente</span>
+            <span className="text-gray-400 text-sm">Plataforma Pedagógica Inteligente</span>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-400">

@@ -65,7 +65,7 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
           </svg>
           <h2 className="text-xl font-bold text-[#1A3A5C] mb-2">Recurso no encontrado</h2>
           <Link href="/" className="text-sm text-[#8B2252] hover:underline">
-            Volver a la biblioteca
+            Volver a la plataforma
           </Link>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
           </svg>
           <h2 className="text-xl font-bold text-[#1A3A5C] mb-2">Recurso en revisión</h2>
           <p className="text-sm text-gray-400 mb-4">Este recurso no está disponible en este momento.</p>
-          <Link href="/" className="text-sm text-[#8B2252] hover:underline">Volver a la biblioteca</Link>
+          <Link href="/" className="text-sm text-[#8B2252] hover:underline">Volver a la plataforma</Link>
         </div>
       </div>
     )
@@ -135,7 +135,7 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Volver a la biblioteca
+          Volver a la plataforma
         </Link>
 
         {/* Banner de revisión para el autor */}

@@ -215,7 +215,7 @@ export default function ImportarPage() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Volver a la biblioteca
+          Volver a la plataforma
         </Link>
 
         <h1 className="text-2xl font-bold text-[#1A3A5C] mb-6">Importar desde Google Drive</h1>
@@ -476,7 +476,7 @@ export default function ImportarPage() {
                          text-sm font-semibold shadow-sm
                          hover:shadow-lg transition-all duration-200 cursor-pointer"
             >
-              Ir a la biblioteca
+              Ir a la plataforma
             </button>
           </div>
         )}

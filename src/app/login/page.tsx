@@ -50,7 +50,7 @@ function LoginContent() {
         </div>
 
         <p className="text-lg sm:text-xl font-medium mb-5 sm:mb-8 text-gradient-lumen">
-          Biblioteca Pedagógica Inteligente
+          Plataforma Pedagógica Inteligente
         </p>
 
         {/* Línea decorativa */}

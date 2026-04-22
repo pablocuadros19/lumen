@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "LUMEN — Biblioteca Pedagógica Inteligente",
+  title: "LUMEN — Plataforma Pedagógica Inteligente",
   description: "Encontrá el recurso justo en segundos, entendé qué es sin abrirlo, y usá IA para adaptarlo a tu clase.",
   icons: {
     icon: "/logo.png",

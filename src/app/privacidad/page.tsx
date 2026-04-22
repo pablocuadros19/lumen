@@ -15,7 +15,7 @@ export default function PrivacidadPage() {
           <section>
             <h2 className="text-lg font-semibold text-[#1A3A5C] mb-3">1. Qué es LUMEN</h2>
             <p>
-              LUMEN es una biblioteca pedagógica digital diseñada para instituciones educativas.
+              LUMEN es una plataforma pedagógica digital diseñada para instituciones educativas.
               Permite a docentes y coordinadores compartir, organizar y descubrir recursos
               pedagógicos de manera colaborativa.
             </p>

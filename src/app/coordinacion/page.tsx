@@ -139,7 +139,7 @@ export default async function CoordinacionPage() {
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#1A3A5C] mb-6 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-          Volver a la biblioteca
+          Volver a la plataforma
         </Link>
 
         <h1 className="text-2xl font-bold text-[#1A3A5C] mb-1">Panel de Coordinación</h1>
