@@ -360,6 +360,20 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
                 <p className="text-sm text-gray-400 text-center py-2">Sin archivo disponible</p>
               )}
 
+              <Link
+                href={`/clase/${recurso.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full px-4 py-3.5 rounded-2xl bg-white border-2 border-[#1A3A5C] text-[#1A3A5C]
+                           text-sm font-semibold shadow-sm hover:shadow-card hover:-translate-y-0.5
+                           transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                </svg>
+                Modo clase
+              </Link>
+
               <CompartirButton recursoId={recurso.id} titulo={recurso.titulo} />
             </div>
 
