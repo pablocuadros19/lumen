@@ -218,10 +218,25 @@ interface Props {
   userName: string
   userAvatar: string
   areaCounts: Record<string, number>
-  recientes: Recurso[]
+  actividad: Recurso[]
   todosRecursos: Pick<Recurso, 'id' | 'titulo' | 'area' | 'eje_tematico' | 'thumbnail_url'>[]
   efemerideProxima?: EfemerideProxima | null
   adminIds: string[]
+}
+
+function tiempoRelativo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const min = Math.floor(diff / 60000)
+  if (min < 1) return 'recién'
+  if (min < 60) return `hace ${min} min`
+  const hs = Math.floor(min / 60)
+  if (hs < 24) return `hace ${hs}h`
+  const dias = Math.floor(hs / 24)
+  if (dias < 7) return `hace ${dias}d`
+  const semanas = Math.floor(dias / 7)
+  if (semanas < 4) return `hace ${semanas}sem`
+  const meses = Math.floor(dias / 30)
+  return `hace ${meses} meses`
 }
 
 const PLACEHOLDERS = [
@@ -235,7 +250,7 @@ const PLACEHOLDERS = [
   'Todo lo que necesitás para el aula...',
 ]
 
-export default function HubView({ userName, userAvatar, areaCounts, recientes, todosRecursos, efemerideProxima }: Props) {
+export default function HubView({ userName, userAvatar, areaCounts, actividad, todosRecursos, efemerideProxima }: Props) {
   const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [placeholder] = useState(() => PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)])
@@ -479,37 +494,50 @@ export default function HubView({ userName, userAvatar, areaCounts, recientes, t
               </div>
             )}
 
-            {/* Recientes */}
-            {recientes.length > 0 && (
-              <div className="w-full max-w-5xl">
+            {/* Actividad reciente */}
+            {actividad.length > 0 && (
+              <div className="w-full max-w-3xl">
                 <h2 className="text-sm font-bold text-[#1A3A5C] uppercase tracking-wider mb-4 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#2E6EA6]" />
-                  Recientes
+                  Actividad reciente
                 </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {recientes.map((r) => (
-                    <Link
-                      key={r.id}
-                      href={`/recurso/${r.id}`}
-                      className="group p-3 rounded-2xl bg-white border border-gray-100 shadow-sm
-                                 hover:shadow-card hover:-translate-y-1 transition-all duration-200"
-                    >
-                      <div className="h-20 rounded-xl bg-gradient-to-br from-[#1A3A5C]/4 to-[#8B2252]/4
-                                      mb-2.5 overflow-hidden flex items-center justify-center">
-                        {r.thumbnail_url ? (
-                          <img src={r.thumbnail_url} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <svg className="w-6 h-6 text-[#1A3A5C]/15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                          </svg>
-                        )}
-                      </div>
-                      <p className="text-xs font-semibold text-[#1A3A5C] line-clamp-2 group-hover:text-[#8B2252] transition-colors">
-                        {r.titulo}
-                      </p>
-                      <p className="text-[10px] text-gray-400 mt-1">{r.eje_tematico}</p>
-                    </Link>
-                  ))}
+                <div className="space-y-2">
+                  {actividad.map((r) => {
+                    const areaColor = getColorForArea(r.area)
+                    return (
+                      <Link
+                        key={r.id}
+                        href={`/recurso/${r.id}`}
+                        className="group flex items-center gap-3 p-3 rounded-2xl bg-white border border-gray-100 shadow-sm
+                                   hover:shadow-card hover:-translate-y-0.5 transition-all duration-200"
+                      >
+                        <div
+                          className="w-12 h-12 rounded-xl shrink-0 overflow-hidden flex items-center justify-center"
+                          style={{ backgroundColor: `${areaColor}10` }}
+                        >
+                          {r.thumbnail_url ? (
+                            <img src={r.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <AreaIcon slug={AREAS.find(a => a.nombre === r.area)?.slug || ''} className="w-5 h-5" style={{ color: areaColor }} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-[#1A3A5C] truncate">
+                            <span className="font-semibold">{r.autor_nombre || 'Anónimo'}</span>
+                            <span className="text-gray-500"> subió </span>
+                            <span className="font-semibold group-hover:text-[#8B2252] transition-colors">«{r.titulo}»</span>
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[11px] text-gray-400">{tiempoRelativo(r.created_at)}</span>
+                            <span className="text-[11px] text-gray-300">·</span>
+                            <span className="text-[11px] font-medium" style={{ color: areaColor }}>{r.area}</span>
+                            <span className="text-[11px] text-gray-300">·</span>
+                            <span className="text-[11px] text-gray-500 truncate">{r.eje_tematico}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  })}
                 </div>
               </div>
             )}

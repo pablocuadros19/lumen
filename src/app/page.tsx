@@ -22,47 +22,14 @@ export default async function HomePage() {
     areaCounts[area.nombre] = count || 0
   }
 
-  // Recientes del usuario (últimos descargados)
-  let recientes: Recurso[] = []
-  if (user) {
-    try {
-      const { data: historial } = await supabase
-        .from('historial_descargas')
-        .select('recurso_id')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(8)
-
-      if (historial && historial.length > 0) {
-        const ids = [...new Set(historial.map(h => h.recurso_id))]
-        const { data: recursos } = await supabase
-          .from('recursos')
-          .select('*')
-          .in('id', ids)
-          .in('estado', ['publicado', 'destacado'])
-        if (recursos) {
-          // Mantener orden del historial
-          recientes = ids
-            .map(id => recursos.find(r => r.id === id))
-            .filter((r): r is Recurso => r !== undefined)
-            .slice(0, 8)
-        }
-      }
-    } catch {
-      // Tabla puede no existir
-    }
-
-    // Si no hay historial, mostrar los más recientes
-    if (recientes.length === 0) {
-      const { data } = await supabase
-        .from('recursos')
-        .select('*')
-        .in('estado', ['publicado', 'destacado'])
-        .order('created_at', { ascending: false })
-        .limit(8)
-      recientes = data || []
-    }
-  }
+  // Actividad reciente (feed global de últimos recursos publicados)
+  const { data: actividadData } = await supabase
+    .from('recursos')
+    .select('*')
+    .in('estado', ['publicado', 'destacado'])
+    .order('created_at', { ascending: false })
+    .limit(8)
+  const actividad: Recurso[] = actividadData || []
 
   // Recursos lightweight para búsqueda global
   const { data: todosRecursos } = await supabase
@@ -116,7 +83,7 @@ export default async function HomePage() {
       userName={userName}
       userAvatar={userAvatar}
       areaCounts={areaCounts}
-      recientes={recientes}
+      actividad={actividad}
       todosRecursos={todosRecursos || []}
       efemerideProxima={efemerideProxima}
       adminIds={adminIds}
