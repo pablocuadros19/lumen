@@ -1,9 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import Lumen3dPopup from '@/components/Lumen3dPopup'
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-[#1A3A5C] overflow-hidden">
+      <Lumen3dPopup />
 
       {/* ===================== HERO ===================== */}
       <section className="relative min-h-screen flex items-center justify-center px-6 py-20">

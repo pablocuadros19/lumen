@@ -34,6 +34,7 @@ export async function updateSession(request: NextRequest) {
     path.startsWith('/auth') ||
     path.startsWith('/landing') ||
     path.startsWith('/privacidad') ||
+    path.startsWith('/3d') ||
     path === '/'
 
   if (!user && !esRutaPublica) {

@@ -54,6 +54,25 @@ body {
   100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+@keyframes slideInDown {
+  0% { opacity: 0; transform: translateY(-120%); }
+  60% { opacity: 1; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideOutUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-120%); }
+}
+
+.animate-slide-in-down {
+  animation: slideInDown 0.7s var(--ease-spring) both;
+}
+
+.animate-slide-out-up {
+  animation: slideOutUp 0.4s var(--ease-smooth) forwards;
+}
+
 /* Animación entrada cards */
 .animate-card-in {
   animation: fadeInUp 0.4s var(--ease-smooth) both;
