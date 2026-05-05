@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { clasificarArchivo } from '@/lib/clasificar'
 
 export async function POST(request: NextRequest) {
   try {
@@ -72,19 +73,13 @@ export async function POST(request: NextRequest) {
     const { data: urlData } = supabase.storage.from('recursos').getPublicUrl(storagePath)
     const archivoUrl = urlData.publicUrl
 
-    const clasificarUrl = new URL('/api/clasificar', request.url)
-    const formData = new FormData()
-    formData.append('archivo', new Blob([fileBuffer], { type: finalMimeType }), finalFileName)
-    formData.append('nombre', finalFileName)
-    console.log('[drive/importar] enviando a clasificar:', { finalFileName, finalMimeType, size: fileBuffer.length })
-    const clasRes = await fetch(clasificarUrl, { method: 'POST', body: formData })
     let clasificacion
-    if (clasRes.ok) {
-      clasificacion = await clasRes.json()
-      console.log('[drive/importar] clasificación recibida:', clasificacion)
-    } else {
-      const errText = await clasRes.text().catch(() => '')
-      console.error('[drive/importar] Clasificar falló:', clasRes.status, errText.slice(0, 300))
+    try {
+      console.log('[drive/importar] clasificando:', { finalFileName, finalMimeType, size: fileBuffer.length })
+      clasificacion = await clasificarArchivo(fileBuffer, finalFileName, finalMimeType)
+      console.log('[drive/importar] clasificación OK:', { titulo: clasificacion.titulo, area: clasificacion.area })
+    } catch (err) {
+      console.error('[drive/importar] Clasificar falló:', err)
       clasificacion = { titulo: finalFileName, resumen: '', ejes_tematicos: [], tipo_recurso: 'Actividad', idioma: 'es' }
     }
 
