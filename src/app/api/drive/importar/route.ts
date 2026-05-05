@@ -76,10 +76,17 @@ export async function POST(request: NextRequest) {
     const formData = new FormData()
     formData.append('archivo', new Blob([fileBuffer], { type: finalMimeType }), finalFileName)
     formData.append('nombre', finalFileName)
+    console.log('[drive/importar] enviando a clasificar:', { finalFileName, finalMimeType, size: fileBuffer.length })
     const clasRes = await fetch(clasificarUrl, { method: 'POST', body: formData })
-    const clasificacion = clasRes.ok
-      ? await clasRes.json()
-      : { titulo: finalFileName, resumen: '', ejes_tematicos: [], tipo_recurso: 'Actividad', idioma: 'es' }
+    let clasificacion
+    if (clasRes.ok) {
+      clasificacion = await clasRes.json()
+      console.log('[drive/importar] clasificación recibida:', clasificacion)
+    } else {
+      const errText = await clasRes.text().catch(() => '')
+      console.error('[drive/importar] Clasificar falló:', clasRes.status, errText.slice(0, 300))
+      clasificacion = { titulo: finalFileName, resumen: '', ejes_tematicos: [], tipo_recurso: 'Actividad', idioma: 'es' }
+    }
 
     let thumbnailUrl: string | null = null
     if (finalMimeType.startsWith('image/')) {

@@ -74,22 +74,40 @@ export async function POST(request: NextRequest) {
     const archivo = formData.get('archivo') as File | null
     const nombreArchivo = formData.get('nombre') as string || ''
 
+    console.log('[clasificar] archivo:', archivo ? { name: archivo.name, type: archivo.type, size: archivo.size } : null, 'nombre:', nombreArchivo)
+
     let textoExtraido = ''
 
     if (archivo) {
       const buffer = Buffer.from(await archivo.arrayBuffer())
       const base64 = buffer.toString('base64')
       const esImagen = archivo.type.startsWith('image/')
-      const esPDF = archivo.name.toLowerCase().endsWith('.pdf')
+      const esPDF = archivo.name.toLowerCase().endsWith('.pdf') || archivo.type === 'application/pdf'
 
       // Imágenes y PDFs: enviar directo a Haiku como contenido visual
       if (esImagen || esPDF) {
+        // Mapear mime types soportados por Anthropic
+        const TIPOS_IMG_SOPORTADOS = ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+        let mediaTypeImg = archivo.type
+        if (esImagen && !TIPOS_IMG_SOPORTADOS.includes(archivo.type)) {
+          // Inferir desde la extensión
+          const ext = archivo.name.toLowerCase().split('.').pop()
+          if (ext === 'jpg' || ext === 'jpeg') mediaTypeImg = 'image/jpeg'
+          else if (ext === 'png') mediaTypeImg = 'image/png'
+          else if (ext === 'gif') mediaTypeImg = 'image/gif'
+          else if (ext === 'webp') mediaTypeImg = 'image/webp'
+          else {
+            console.warn('[clasificar] Imagen con tipo no soportado:', archivo.type, archivo.name)
+            mediaTypeImg = 'image/jpeg'
+          }
+        }
+
         const contentBlock = esImagen
           ? {
               type: 'image' as const,
               source: {
                 type: 'base64' as const,
-                media_type: archivo.type as 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp',
+                media_type: mediaTypeImg as 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp',
                 data: base64,
               },
             }
@@ -102,25 +120,31 @@ export async function POST(request: NextRequest) {
               },
             }
 
-        const message = await anthropic.messages.create({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 1000,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                contentBlock,
-                {
-                  type: 'text',
-                  text: `Clasificá este recurso pedagógico. Describí lo que ves.\n\n${PROMPT_SISTEMA}`,
-                },
-              ],
-            },
-          ],
-        })
+        try {
+          const message = await anthropic.messages.create({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 1000,
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  contentBlock,
+                  {
+                    type: 'text',
+                    text: `Clasificá este recurso pedagógico. Describí lo que ves.\n\n${PROMPT_SISTEMA}`,
+                  },
+                ],
+              },
+            ],
+          })
 
-        const respuestaTexto = message.content[0].type === 'text' ? message.content[0].text : ''
-        return responderConClasificacion(respuestaTexto, nombreArchivo, '')
+          const respuestaTexto = message.content[0].type === 'text' ? message.content[0].text : ''
+          console.log('[clasificar] respuesta IA (visual):', respuestaTexto.slice(0, 200))
+          return responderConClasificacion(respuestaTexto, nombreArchivo, '')
+        } catch (err) {
+          console.error('[clasificar] Error llamando a Anthropic con archivo visual:', err)
+          // Fallback: clasificar solo por nombre
+        }
       }
 
       // Archivos de texto plano
