@@ -135,52 +135,20 @@ export default function DrivePickerModal({ onClose, onFileImported }: Props) {
       setError('')
 
       try {
-        // Descargar el archivo desde el browser (donde el Picker habilitó el acceso)
-        // con drive.file el servidor no puede descargarlo, pero el browser sí
-        let downloadUrl: string
-        let finalMimeType = doc.mimeType
-        let finalFileName = doc.name
-
-        if (doc.mimeType === 'application/vnd.google-apps.document') {
-          downloadUrl = `https://www.googleapis.com/drive/v3/files/${doc.id}/export?mimeType=application/pdf`
-          finalMimeType = 'application/pdf'
-          finalFileName = doc.name.replace(/\.[^.]+$/, '') + '.pdf'
-        } else if (doc.mimeType === 'application/vnd.google-apps.presentation') {
-          downloadUrl = `https://www.googleapis.com/drive/v3/files/${doc.id}/export?mimeType=application/pdf`
-          finalMimeType = 'application/pdf'
-          finalFileName = doc.name.replace(/\.[^.]+$/, '') + '.pdf'
-        } else {
-          downloadUrl = `https://www.googleapis.com/drive/v3/files/${doc.id}?alt=media`
-        }
-
-        const driveRes = await fetch(downloadUrl, {
-          headers: { Authorization: `Bearer ${googleToken}` },
-        })
-
-        if (!driveRes.ok) {
-          setError(`No se pudo descargar el archivo de Drive (${driveRes.status})`)
-          setEstado('error')
-          return
-        }
-
-        const fileBlob = await driveRes.blob()
-        const formData = new FormData()
-        formData.append('file', fileBlob, finalFileName)
-        formData.append('fileId', doc.id)
-        formData.append('fileName', finalFileName)
-        formData.append('mimeType', finalMimeType)
-        formData.append('originalMimeType', doc.mimeType)
-
         const res = await fetch('/api/drive/importar', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileId: doc.id, fileName: doc.name, mimeType: doc.mimeType }),
         })
 
         if (!res.ok) {
           const errData = await res.json()
+          if (errData.code === 'TOKEN_EXPIRED') {
+            setEstado('conectar')
+            return
+          }
           const detalle = errData.detalle ? ` (${errData.detalle})` : ''
           setError(`${errData.error || 'Error importando'}${detalle}`)
-          console.error('[DrivePicker] Error completo:', errData)
           setEstado('error')
           return
         }
