@@ -35,7 +35,7 @@ const SUPPORTED_MIMES = [
 ]
 
 export default function DrivePickerModal({ onClose, onFileImported }: Props) {
-  const [estado, setEstado] = useState<'cargando' | 'conectar' | 'picker' | 'importando'>('cargando')
+  const [estado, setEstado] = useState<'cargando' | 'conectar' | 'picker' | 'importando' | 'error'>('cargando')
   const [error, setError] = useState('')
   const [googleToken, setGoogleToken] = useState<string | null>(null)
   const [pickerLoaded, setPickerLoaded] = useState(false)
@@ -135,27 +135,53 @@ export default function DrivePickerModal({ onClose, onFileImported }: Props) {
       setError('')
 
       try {
+        // Descargar el archivo desde el browser (donde el Picker habilitó el acceso)
+        // con drive.file el servidor no puede descargarlo, pero el browser sí
+        let downloadUrl: string
+        let finalMimeType = doc.mimeType
+        let finalFileName = doc.name
+
+        if (doc.mimeType === 'application/vnd.google-apps.document') {
+          downloadUrl = `https://www.googleapis.com/drive/v3/files/${doc.id}/export?mimeType=application/pdf`
+          finalMimeType = 'application/pdf'
+          finalFileName = doc.name.replace(/\.[^.]+$/, '') + '.pdf'
+        } else if (doc.mimeType === 'application/vnd.google-apps.presentation') {
+          downloadUrl = `https://www.googleapis.com/drive/v3/files/${doc.id}/export?mimeType=application/pdf`
+          finalMimeType = 'application/pdf'
+          finalFileName = doc.name.replace(/\.[^.]+$/, '') + '.pdf'
+        } else {
+          downloadUrl = `https://www.googleapis.com/drive/v3/files/${doc.id}?alt=media`
+        }
+
+        const driveRes = await fetch(downloadUrl, {
+          headers: { Authorization: `Bearer ${googleToken}` },
+        })
+
+        if (!driveRes.ok) {
+          setError(`No se pudo descargar el archivo de Drive (${driveRes.status})`)
+          setEstado('error')
+          return
+        }
+
+        const fileBlob = await driveRes.blob()
+        const formData = new FormData()
+        formData.append('file', fileBlob, finalFileName)
+        formData.append('fileId', doc.id)
+        formData.append('fileName', finalFileName)
+        formData.append('mimeType', finalMimeType)
+        formData.append('originalMimeType', doc.mimeType)
+
         const res = await fetch('/api/drive/importar', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fileId: doc.id,
-            fileName: doc.name,
-            mimeType: doc.mimeType,
-          }),
+          body: formData,
         })
 
         if (!res.ok) {
           const errData = await res.json()
-          if (errData.code === 'TOKEN_EXPIRED') {
-            setEstado('conectar')
-            return
-          }
           const detalle = errData.detalle ? ` (${errData.detalle})` : ''
-          const fase = errData.fase ? `[${errData.fase}] ` : ''
-          setError(`${fase}${errData.error || 'Error importando'}${detalle}`)
+          setError(`${errData.error || 'Error importando'}${detalle}`)
           console.error('[DrivePicker] Error completo:', errData)
-          setEstado('picker')
+          setEstado('error')
           return
         }
 
@@ -173,7 +199,7 @@ export default function DrivePickerModal({ onClose, onFileImported }: Props) {
         })
       } catch {
         setError('Error de conexión')
-        setEstado('picker')
+        setEstado('error')
       }
     }
   }
@@ -184,7 +210,7 @@ export default function DrivePickerModal({ onClose, onFileImported }: Props) {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/subir?drive=1')}`,
-        scopes: 'https://www.googleapis.com/auth/drive.file',
+        scopes: 'https://www.googleapis.com/auth/drive.readonly',
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -242,6 +268,24 @@ export default function DrivePickerModal({ onClose, onFileImported }: Props) {
                          text-sm font-semibold shadow-sm hover:shadow-lg transition-all cursor-pointer"
             >
               Conectar Google Drive
+            </button>
+          </div>
+        )}
+
+        {/* Error — mostrar el detalle y permitir reintentar manualmente */}
+        {estado === 'error' && (
+          <div className="flex flex-col items-center justify-center py-12 px-6">
+            <svg className="w-10 h-10 text-red-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>
+            <p className="text-sm font-semibold text-red-600 mb-1">No se pudo importar el archivo</p>
+            {error && <p className="text-xs text-gray-500 text-center mb-5 max-w-xs">{error}</p>}
+            <button
+              onClick={() => { setError(''); setEstado('picker'); }}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#1A3A5C] to-[#2E6EA6] text-white
+                         text-sm font-semibold shadow-sm hover:shadow-lg transition-all cursor-pointer"
+            >
+              Elegir otro archivo
             </button>
           </div>
         )}

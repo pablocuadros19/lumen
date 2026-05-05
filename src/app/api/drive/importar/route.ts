@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-// Importar un archivo de Drive: descarga, sube a Storage, clasifica con IA
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -18,49 +17,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No conectado a Drive', code: 'NO_TOKEN' }, { status: 401 })
     }
 
-    const { fileId, fileName, mimeType } = await request.json()
+    // El cliente descarga el archivo (scope drive.file funciona en browser post-Picker)
+    // y lo envía como FormData. El servidor solo sube a Storage y clasifica.
+    const formData = await request.formData()
+    const file = formData.get('file') as File | null
+    const fileId = formData.get('fileId') as string
+    const finalFileName = formData.get('fileName') as string
+    const finalMimeType = formData.get('mimeType') as string
+    const originalMimeType = formData.get('originalMimeType') as string
 
-    // Para Google Docs/Slides, exportar como PDF
-    let downloadUrl: string
-    let finalMimeType = mimeType
-    let finalFileName = fileName
+    if (!file || !fileId || !finalFileName || !finalMimeType) {
+      return NextResponse.json({ error: 'Faltan campos requeridos', fase: 'validacion' }, { status: 400 })
+    }
 
+    const fileBuffer = Buffer.from(await file.arrayBuffer())
+
+    // Link editable para Google Docs/Slides
     let googleLink: string | null = null
-
-    if (mimeType === 'application/vnd.google-apps.document') {
-      downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/pdf`
-      finalMimeType = 'application/pdf'
-      finalFileName = fileName.replace(/\.[^.]+$/, '') + '.pdf'
+    if (originalMimeType === 'application/vnd.google-apps.document') {
       googleLink = `https://docs.google.com/document/d/${fileId}/edit`
-    } else if (mimeType === 'application/vnd.google-apps.presentation') {
-      downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/pdf`
-      finalMimeType = 'application/pdf'
-      finalFileName = fileName.replace(/\.[^.]+$/, '') + '.pdf'
+    } else if (originalMimeType === 'application/vnd.google-apps.presentation') {
       googleLink = `https://docs.google.com/presentation/d/${fileId}/edit`
-    } else {
-      downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`
     }
-
-    // Descargar archivo de Drive
-    const driveRes = await fetch(downloadUrl, {
-      headers: { Authorization: `Bearer ${perfil.google_token}` },
-    })
-
-    if (!driveRes.ok) {
-      const errBody = await driveRes.text().catch(() => '')
-      console.error('[drive/importar] Error descargando de Drive:', driveRes.status, errBody)
-      if (driveRes.status === 401) {
-        await supabase.from('perfiles').update({ google_token: null }).eq('id', user.id)
-        return NextResponse.json({ error: 'Token expirado', code: 'TOKEN_EXPIRED' }, { status: 401 })
-      }
-      return NextResponse.json({
-        error: `Drive devolvió ${driveRes.status}`,
-        detalle: errBody.slice(0, 500),
-        fase: 'descarga',
-      }, { status: 500 })
-    }
-
-    const fileBuffer = Buffer.from(await driveRes.arrayBuffer())
 
     // Subir a Supabase Storage
     const ext = finalFileName.split('.').pop() || 'pdf'
@@ -85,22 +63,23 @@ export async function POST(request: NextRequest) {
     const { data: urlData } = supabase.storage.from('recursos').getPublicUrl(storagePath)
     const archivoUrl = urlData.publicUrl
 
-    // Clasificar con IA (enviar al endpoint de clasificar como FormData)
+    // Clasificar con IA
     const clasificarUrl = new URL('/api/clasificar', request.url)
-    const formData = new FormData()
+    const clasFormData = new FormData()
     const blob = new Blob([fileBuffer], { type: finalMimeType })
-    formData.append('archivo', blob, finalFileName)
-    formData.append('nombre', finalFileName)
+    clasFormData.append('archivo', blob, finalFileName)
+    clasFormData.append('nombre', finalFileName)
 
-    const clasRes = await fetch(clasificarUrl, { method: 'POST', body: formData })
-    const clasificacion = clasRes.ok ? await clasRes.json() : { titulo: finalFileName, resumen: '', ejes_tematicos: [], tipo_recurso: 'Actividad', idioma: 'es' }
+    const clasRes = await fetch(clasificarUrl, { method: 'POST', body: clasFormData })
+    const clasificacion = clasRes.ok
+      ? await clasRes.json()
+      : { titulo: finalFileName, resumen: '', ejes_tematicos: [], tipo_recurso: 'Actividad', idioma: 'es' }
 
-    // Thumbnail
+    // Thumbnail — intentar desde Drive API con el token del servidor
     let thumbnailUrl: string | null = null
     if (finalMimeType.startsWith('image/')) {
       thumbnailUrl = archivoUrl
     } else {
-      // Intentar capturar thumbnail desde Drive API
       try {
         const thumbMeta = await fetch(
           `https://www.googleapis.com/drive/v3/files/${fileId}?fields=thumbnailLink`,
@@ -124,7 +103,7 @@ export async function POST(request: NextRequest) {
           }
         }
       } catch {
-        // Si falla, seguir sin thumbnail
+        // Sin thumbnail
       }
     }
 
@@ -139,10 +118,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[drive/importar] Error interno:', error)
     const msg = error instanceof Error ? error.message : String(error)
-    const stack = error instanceof Error ? error.stack?.split('\n').slice(0, 3).join(' | ') : ''
     return NextResponse.json({
       error: `Error interno: ${msg}`,
-      detalle: stack,
       fase: 'desconocida',
     }, { status: 500 })
   }
