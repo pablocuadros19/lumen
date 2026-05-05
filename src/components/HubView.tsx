@@ -300,12 +300,12 @@ export default function HubView({ userName, userAvatar, areaCounts, actividad, t
         <Image
           src="/logo.png"
           alt="LUMEN"
-          width={120}
-          height={120}
-          className="mb-3 drop-shadow-sm"
+          width={180}
+          height={180}
+          className="mb-4 drop-shadow-sm"
           priority
         />
-        <p className="text-sm text-gray-400 font-medium tracking-wide mb-8">Plataforma Pedagógica Inteligente</p>
+        <p className="text-lg text-gray-500 font-medium tracking-wide mb-10">Plataforma Pedagógica Inteligente</p>
 
         {/* Buscador grande estilo ChatGPT */}
         <div className="w-full max-w-2xl mb-10 relative">
