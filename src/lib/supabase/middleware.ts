@@ -2,6 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
+  // Si entran por *.vercel.app, redirigir a www.lumen.ar (dominio canónico)
+  const hostname = request.headers.get('host') || ''
+  if (hostname.endsWith('.vercel.app')) {
+    const canonicalUrl = new URL(request.nextUrl.pathname + request.nextUrl.search, 'https://www.lumen.ar')
+    return NextResponse.redirect(canonicalUrl, 308)
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
