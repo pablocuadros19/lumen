@@ -47,11 +47,17 @@ export async function POST(request: NextRequest) {
     })
 
     if (!driveRes.ok) {
+      const errBody = await driveRes.text().catch(() => '')
+      console.error('[drive/importar] Error descargando de Drive:', driveRes.status, errBody)
       if (driveRes.status === 401) {
         await supabase.from('perfiles').update({ google_token: null }).eq('id', user.id)
         return NextResponse.json({ error: 'Token expirado', code: 'TOKEN_EXPIRED' }, { status: 401 })
       }
-      return NextResponse.json({ error: `Error descargando: ${driveRes.status}` }, { status: 500 })
+      return NextResponse.json({
+        error: `Drive devolvió ${driveRes.status}`,
+        detalle: errBody.slice(0, 500),
+        fase: 'descarga',
+      }, { status: 500 })
     }
 
     const fileBuffer = Buffer.from(await driveRes.arrayBuffer())
@@ -69,7 +75,11 @@ export async function POST(request: NextRequest) {
       })
 
     if (uploadError) {
-      return NextResponse.json({ error: `Error subiendo: ${uploadError.message}` }, { status: 500 })
+      console.error('[drive/importar] Error subiendo a Storage:', uploadError)
+      return NextResponse.json({
+        error: `Storage: ${uploadError.message}`,
+        fase: 'upload',
+      }, { status: 500 })
     }
 
     const { data: urlData } = supabase.storage.from('recursos').getPublicUrl(storagePath)
@@ -127,7 +137,13 @@ export async function POST(request: NextRequest) {
       ...clasificacion,
     })
   } catch (error) {
-    console.error('Error importando desde Drive:', error)
-    return NextResponse.json({ error: 'Error interno' }, { status: 500 })
+    console.error('[drive/importar] Error interno:', error)
+    const msg = error instanceof Error ? error.message : String(error)
+    const stack = error instanceof Error ? error.stack?.split('\n').slice(0, 3).join(' | ') : ''
+    return NextResponse.json({
+      error: `Error interno: ${msg}`,
+      detalle: stack,
+      fase: 'desconocida',
+    }, { status: 500 })
   }
 }

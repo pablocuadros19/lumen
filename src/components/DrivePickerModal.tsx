@@ -151,7 +151,10 @@ export default function DrivePickerModal({ onClose, onFileImported }: Props) {
             setEstado('conectar')
             return
           }
-          setError(errData.error || 'Error importando')
+          const detalle = errData.detalle ? ` (${errData.detalle})` : ''
+          const fase = errData.fase ? `[${errData.fase}] ` : ''
+          setError(`${fase}${errData.error || 'Error importando'}${detalle}`)
+          console.error('[DrivePicker] Error completo:', errData)
           setEstado('picker')
           return
         }
