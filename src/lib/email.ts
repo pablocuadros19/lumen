@@ -152,7 +152,7 @@ export async function emailNuevoRecurso(opts: {
         subject: `Nuevo material para revisar — ${opts.recurso.titulo}`,
         html: layoutHtml({
           saludo: `Hola ${primerNombre(dest.nombre)},`,
-          mensaje: `<strong>${autorEsc}</strong> acaba de subir material a LUMEN y está esperando tu revisión. Dale una mirada cuando puedas y decidís si lo publicamos o pedimos algún ajuste.`,
+          mensaje: `<strong>${autorEsc}</strong> subió material nuevo a LUMEN. Podés revisarlo y decidir si lo publicamos o pedimos algún ajuste.`,
           recurso: opts.recurso,
           ctaTexto: 'Ver el recurso',
         }),
@@ -176,7 +176,7 @@ export async function emailRecursoAprobado(opts: {
       subject: `Tu material fue aprobado — ${opts.recurso.titulo}`,
       html: layoutHtml({
         saludo: `¡Hola ${primerNombre(opts.destinatario.nombre)}!`,
-        mensaje: `<strong>${escapeHtml(opts.aprobador)}</strong> revisó lo que subiste y le dio el visto bueno. Ya está publicado en la biblioteca y disponible para todo el equipo.`,
+        mensaje: `<strong>${escapeHtml(opts.aprobador)}</strong> revisó tu material y lo aprobó. Ya está publicado en la biblioteca, disponible para todo el equipo.`,
         recurso: opts.recurso,
         ctaTexto: 'Verlo en LUMEN',
       }),
@@ -202,9 +202,8 @@ export async function emailRecursoObservado(opts: {
       subject: `Ajustes antes de publicar — ${opts.recurso.titulo}`,
       html: layoutHtml({
         saludo: `Hola ${primerNombre(opts.destinatario.nombre)},`,
-        mensaje: `<strong>${escapeHtml(opts.revisor)}</strong> revisó tu material y te dejó algunos ajustes antes de publicarlo. No es un rechazo — el recurso queda pausado hasta que apliques los cambios y lo reenvíes desde la plataforma.`,
+        mensaje: `<strong>${escapeHtml(opts.revisor)}</strong> revisó tu material y sugirió algunos cambios antes de publicarlo. Cuando los tengas listos, podés reenviarlo desde la página del recurso.`,
         comentario: opts.comentario,
-        submensaje: 'Para reenviarlo, abrís el recurso en LUMEN y usás el botón "Reenviar para revisión".',
         recurso: opts.recurso,
         ctaTexto: 'Ir a hacer los ajustes',
       }),
