@@ -45,6 +45,7 @@ export type TipoRecurso =
   | 'Teoría / Marco'
   | 'Ideas / Inspiración'
   | 'Juego'
+  | 'Lectura'
   | 'Material audiovisual'
   | 'Proyecto'
 

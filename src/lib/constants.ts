@@ -85,6 +85,7 @@ export const TIPOS_RECURSO = [
   'Teoría / Marco',
   'Ideas / Inspiración',
   'Juego',
+  'Lectura',
   'Material audiovisual',
   'Proyecto',
 ] as const

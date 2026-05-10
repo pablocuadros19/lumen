@@ -28,7 +28,7 @@ const AREAS_VALIDAS = ['Prácticas del Lenguaje', 'Ciencias Naturales', 'Matemá
 const TIPOS_VALIDOS = [
   'Actividad', 'Evaluación', 'Rúbrica', 'Planificación',
   'Presentación', 'Teoría / Marco', 'Ideas / Inspiración',
-  'Juego', 'Material audiovisual', 'Proyecto',
+  'Juego', 'Lectura', 'Material audiovisual', 'Proyecto',
 ]
 
 const PROMPT_SISTEMA = `Sos un bibliotecario pedagógico experto en educación primaria argentina (1ro a 6to grado) según el Diseño Curricular de la Provincia de Buenos Aires.
