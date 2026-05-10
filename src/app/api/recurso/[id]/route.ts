@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { emailRecursoAprobado, emailRecursoObservado } from '@/lib/email'
 
 // Aprobar, observar o reenviar un recurso
 export async function PATCH(
@@ -18,22 +19,40 @@ export async function PATCH(
     const body = await request.json()
     const { accion, comentario } = body as { accion: string; comentario?: string }
 
-    // Obtener perfil del usuario
+    // Obtener perfil del usuario (revisor)
     const { data: perfil } = await supabase
       .from('perfiles')
-      .select('rol')
+      .select('rol, nombre')
       .eq('id', user.id)
       .single()
 
-    // Obtener recurso
+    // Obtener recurso (con datos para email)
     const { data: recurso } = await supabase
       .from('recursos')
-      .select('subido_por, estado')
+      .select('subido_por, estado, titulo, areas, area, grados, tipo_recurso')
       .eq('id', id)
       .single()
 
     if (!recurso) {
       return NextResponse.json({ error: 'Recurso no encontrado' }, { status: 404 })
+    }
+
+    // Helper: traer email/nombre del autor para notificar
+    async function getAutor() {
+      const { data } = await supabase
+        .from('perfiles')
+        .select('email, nombre')
+        .eq('id', recurso!.subido_por)
+        .single()
+      return data
+    }
+
+    const recursoEmail = {
+      id,
+      titulo: recurso.titulo || '',
+      areas: recurso.areas?.length ? recurso.areas : recurso.area ? [recurso.area] : [],
+      grados: recurso.grados || [],
+      tipo: recurso.tipo_recurso || '',
     }
 
     if (accion === 'aprobar') {
@@ -47,6 +66,21 @@ export async function PATCH(
         .eq('id', id)
 
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+      // Email al autor
+      try {
+        const autor = await getAutor()
+        if (autor?.email && recurso.subido_por !== user.id) {
+          await emailRecursoAprobado({
+            destinatario: { email: autor.email, nombre: autor.nombre || '' },
+            aprobador: perfil?.nombre || 'Coordinación',
+            recurso: recursoEmail,
+          })
+        }
+      } catch (err) {
+        console.error('[recurso aprobar] error email:', err)
+      }
+
       return NextResponse.json({ ok: true, estado: 'aprobado' })
     }
 
@@ -64,6 +98,22 @@ export async function PATCH(
         .eq('id', id)
 
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+      // Email al autor con la devolución
+      try {
+        const autor = await getAutor()
+        if (autor?.email && recurso.subido_por !== user.id) {
+          await emailRecursoObservado({
+            destinatario: { email: autor.email, nombre: autor.nombre || '' },
+            revisor: perfil?.nombre || 'Coordinación',
+            comentario,
+            recurso: recursoEmail,
+          })
+        }
+      } catch (err) {
+        console.error('[recurso observar] error email:', err)
+      }
+
       return NextResponse.json({ ok: true, estado: 'revision' })
     }
 

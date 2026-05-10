@@ -66,7 +66,7 @@ export interface Recurso {
   resumen: string | null
   grados: Grado[]
   area: Area
-  areas: string[] | null
+  areas?: string[] | null
   eje_tematico: EjeTematico
   tipo_recurso: TipoRecurso
   formato: Formato

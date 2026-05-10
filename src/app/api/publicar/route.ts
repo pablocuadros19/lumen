@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { emailNuevoRecurso } from '@/lib/email'
 
 // Detectar formato por extensión
 function detectarFormato(nombre: string): string {
@@ -144,6 +145,36 @@ export async function POST(request: NextRequest) {
         efemeride_id: efeId,
       }))
       await supabase.from('recurso_efemerides').insert(efeRows)
+    }
+
+    // Notificar a coordinadoras de las áreas del recurso (si docente, no admin)
+    if (!esAdmin && recursoCreado) {
+      try {
+        const { data: admins } = await supabase
+          .from('perfiles')
+          .select('email, nombre, areas')
+          .eq('rol', 'admin')
+          .neq('id', user.id)
+
+        const destinatarios = (admins || [])
+          .filter(a => !a.areas || a.areas.length === 0 || a.areas.some((x: string) => areasLista.includes(x)))
+          .filter(a => a.email)
+          .map(a => ({ email: a.email as string, nombre: a.nombre || '' }))
+
+        await emailNuevoRecurso({
+          destinatarios,
+          autor: recurso.autor_nombre || 'Un docente',
+          recurso: {
+            id: recursoCreado.id,
+            titulo: recurso.titulo,
+            areas: areasLista,
+            grados: recurso.grados || [],
+            tipo: recurso.tipo_recurso || '',
+          },
+        })
+      } catch (err) {
+        console.error('[publicar] error notificando admins:', err)
+      }
     }
 
     return NextResponse.json(recursoCreado)
