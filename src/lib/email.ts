@@ -55,21 +55,19 @@ function layoutHtml(opts: {
 <tr><td align="center">
 <table width="580" cellpadding="0" cellspacing="0" role="presentation" style="max-width:580px;width:100%;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 16px rgba(26,58,92,0.10);">
 
-  <!-- HEADER -->
+  <!-- HEADER estilo landing -->
   <tr>
-    <td style="background:linear-gradient(135deg,#1A3A5C 0%,#2E6EA6 55%,#8B2252 100%);padding:26px 36px;">
-      <table cellpadding="0" cellspacing="0" role="presentation">
-        <tr>
-          <td style="vertical-align:middle;">
-            <img src="${logoUrl}" alt="LUMEN" width="44" height="44"
-              style="border-radius:12px;display:block;border:2px solid rgba(255,255,255,0.25);" />
-          </td>
-          <td style="vertical-align:middle;padding-left:14px;">
-            <div style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;line-height:1;">LUMEN</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:3px;letter-spacing:0.8px;text-transform:uppercase;">Plataforma pedagógica · Newman</div>
-          </td>
-        </tr>
-      </table>
+    <td style="background:#ffffff;padding:40px 36px 22px;text-align:center;">
+      <img src="${logoUrl}" alt="LUMEN" width="96" height="96"
+        style="display:block;margin:0 auto;" />
+      <div style="font-size:11px;font-weight:700;color:#8B2252;letter-spacing:3px;text-transform:uppercase;margin-top:10px;">
+        Plataforma Pedagógica · Newman
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0;line-height:0;font-size:0;">
+      <div style="height:3px;background:linear-gradient(90deg,#1A3A5C 0%,#2E6EA6 50%,#8B2252 100%);"></div>
     </td>
   </tr>
 

@@ -417,31 +417,31 @@ export default function HubView({ userName, userAvatar, areaCounts, actividad, t
                     )}
 
                     {/* Contenido */}
-                    <div className="relative h-full flex flex-col justify-end p-5">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center
+                    <div className="relative h-full flex flex-col justify-end p-3 sm:p-5">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                        <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0
                                         ${!area.proximamente ? 'group-hover:scale-110' : ''} transition-transform duration-300`}>
-                          <AreaIcon slug={area.slug} className="w-6 h-6 text-white" />
+                          <AreaIcon slug={area.slug} className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                         </div>
-                        <div>
-                          <h3 className="text-base font-bold text-white leading-tight drop-shadow-sm">
+                        <div className="min-w-0">
+                          <h3 className="text-[15px] sm:text-base font-bold text-white leading-tight drop-shadow-sm">
                             {area.nombre}
                           </h3>
-                          <p className="text-white/70 text-xs mt-0.5">{area.description}</p>
+                          <p className="hidden sm:block text-white/70 text-xs mt-0.5">{area.description}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between mt-1">
+                      <div className="flex items-center justify-between mt-1 gap-2">
                         {area.proximamente ? (
-                          <span className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                          <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                             Próximamente
                           </span>
                         ) : (
                           <>
-                            <span className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                            <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] sm:text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
                               {count} {count === 1 ? 'recurso' : 'recursos'}
                             </span>
-                            <div className="flex items-center gap-1 text-white/60 group-hover:text-white group-hover:translate-x-1
+                            <div className="hidden sm:flex items-center gap-1 text-white/60 group-hover:text-white group-hover:translate-x-1
                                             transition-all duration-300">
                               <span className="text-xs font-medium">Explorar</span>
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -462,7 +462,7 @@ export default function HubView({ userName, userAvatar, areaCounts, actividad, t
                       className="group rounded-3xl overflow-hidden opacity-75"
                       style={{ boxShadow: `0 4px 12px rgba(0,0,0,0.08), 0 4px 0 ${area.color}` }}
                     >
-                      <div className="relative block h-48">
+                      <div className="relative block h-36 sm:h-48">
                         {contenido}
                       </div>
                     </div>
@@ -478,7 +478,7 @@ export default function HubView({ userName, userAvatar, areaCounts, actividad, t
                   >
                     <Link
                       href={`/area/${area.slug}`}
-                      className="relative block h-48 cursor-pointer"
+                      className="relative block h-36 sm:h-48 cursor-pointer"
                     >
                       {contenido}
                     </Link>
