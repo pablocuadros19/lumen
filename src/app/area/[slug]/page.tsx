@@ -14,11 +14,11 @@ export default async function AreaPage({ params }: { params: Promise<{ slug: str
 
   const supabase = await createClient()
 
-  // Recursos de esta área
+  // Recursos de esta área (busca en array multi-área)
   const { data } = await supabase
     .from('recursos')
     .select('*')
-    .eq('area', areaConfig.nombre)
+    .overlaps('areas', [areaConfig.nombre])
     .in('estado', ['publicado', 'destacado'])
     .order('created_at', { ascending: false })
 

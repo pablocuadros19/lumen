@@ -14,7 +14,7 @@ import ThankYouOverlay from '@/components/ThankYouOverlay'
 type FormData = {
   titulo: string
   resumen: string
-  area: string
+  areas: string[]
   grados: string[]
   ejes_tematicos: string[]
   tipo_recurso: string
@@ -80,7 +80,7 @@ function SubirContent() {
   const [form, setForm] = useState<FormData>({
     titulo: '',
     resumen: '',
-    area: 'Prácticas del Lenguaje',
+    areas: ['Prácticas del Lenguaje'],
     grados: [],
     ejes_tematicos: [],
     tipo_recurso: '',
@@ -117,7 +117,7 @@ function SubirContent() {
         setForm(prev => ({
           titulo: data.titulo || file.name.replace(/\.[^.]+$/, ''),
           resumen: data.resumen || '',
-          area: data.area || prev.area,
+          areas: data.areas?.length ? data.areas : data.area ? [data.area] : prev.areas,
           grados: [],
           ejes_tematicos: data.ejes_tematicos || [],
           tipo_recurso: data.tipo_recurso || 'Actividad',
@@ -173,7 +173,8 @@ function SubirContent() {
 
   const handleDriveImport = (data: {
     archivo_url: string; thumbnail_url: string | null; titulo: string; resumen: string;
-    ejes_tematicos: string[]; tipo_recurso: string; idioma: string; texto_extraido?: string; fileName: string
+    ejes_tematicos: string[]; tipo_recurso: string; idioma: string; texto_extraido?: string; fileName: string;
+    area?: string; areas?: string[]
   }) => {
     setArchivoUrl(data.archivo_url)
     setDriveFileName(data.fileName)
@@ -182,7 +183,7 @@ function SubirContent() {
     setForm(prev => ({
       titulo: data.titulo,
       resumen: data.resumen,
-      area: prev.area,
+      areas: data.areas?.length ? data.areas : data.area ? [data.area] : prev.areas,
       grados: [],
       ejes_tematicos: data.ejes_tematicos || [],
       tipo_recurso: data.tipo_recurso || 'Actividad',
@@ -238,6 +239,7 @@ function SubirContent() {
       }
       body.append('datos', JSON.stringify({
         ...form,
+        area: form.areas[0] || 'Prácticas del Lenguaje',
         texto_extraido: textoExtraido,
         efemeride_ids: efemeridesSeleccionadas,
         ...(archivoUrl ? { existing_archivo_url: archivoUrl, existing_thumbnail_url: form.thumbnail_url || null } : {}),
@@ -569,29 +571,41 @@ function SubirContent() {
 
               {/* Área */}
               <div>
-                <label className="block text-sm font-medium text-[#1A3A5C] mb-2">
+                <label className="block text-sm font-medium text-[#1A3A5C] mb-1.5">
                   Área <span className="text-[#8B2252]">*</span>
+                  <span className="text-xs text-gray-400 ml-2 font-normal">Podés elegir varias</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {AREAS.map((a) => (
-                    <button
-                      key={a.slug}
-                      onClick={() => setForm(prev => ({
-                        ...prev,
-                        area: a.nombre,
-                        ejes_tematicos: [], // Reset ejes al cambiar área
-                      }))}
-                      className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer
-                        hover:scale-105
-                        ${form.area === a.nombre
-                          ? 'text-white shadow-md'
-                          : 'bg-white text-gray-600 border border-gray-200 shadow-sm'
-                        }`}
-                      style={form.area === a.nombre ? { backgroundColor: a.color, boxShadow: `0 4px 6px ${a.color}40` } : {}}
-                    >
-                      {a.nombre}
-                    </button>
-                  ))}
+                  {AREAS.map((a) => {
+                    const activa = form.areas.includes(a.nombre)
+                    return (
+                      <button
+                        key={a.slug}
+                        onClick={() => setForm(prev => {
+                          const yaActiva = prev.areas.includes(a.nombre)
+                          const nuevasAreas = yaActiva
+                            ? prev.areas.filter(x => x !== a.nombre)
+                            : [...prev.areas, a.nombre]
+                          if (nuevasAreas.length === 0) return prev
+                          const ejesValidos = nuevasAreas.flatMap(nombre => [...getEjesForArea(nombre)])
+                          return {
+                            ...prev,
+                            areas: nuevasAreas,
+                            ejes_tematicos: prev.ejes_tematicos.filter(e => ejesValidos.includes(e)),
+                          }
+                        })}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer
+                          hover:scale-105
+                          ${activa
+                            ? 'text-white shadow-md'
+                            : 'bg-white text-gray-600 border border-gray-200 shadow-sm'
+                          }`}
+                        style={activa ? { backgroundColor: a.color, boxShadow: `0 4px 6px ${a.color}40` } : {}}
+                      >
+                        {a.nombre}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
@@ -626,7 +640,7 @@ function SubirContent() {
                   <span className="text-xs text-gray-400 ml-2 font-normal">Podés elegir varios</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {getEjesForArea(form.area).map((e) => (
+                  {[...new Set(form.areas.flatMap(a => [...getEjesForArea(a)]))].map((e) => (
                     <button
                       key={e}
                       onClick={() => setForm(prev => ({

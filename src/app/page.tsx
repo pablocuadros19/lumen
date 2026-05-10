@@ -11,13 +11,13 @@ export default async function HomePage() {
   // Si no está logueado, mostrar landing
   if (!user) return <LandingPage />
 
-  // Counts por área
+  // Counts por área (busca en array multi-área)
   const areaCounts: Record<string, number> = {}
   for (const area of AREAS) {
     const { count } = await supabase
       .from('recursos')
       .select('*', { count: 'exact', head: true })
-      .eq('area', area.nombre)
+      .overlaps('areas', [area.nombre])
       .in('estado', ['publicado', 'destacado'])
     areaCounts[area.nombre] = count || 0
   }

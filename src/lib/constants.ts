@@ -84,6 +84,9 @@ export const TIPOS_RECURSO = [
   'Presentación',
   'Teoría / Marco',
   'Ideas / Inspiración',
+  'Juego',
+  'Material audiovisual',
+  'Proyecto',
 ] as const
 
 export const FORMATOS = [

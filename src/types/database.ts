@@ -44,6 +44,9 @@ export type TipoRecurso =
   | 'Presentación'
   | 'Teoría / Marco'
   | 'Ideas / Inspiración'
+  | 'Juego'
+  | 'Material audiovisual'
+  | 'Proyecto'
 
 export type Formato =
   | 'Documento'
@@ -62,6 +65,7 @@ export interface Recurso {
   resumen: string | null
   grados: Grado[]
   area: Area
+  areas: string[] | null
   eje_tematico: EjeTematico
   tipo_recurso: TipoRecurso
   formato: Formato

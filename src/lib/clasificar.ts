@@ -28,6 +28,7 @@ const AREAS_VALIDAS = ['Prácticas del Lenguaje', 'Ciencias Naturales', 'Matemá
 const TIPOS_VALIDOS = [
   'Actividad', 'Evaluación', 'Rúbrica', 'Planificación',
   'Presentación', 'Teoría / Marco', 'Ideas / Inspiración',
+  'Juego', 'Material audiovisual', 'Proyecto',
 ]
 
 const PROMPT_SISTEMA = `Sos un bibliotecario pedagógico experto en educación primaria argentina (1ro a 6to grado) según el Diseño Curricular de la Provincia de Buenos Aires.
@@ -67,6 +68,7 @@ REGLAS:
 
 export interface Clasificacion {
   area?: string
+  areas?: string[]
   titulo: string
   resumen: string
   ejes_tematicos: string[]
@@ -177,6 +179,12 @@ function parsearClasificacion(respuestaTexto: string, nombreArchivo: string, tex
 
   if (!TIPOS_VALIDOS.includes(clasificacion.tipo_recurso)) {
     clasificacion.tipo_recurso = 'Actividad'
+  }
+
+  if (clasificacion.area && AREAS_VALIDAS.includes(clasificacion.area)) {
+    clasificacion.areas = [clasificacion.area]
+  } else if (!clasificacion.areas) {
+    clasificacion.areas = []
   }
 
   clasificacion.texto_extraido = textoExtraido.slice(0, 2000)
