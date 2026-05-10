@@ -20,7 +20,6 @@ function escapeHtml(s: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
 }
 
 function primerNombre(nombre: string): string {
@@ -30,60 +29,112 @@ function primerNombre(nombre: string): string {
 function layoutHtml(opts: {
   saludo: string
   mensaje: string
+  submensaje?: string
   comentario?: string
   recurso: RecursoEmail
   ctaTexto: string
 }): string {
-  const { saludo, mensaje, comentario, recurso, ctaTexto } = opts
+  const { saludo, mensaje, submensaje, comentario, recurso, ctaTexto } = opts
   const url = `${SITE_URL}/recurso/${recurso.id}`
+  const logoUrl = `${SITE_URL}/logo.png`
+
   const meta = [
     recurso.areas.join(' · '),
     recurso.grados.length > 0 ? recurso.grados.join(', ') : '',
     recurso.tipo,
-  ].filter(Boolean).join(' · ')
+  ].filter(Boolean).join('  ·  ')
 
   return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:#f3f4f6;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body style="margin:0;padding:0;background:#EBF0F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="padding:32px 16px;">
+<tr><td align="center">
+<table width="580" cellpadding="0" cellspacing="0" role="presentation" style="max-width:580px;width:100%;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 16px rgba(26,58,92,0.10);">
+
+  <!-- HEADER -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#1A3A5C 0%,#2E6EA6 55%,#8B2252 100%);padding:26px 36px;">
+      <table cellpadding="0" cellspacing="0" role="presentation">
         <tr>
-          <td style="background:linear-gradient(135deg,#1A3A5C,#2E6EA6);padding:24px 32px;color:white;">
-            <div style="font-size:18px;font-weight:700;letter-spacing:-0.5px;">LUMEN</div>
-            <div style="font-size:12px;opacity:0.8;margin-top:2px;">Plataforma pedagógica · Newman</div>
+          <td style="vertical-align:middle;">
+            <img src="${logoUrl}" alt="LUMEN" width="44" height="44"
+              style="border-radius:12px;display:block;border:2px solid rgba(255,255,255,0.25);" />
           </td>
-        </tr>
-        <tr>
-          <td style="padding:32px;">
-            <h1 style="margin:0 0 8px;font-size:20px;color:#1A3A5C;font-weight:700;">${saludo}</h1>
-            <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#374151;">${mensaje}</p>
-            ${comentario ? `
-            <div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:14px 16px;border-radius:8px;margin-bottom:24px;">
-              <div style="font-size:11px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Devolución</div>
-              <div style="font-size:14px;color:#78350F;line-height:1.5;">${escapeHtml(comentario).replace(/\n/g, '<br>')}</div>
-            </div>` : ''}
-            <div style="background:#f7f9fc;border:1px solid #e0e5ec;border-radius:12px;padding:16px 18px;margin-bottom:24px;">
-              <div style="font-size:16px;font-weight:700;color:#1A3A5C;margin-bottom:6px;">${escapeHtml(recurso.titulo)}</div>
-              <div style="font-size:13px;color:#6b7280;">${escapeHtml(meta)}</div>
-            </div>
-            <a href="${url}" style="display:inline-block;background:#8B2252;color:white;padding:12px 28px;border-radius:10px;font-weight:600;font-size:14px;text-decoration:none;">${ctaTexto}</a>
-          </td>
-        </tr>
-        <tr>
-          <td style="background:#f9fafb;padding:16px 32px;border-top:1px solid #f3f4f6;">
-            <div style="font-size:11px;color:#9ca3af;text-align:center;">
-              LUMEN · Plataforma pedagógica del Colegio Cardenal Newman
-            </div>
+          <td style="vertical-align:middle;padding-left:14px;">
+            <div style="font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;line-height:1;">LUMEN</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:3px;letter-spacing:0.8px;text-transform:uppercase;">Plataforma pedagógica · Newman</div>
           </td>
         </tr>
       </table>
-    </td></tr>
-  </table>
+    </td>
+  </tr>
+
+  <!-- BODY -->
+  <tr>
+    <td style="padding:36px 36px 28px;">
+
+      <h1 style="margin:0 0 14px;font-size:22px;font-weight:700;color:#1A3A5C;line-height:1.25;">${saludo}</h1>
+
+      <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#374151;">${mensaje}</p>
+
+      ${comentario ? `
+      <div style="background:#FFFBEB;border-left:4px solid #F59E0B;border-radius:0 12px 12px 0;padding:16px 20px;margin-bottom:24px;">
+        <p style="margin:0 0 6px;font-size:10px;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:1.5px;">Devolución</p>
+        <p style="margin:0;font-size:14px;color:#78350F;line-height:1.65;">${escapeHtml(comentario).replace(/\n/g, '<br>')}</p>
+      </div>` : ''}
+
+      ${submensaje ? `<p style="margin:-12px 0 24px;font-size:14px;line-height:1.65;color:#6b7280;">${submensaje}</p>` : ''}
+
+      <!-- Card recurso -->
+      <div style="background:#f7f9fc;border:1px solid #e0e5ec;border-left:4px solid #8B2252;border-radius:0 14px 14px 0;padding:18px 22px;margin-bottom:30px;">
+        <p style="margin:0 0 6px;font-size:16px;font-weight:700;color:#1A3A5C;line-height:1.35;">${escapeHtml(recurso.titulo)}</p>
+        <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.5;">${escapeHtml(meta)}</p>
+      </div>
+
+      <!-- CTA -->
+      <table cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+          <td style="border-radius:10px;background:linear-gradient(135deg,#8B2252,#6d1b41);box-shadow:0 4px 12px rgba(139,34,82,0.25);">
+            <a href="${url}"
+               style="display:block;padding:13px 30px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.3px;white-space:nowrap;">
+              ${ctaTexto} →
+            </a>
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+
+  <!-- DIVISOR -->
+  <tr>
+    <td style="padding:0 36px;">
+      <div style="height:3px;background:linear-gradient(90deg,#1A3A5C,#2E6EA6,#8B2252);border-radius:2px;opacity:0.15;"></div>
+    </td>
+  </tr>
+
+  <!-- FOOTER -->
+  <tr>
+    <td style="padding:20px 36px 24px;">
+      <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;text-align:center;">
+        Mensaje automático de LUMEN · Colegio Cardenal Newman<br>
+        <a href="${SITE_URL}" style="color:#2E6EA6;text-decoration:none;font-weight:500;">Ir a la plataforma</a>
+      </p>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
 </body>
 </html>`
 }
+
+// ─── Email 1: Nuevo recurso → coordinadora ───────────────────────────────────
 
 export async function emailNuevoRecurso(opts: {
   destinatarios: { email: string; nombre: string }[]
@@ -98,17 +149,19 @@ export async function emailNuevoRecurso(opts: {
       resend!.emails.send({
         from: FROM,
         to: dest.email,
-        subject: `Nuevo recurso para revisar — ${opts.recurso.titulo}`,
+        subject: `Nuevo material para revisar — ${opts.recurso.titulo}`,
         html: layoutHtml({
-          saludo: `Hola ${primerNombre(dest.nombre)}`,
-          mensaje: `<strong>${autorEsc}</strong> subió un recurso a LUMEN y está esperando tu revisión.`,
+          saludo: `Hola ${primerNombre(dest.nombre)},`,
+          mensaje: `<strong>${autorEsc}</strong> acaba de subir material a LUMEN y está esperando tu revisión. Dale una mirada cuando puedas y decidís si lo publicamos o pedimos algún ajuste.`,
           recurso: opts.recurso,
-          ctaTexto: 'Revisar recurso',
+          ctaTexto: 'Ver el recurso',
         }),
       }).catch(err => console.error('[email] nuevo recurso:', err))
     )
   )
 }
+
+// ─── Email 2: Recurso aprobado → docente ─────────────────────────────────────
 
 export async function emailRecursoAprobado(opts: {
   destinatario: { email: string; nombre: string }
@@ -120,18 +173,20 @@ export async function emailRecursoAprobado(opts: {
     await resend.emails.send({
       from: FROM,
       to: opts.destinatario.email,
-      subject: `Tu recurso fue aprobado — ${opts.recurso.titulo}`,
+      subject: `Tu material fue aprobado — ${opts.recurso.titulo}`,
       html: layoutHtml({
         saludo: `¡Hola ${primerNombre(opts.destinatario.nombre)}!`,
-        mensaje: `<strong>${escapeHtml(opts.aprobador)}</strong> aprobó tu recurso. Ya está visible para todo el equipo en la biblioteca.`,
+        mensaje: `<strong>${escapeHtml(opts.aprobador)}</strong> revisó lo que subiste y le dio el visto bueno. Ya está publicado en la biblioteca y disponible para todo el equipo.`,
         recurso: opts.recurso,
-        ctaTexto: 'Ver en LUMEN',
+        ctaTexto: 'Verlo en LUMEN',
       }),
     })
   } catch (err) {
     console.error('[email] aprobado:', err)
   }
 }
+
+// ─── Email 3: Recurso observado → docente ────────────────────────────────────
 
 export async function emailRecursoObservado(opts: {
   destinatario: { email: string; nombre: string }
@@ -144,13 +199,14 @@ export async function emailRecursoObservado(opts: {
     await resend.emails.send({
       from: FROM,
       to: opts.destinatario.email,
-      subject: `Tu recurso necesita correcciones — ${opts.recurso.titulo}`,
+      subject: `Ajustes antes de publicar — ${opts.recurso.titulo}`,
       html: layoutHtml({
-        saludo: `Hola ${primerNombre(opts.destinatario.nombre)}`,
-        mensaje: `<strong>${escapeHtml(opts.revisor)}</strong> revisó tu recurso y dejó una devolución. Lo pausamos hasta que apliques los ajustes y lo reenvíes desde la plataforma.`,
+        saludo: `Hola ${primerNombre(opts.destinatario.nombre)},`,
+        mensaje: `<strong>${escapeHtml(opts.revisor)}</strong> revisó tu material y te dejó algunos ajustes antes de publicarlo. No es un rechazo — el recurso queda pausado hasta que apliques los cambios y lo reenvíes desde la plataforma.`,
         comentario: opts.comentario,
+        submensaje: 'Para reenviarlo, abrís el recurso en LUMEN y usás el botón "Reenviar para revisión".',
         recurso: opts.recurso,
-        ctaTexto: 'Ir al recurso',
+        ctaTexto: 'Ir a hacer los ajustes',
       }),
     })
   } catch (err) {
