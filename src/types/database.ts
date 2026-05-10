@@ -92,8 +92,9 @@ export interface Perfil {
   id: string
   email: string
   nombre: string
-  rol: 'admin' | 'docente'
+  rol: 'admin' | 'docente' | 'directivo'
   area: string | null
+  areas?: string[] | null
   grados_asignados: Grado[]
   avatar_url: string | null
   created_at: string

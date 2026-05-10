@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { GRADOS, EJES_TEMATICOS } from '@/lib/constants'
 import PendientesRevision from '@/components/PendientesRevision'
+import GestionUsuarios from '@/components/GestionUsuarios'
 
 const MESES = ['', 'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 
@@ -20,7 +21,7 @@ export default async function CoordinacionPage() {
     .eq('id', user.id)
     .single()
 
-  if (perfil?.rol !== 'admin') redirect('/')
+  if (!['admin', 'directivo'].includes(perfil?.rol ?? '')) redirect('/')
 
   // Recursos publicados
   const { data: recursos } = await supabase
@@ -111,6 +112,16 @@ export default async function CoordinacionPage() {
     .in('estado', ['publicado', 'destacado'])
     .order('created_at', { ascending: false })
     .limit(5)
+
+  // Lista de usuarios (solo para directivo)
+  let todosUsuarios: { id: string; email: string; nombre: string | null; rol: string; created_at: string }[] = []
+  if (perfil?.rol === 'directivo') {
+    const { data: users } = await supabase
+      .from('perfiles')
+      .select('id, email, nombre, rol, created_at')
+      .order('created_at', { ascending: true })
+    todosUsuarios = users || []
+  }
 
   // Color según cantidad
   const colorCelda = (n: number) => {
@@ -279,6 +290,13 @@ export default async function CoordinacionPage() {
             )}
           </div>
         </div>
+
+        {/* Gestión de usuarios — solo directivo */}
+        {perfil?.rol === 'directivo' && todosUsuarios.length > 0 && (
+          <div className="mt-6">
+            <GestionUsuarios usuarios={todosUsuarios} userId={user.id} />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -57,8 +57,8 @@ export async function PATCH(
 
     if (accion === 'aprobar') {
       // Solo admin puede aprobar
-      if (perfil?.rol !== 'admin') {
-        return NextResponse.json({ error: 'Solo un admin puede aprobar recursos' }, { status: 403 })
+      if (!['admin', 'directivo'].includes(perfil?.rol ?? '')) {
+        return NextResponse.json({ error: 'Solo coordinadores o directivos pueden aprobar recursos' }, { status: 403 })
       }
       const { error } = await supabase
         .from('recursos')
@@ -86,8 +86,8 @@ export async function PATCH(
 
     if (accion === 'observar') {
       // Solo admin puede observar
-      if (perfil?.rol !== 'admin') {
-        return NextResponse.json({ error: 'Solo un admin puede observar recursos' }, { status: 403 })
+      if (!['admin', 'directivo'].includes(perfil?.rol ?? '')) {
+        return NextResponse.json({ error: 'Solo coordinadores o directivos pueden observar recursos' }, { status: 403 })
       }
       if (!comentario) {
         return NextResponse.json({ error: 'El comentario es obligatorio al observar' }, { status: 400 })

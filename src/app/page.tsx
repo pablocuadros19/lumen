@@ -43,7 +43,7 @@ export default async function HomePage() {
   const { data: admins } = await supabase
     .from('perfiles')
     .select('id')
-    .eq('rol', 'admin')
+    .in('rol', ['admin', 'directivo'])
   const adminIds = (admins || []).map(a => a.id)
 
   // Efeméride próxima

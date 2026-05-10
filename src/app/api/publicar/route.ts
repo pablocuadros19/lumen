@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    const esAdmin = perfil?.rol === 'admin'
+    const esAdmin = ['admin', 'directivo'].includes(perfil?.rol ?? '')
 
     // Insertar recurso en la tabla
     const areasLista: string[] = datos.areas?.length ? datos.areas : [datos.area || 'Prácticas del Lenguaje']
