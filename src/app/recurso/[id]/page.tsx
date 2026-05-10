@@ -8,6 +8,7 @@ import AgregarAColeccion from '@/components/AgregarAColeccion'
 import CopilotoSection from '@/components/CopilotoSection'
 import NotasPrivadas from '@/components/NotasPrivadas'
 import BannerRevision from '@/components/BannerRevision'
+import AccionesRevision from '@/components/AccionesRevision'
 import type { Recurso } from '@/types/database'
 
 // Colores por eje temático
@@ -76,12 +77,15 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
   const { data: { user } } = await supabase.auth.getUser()
   const esAutor = user && recurso.subido_por === user.id
 
-  // Verificar si es admin
+  // Verificar si es admin o directivo
   let esAdmin = false
   if (user) {
     const { data: perfilUser } = await supabase.from('perfiles').select('rol').eq('id', user.id).single()
-    esAdmin = perfilUser?.rol === 'admin'
+    esAdmin = ['admin', 'directivo'].includes(perfilUser?.rol ?? '')
   }
+
+  // ¿Necesita revisión? (publicado no revisado, o en revisión)
+  const necesitaRevision = !recurso.revisado || recurso.estado === 'revision'
 
   // Si está en revisión y no es autor ni admin → no mostrar
   if (recurso.estado === 'revision' && !esAutor && !esAdmin) {
@@ -376,6 +380,10 @@ export default async function RecursoPage({ params }: { params: Promise<{ id: st
 
               <CompartirButton recursoId={recurso.id} titulo={recurso.titulo} />
             </div>
+
+            {esAdmin && !esAutor && necesitaRevision && (
+              <AccionesRevision recursoId={recurso.id} yaAprobado={recurso.revisado} />
+            )}
 
             <div className="rounded-3xl border border-gray-100 bg-white shadow-card p-5">
               <h3 className="text-[11px] font-bold text-[#1A3A5C] uppercase tracking-wider mb-3 flex items-center gap-2">
