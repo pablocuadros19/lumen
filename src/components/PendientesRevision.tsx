@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface RecursoPendiente {
   id: string
@@ -17,40 +18,52 @@ interface Props {
 }
 
 export default function PendientesRevision({ recursos: recursosIniciales }: Props) {
+  const router = useRouter()
   const [recursos, setRecursos] = useState(recursosIniciales)
   const [observandoId, setObservandoId] = useState<string | null>(null)
   const [comentario, setComentario] = useState('')
   const [cargando, setCargando] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   if (recursos.length === 0) return null
 
   const aprobar = async (id: string) => {
     setCargando(id)
+    setError(null)
     const res = await fetch(`/api/recurso/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ accion: 'aprobar' }),
     })
-    if (res.ok) {
-      setRecursos(prev => prev.filter(r => r.id !== id))
-    }
     setCargando(null)
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setError(data?.error || `Error ${res.status} al aprobar`)
+      return
+    }
+    setRecursos(prev => prev.filter(r => r.id !== id))
+    router.refresh()
   }
 
   const observar = async (id: string) => {
     if (!comentario.trim()) return
     setCargando(id)
+    setError(null)
     const res = await fetch(`/api/recurso/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ accion: 'observar', comentario }),
     })
-    if (res.ok) {
-      setRecursos(prev => prev.filter(r => r.id !== id))
-      setObservandoId(null)
-      setComentario('')
-    }
     setCargando(null)
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setError(data?.error || `Error ${res.status} al observar`)
+      return
+    }
+    setRecursos(prev => prev.filter(r => r.id !== id))
+    setObservandoId(null)
+    setComentario('')
+    router.refresh()
   }
 
   return (
@@ -66,6 +79,15 @@ export default function PendientesRevision({ recursos: recursosIniciales }: Prop
           <p className="text-xs text-gray-400">{recursos.length} recurso{recursos.length > 1 ? 's' : ''} esperando tu aprobación</p>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700 flex items-start gap-2">
+          <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className="space-y-3">
         {recursos.map(r => (

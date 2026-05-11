@@ -14,36 +14,45 @@ export default function AccionesRevision({ recursoId, yaAprobado }: Props) {
   const [comentario, setComentario] = useState('')
   const [cargando, setCargando] = useState(false)
   const [ok, setOk] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const aprobar = async () => {
     setCargando(true)
+    setError(null)
     const res = await fetch(`/api/recurso/${recursoId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ accion: 'aprobar' }),
     })
     setCargando(false)
-    if (res.ok) {
-      setOk('Recurso aprobado')
-      router.refresh()
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setError(data?.error || `Error ${res.status} al aprobar`)
+      return
     }
+    setOk('Recurso aprobado')
+    router.refresh()
   }
 
   const observar = async () => {
     if (!comentario.trim()) return
     setCargando(true)
+    setError(null)
     const res = await fetch(`/api/recurso/${recursoId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ accion: 'observar', comentario }),
     })
     setCargando(false)
-    if (res.ok) {
-      setOk('Devolución enviada')
-      setComentario('')
-      setModo('idle')
-      router.refresh()
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setError(data?.error || `Error ${res.status} al observar`)
+      return
     }
+    setOk('Devolución enviada')
+    setComentario('')
+    setModo('idle')
+    router.refresh()
   }
 
   if (ok) {
@@ -70,6 +79,15 @@ export default function AccionesRevision({ recursoId, yaAprobado }: Props) {
           ? 'El docente reenvió el recurso. Revisalo y aprobalo o pedí ajustes.'
           : 'Aprobá el recurso o devolvelo con una observación.'}
       </p>
+
+      {error && (
+        <div className="mb-3 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2">
+          <svg className="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
 
       {modo === 'idle' && (
         <div className="flex flex-col gap-2">
