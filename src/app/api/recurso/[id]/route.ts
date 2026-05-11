@@ -60,12 +60,20 @@ export async function PATCH(
       if (!['admin', 'directivo'].includes(perfil?.rol ?? '')) {
         return NextResponse.json({ error: 'Solo coordinadores o directivos pueden aprobar recursos' }, { status: 403 })
       }
-      const { error } = await supabase
+      const { data: updRows, error } = await supabase
         .from('recursos')
         .update({ revisado: true, revisado_por: user.id, comentario_revision: null })
         .eq('id', id)
+        .select('id')
 
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+      if (error) {
+        console.error('[aprobar] supabase error:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+      if (!updRows || updRows.length === 0) {
+        console.error('[aprobar] 0 filas afectadas — posible RLS', { id, userId: user.id, rol: perfil?.rol })
+        return NextResponse.json({ error: 'No se pudo actualizar el recurso (permisos)' }, { status: 403 })
+      }
 
       // Email al autor
       try {
@@ -92,12 +100,20 @@ export async function PATCH(
       if (!comentario) {
         return NextResponse.json({ error: 'El comentario es obligatorio al observar' }, { status: 400 })
       }
-      const { error } = await supabase
+      const { data: updRows, error } = await supabase
         .from('recursos')
         .update({ estado: 'revision', comentario_revision: comentario, revisado: false, revisado_por: null })
         .eq('id', id)
+        .select('id')
 
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+      if (error) {
+        console.error('[observar] supabase error:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+      if (!updRows || updRows.length === 0) {
+        console.error('[observar] 0 filas afectadas — posible RLS', { id, userId: user.id, rol: perfil?.rol })
+        return NextResponse.json({ error: 'No se pudo actualizar el recurso (permisos)' }, { status: 403 })
+      }
 
       // Email al autor con la devolución
       try {
