@@ -1,71 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
+import { buildSystemPrompt } from '@/lib/copilot/prompt-builder'
+import type { PromptTemplate, AiGenerationInsert } from '@/types/copilot'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const PROMPTS: Record<string, string> = {
-  adaptar: `Sos una docente experta en educación primaria argentina. Adaptá el siguiente recurso pedagógico al grado indicado.
-
-Ajustá:
-- Vocabulario y complejidad según la edad
-- Extensión de consignas
-- Nivel de andamiaje/ayuda
-- Ejemplos apropiados para el grado
-
-Devolvé el recurso adaptado completo, listo para usar. Formato Markdown.`,
-
-  evaluacion: `Sos una docente experta en evaluación formativa en educación primaria argentina. Generá una evaluación basada en el contenido del siguiente recurso pedagógico.
-
-Incluí:
-- 4-6 consignas variadas (opción múltiple, completar, producción breve)
-- Criterios de evaluación claros
-- Niveles de desempeño esperados
-
-Formato Markdown, listo para imprimir.`,
-
-  simplificar: `Sos una docente experta en inclusión educativa. Reescribí las consignas del siguiente recurso de forma más simple y clara.
-
-Lineamientos:
-- Oraciones cortas y directas
-- Vocabulario accesible
-- Un paso por consigna
-- Agregá ejemplos si ayuda a la comprensión
-
-Devolvé las consignas simplificadas en Markdown.`,
-
-  rubrica: `Sos una experta en evaluación con rúbricas para educación primaria argentina. Generá una rúbrica de evaluación para el siguiente recurso.
-
-Estructura:
-- 3-4 criterios de evaluación relevantes
-- 3 niveles para cada criterio (En inicio / En proceso / Logrado)
-- Descriptores específicos y observables para cada celda
-
-Formato: tabla Markdown lista para copiar.`,
-
-  guia: `Sos una docente coordinadora pedagógica con experiencia en planificación. Generá una guía docente para trabajar con el siguiente recurso en el aula.
-
-Estructura:
-- **Objetivos** de aprendizaje (2-3)
-- **Preparación** previa (qué necesita la docente antes)
-- **Desarrollo** de la clase (paso a paso, con tiempos sugeridos)
-- **Cierre** y evaluación informal
-- **Variantes** posibles
-
-Formato Markdown claro y práctico.`,
-
-  complementarias: `Sos una docente creativa especializada en Prácticas del Lenguaje. Sugerí 3-4 actividades complementarias para hacer después de trabajar con el siguiente recurso.
-
-Para cada actividad incluí:
-- Nombre de la actividad
-- Descripción breve (2-3 líneas)
-- Materiales necesarios
-- Tiempo estimado
-
-Las actividades deben profundizar o extender el aprendizaje del recurso original. Formato Markdown.`,
-}
+const RATE_LIMIT_PER_DAY = 20
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,49 +14,101 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-    const { recurso_id, accion, grado_destino } = await request.json()
+    const body = await request.json()
+    const { recurso_id, accion, grado_destino } = body as {
+      recurso_id: string
+      accion: string
+      grado_destino?: string
+    }
 
-    if (!recurso_id || !accion || !PROMPTS[accion]) {
+    if (!recurso_id || !accion) {
       return NextResponse.json({ error: 'Parámetros inválidos' }, { status: 400 })
     }
 
-    // Obtener recurso
+    // Rate limit: máximo RATE_LIMIT_PER_DAY generaciones en las últimas 24hs
+    const hace24hs = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    const { count: generacionesHoy } = await supabase
+      .from('ai_generations')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('created_at', hace24hs)
+
+    if ((generacionesHoy ?? 0) >= RATE_LIMIT_PER_DAY) {
+      return NextResponse.json(
+        { error: `Límite diario alcanzado (${RATE_LIMIT_PER_DAY} generaciones por día). Intentá mañana.` },
+        { status: 429 }
+      )
+    }
+
+    // Obtener template activo para esta acción
+    const { data: template } = await supabase
+      .from('prompt_templates')
+      .select('id, slug, function, version, layer_pedagogy, layer_task, output_schema_slug, model')
+      .eq('slug', accion)
+      .eq('is_active', true)
+      .single()
+
+    if (!template) {
+      return NextResponse.json({ error: 'Acción no reconocida' }, { status: 400 })
+    }
+
+    // Obtener recurso fuente
     const { data: recurso } = await supabase
       .from('recursos')
       .select('titulo, resumen, texto_extraido, eje_tematico, grados, tipo_recurso')
       .eq('id', recurso_id)
       .single()
 
-    if (!recurso) return NextResponse.json({ error: 'Recurso no encontrado' }, { status: 404 })
-
-    // Armar contexto del recurso
-    const contexto = [
-      `**Título:** ${recurso.titulo}`,
-      recurso.resumen ? `**Resumen:** ${recurso.resumen}` : '',
-      `**Grados:** ${recurso.grados?.join(', ')}`,
-      `**Eje temático:** ${recurso.eje_tematico}`,
-      `**Tipo:** ${recurso.tipo_recurso}`,
-      recurso.texto_extraido ? `\n**Contenido extraído:**\n${recurso.texto_extraido.slice(0, 3000)}` : '',
-    ].filter(Boolean).join('\n')
-
-    // Regla gramatical obligatoria para español rioplatense
-    let prompt = 'REGLA OBLIGATORIA: En español, usá "e" en lugar de "y" cuando la palabra siguiente empiece con "i" o "hi" (ej: "creatividad e imaginación", "gramática e historia"). Nunca escribas "y imaginación", "y historia", etc.\n\n' + PROMPTS[accion]
-
-    // Para adaptar, agregar grado destino
-    if (accion === 'adaptar' && grado_destino) {
-      prompt += `\n\nAdaptá este recurso para **${grado_destino}**.`
+    if (!recurso) {
+      return NextResponse.json({ error: 'Recurso no encontrado' }, { status: 404 })
     }
 
-    const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1500,
-      system: prompt,
-      messages: [{ role: 'user', content: contexto }],
+    // Armar prompt con las 5 capas
+    const systemPrompt = buildSystemPrompt(template as PromptTemplate, {
+      titulo:         recurso.titulo,
+      resumen:        recurso.resumen ?? undefined,
+      grados:         recurso.grados ?? undefined,
+      eje_tematico:   recurso.eje_tematico ?? undefined,
+      tipo_recurso:   recurso.tipo_recurso ?? undefined,
+      texto_extraido: recurso.texto_extraido ?? undefined,
+      grado_destino:  grado_destino ?? undefined,
     })
+
+    // Llamada al modelo (el modelo lo define el template — Sonnet o Haiku según función)
+    const inicio = Date.now()
+    const message = await anthropic.messages.create({
+      model:      template.model,
+      max_tokens: 2048,
+      system:     systemPrompt,
+      messages:   [{ role: 'user', content: '¿Podés generar el material?' }],
+    })
+    const duracion = Date.now() - inicio
 
     const respuesta = message.content[0].type === 'text' ? message.content[0].text : ''
 
-    return NextResponse.json({ respuesta })
+    // Logging de la generación
+    const generacion: AiGenerationInsert = {
+      user_id:            user.id,
+      prompt_template_id: template.id,
+      function:           template.function,
+      slug:               accion,
+      source_resource_id: recurso_id,
+      dua_level:          'estandar',
+      input_params:       { accion, grado_destino: grado_destino ?? null },
+      output_json:        { respuesta },
+      model:              template.model,
+      tokens_input:       message.usage.input_tokens,
+      tokens_output:      message.usage.output_tokens,
+      duration_ms:        duracion,
+    }
+
+    const { data: gen } = await supabase
+      .from('ai_generations')
+      .insert(generacion)
+      .select('id')
+      .single()
+
+    return NextResponse.json({ respuesta, generation_id: gen?.id ?? null })
   } catch (error) {
     console.error('Error copiloto:', error)
     return NextResponse.json({ error: 'Error procesando la solicitud' }, { status: 500 })
