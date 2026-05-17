@@ -21,9 +21,12 @@ const TIPO_LABEL: Record<EvaluationMaterial['tipo'], string> = {
 
 export default function EvaluationMaterialView({ data }: { data: EvaluationMaterial }) {
   const subtitle = `${TIPO_LABEL[data.tipo]} · ${data.area} · ${data.grado}° grado${data.tiempo_estimado_min ? ' · ' + data.tiempo_estimado_min + ' min' : ''}`
+  const printUrl = data.meta.source_resource_id
+    ? `/copilot/${data.meta.source_resource_id}/print?gen=${data.meta.generation_id}`
+    : undefined
 
   return (
-    <OutputCard title={data.titulo} subtitle={subtitle} textToCopy={data.titulo}>
+    <OutputCard title={data.titulo} subtitle={subtitle} textToCopy={data.titulo} printUrl={printUrl}>
       {data.contenido.kind === 'rubrica'         && <RubricaView c={data.contenido} />}
       {data.contenido.kind === 'prueba'          && <PruebaView c={data.contenido} />}
       {data.contenido.kind === 'lista_cotejo'    && <ListaCotejoView c={data.contenido} />}

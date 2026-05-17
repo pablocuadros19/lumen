@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { runCopilotFunction } from '@/lib/copilot/runner'
 import type { AdaptedResource, DuaLevel } from '@/types/copilot'
 
+export const maxDuration = 60 // segundos — Sonnet con tool use puede tardar 20-40s
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()

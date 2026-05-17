@@ -6,9 +6,12 @@ import type { ImplementationGuide } from '@/types/copilot'
 export default function ImplementationGuideView({ data }: { data: ImplementationGuide }) {
   const subtitle = `Guía para implementar · ${data.ambientacion.tiempo_estimado_min} min estimados`
   const texto = guiaToTexto(data)
+  const printUrl = data.meta.source_resource_id
+    ? `/copilot/${data.meta.source_resource_id}/print?gen=${data.meta.generation_id}`
+    : undefined
 
   return (
-    <OutputCard title="Guía de implementación" subtitle={subtitle} textToCopy={texto}>
+    <OutputCard title="Guía de implementación" subtitle={subtitle} textToCopy={texto} printUrl={printUrl}>
       <div className="space-y-5">
         <Seccion titulo="Para qué sirve">
           <p className="text-sm text-gray-700 leading-relaxed">{data.para_que_sirve}</p>

@@ -7,9 +7,12 @@ import type { AdaptedResource } from '@/types/copilot'
 export default function AdaptedResourceView({ data }: { data: AdaptedResource }) {
   const subtitle = `${data.area}${data.eje_tematico ? ' · ' + data.eje_tematico : ''} · ${data.grado_destino}° grado`
   const textoPlano = blocksToMarkdown(data)
+  const printUrl = data.meta.source_resource_id
+    ? `/copilot/${data.meta.source_resource_id}/print?gen=${data.meta.generation_id}`
+    : undefined
 
   return (
-    <OutputCard title={data.titulo} subtitle={subtitle} textToCopy={textoPlano}>
+    <OutputCard title={data.titulo} subtitle={subtitle} textToCopy={textoPlano} printUrl={printUrl}>
       {data.cambios_realizados.length > 0 && (
         <div className="mb-5 bg-[#8B2252]/5 border border-[#8B2252]/15 rounded-xl p-4">
           <div className="text-[11px] font-bold text-[#8B2252] uppercase tracking-wider mb-2">Cambios aplicados</div>
