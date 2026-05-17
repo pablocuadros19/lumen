@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { buildSystemPrompt } from '@/lib/copilot/prompt-builder'
 import { toolsBySlug, toolSchemas } from '@/lib/copilot/tools'
+import { fetchResourceAsMultimodal } from '@/lib/copilot/multimodal'
 import type {
   PromptTemplate,
   AiGenerationInsert,
@@ -80,7 +81,7 @@ export async function runCopilotFunction<T>(
   // Recurso fuente
   const { data: recurso } = await supabase
     .from('recursos')
-    .select('id, titulo, resumen, texto_extraido, eje_tematico, grados, tipo_recurso, areas, area')
+    .select('id, titulo, resumen, texto_extraido, eje_tematico, grados, tipo_recurso, areas, area, archivo_url')
     .eq('id', sourceResourceId)
     .single()
 
@@ -96,6 +97,11 @@ export async function runCopilotFunction<T>(
     texto_extraido: recurso.texto_extraido ?? undefined,
   })
 
+  // Multimodal: bajamos la imagen/PDF original para que el modelo "vea"
+  // el formato y se inspire en él al generar la respuesta.
+  // Si falla o no es soportado, seguimos solo con el texto extraído.
+  const multimodalBlock = await fetchResourceAsMultimodal(recurso.archivo_url)
+
   const tool   = toolsBySlug[slug]
   const schema = toolSchemas[slug] as z.ZodTypeAny
 
@@ -110,8 +116,24 @@ export async function runCopilotFunction<T>(
 
   while (attempt < MAX_ATTEMPTS) {
     attempt++
+
+    // Primer mensaje: si tenemos el archivo original, lo mandamos junto con el texto
+    const firstUserContent: Anthropic.ContentBlockParam[] = []
+    if (multimodalBlock) {
+      firstUserContent.push(multimodalBlock)
+      firstUserContent.push({
+        type: 'text',
+        text: 'Arriba está el recurso pedagógico original (ficha real que usa el docente). Inspirate en su formato visual para tu output: si tiene cuadrículas, usá bloques `cuadricula_escritura`; si tiene líneas para escribir, usá `lineas_respuesta`; si tiene tablas para llenar, usá `tabla_llenar`; etc.\n\n' + userMessage + '\n\nParámetros: ' + JSON.stringify(inputParams),
+      })
+    } else {
+      firstUserContent.push({
+        type: 'text',
+        text: userMessage + '\n\nParámetros: ' + JSON.stringify(inputParams),
+      })
+    }
+
     const messages: Anthropic.MessageParam[] = [
-      { role: 'user', content: userMessage + '\n\nParámetros: ' + JSON.stringify(inputParams) },
+      { role: 'user', content: firstUserContent },
     ]
     if (lastError) {
       messages.push({
@@ -171,7 +193,7 @@ export async function runCopilotFunction<T>(
     slug,
     source_resource_id: sourceResourceId,
     dua_level:          duaLevel,
-    input_params:       inputParams,
+    input_params:       { ...inputParams, _multimodal: !!multimodalBlock },
     output_json:        parsed as Record<string, unknown>,
     model:              template.model,
     tokens_input:       tokensIn,

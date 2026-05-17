@@ -120,5 +120,101 @@ function Block({ block }: { block: ResourceBlock }) {
 
     case 'separador':
       return <hr className="border-gray-200" />
+
+    // ============================================
+    // BLOQUES VISUALES — el chico realmente escribe/marca/dibuja
+    // ============================================
+    case 'cuadricula_escritura':
+      return (
+        <div className="space-y-2 my-3">
+          {block.items.map((item, i) => (
+            <div key={i} className="flex items-center gap-3 flex-wrap">
+              {block.mostrar_etiqueta && (
+                <span className="text-sm font-semibold text-[#1A3A5C] min-w-[100px]">{item.palabra}</span>
+              )}
+              <div className="flex gap-0.5">
+                {Array.from({ length: item.casilleros }).map((_, j) => (
+                  <span key={j} className="w-7 h-9 border-2 border-gray-400 inline-block" />
+                ))}
+              </div>
+              {item.pista && (
+                <span className="text-[11px] text-gray-500 italic ml-2">{item.pista}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+
+    case 'lineas_respuesta':
+      return (
+        <div className="my-3">
+          {block.etiqueta && (
+            <div className="text-xs text-gray-600 mb-2">{block.etiqueta}</div>
+          )}
+          <div className="space-y-3">
+            {Array.from({ length: block.cantidad }).map((_, i) => (
+              <div key={i} className="border-b-2 border-gray-400 h-5" />
+            ))}
+          </div>
+        </div>
+      )
+
+    case 'recuadro_dibujar':
+      return (
+        <div className="my-3">
+          <div className="text-xs text-gray-600 mb-2 font-medium">{block.etiqueta}</div>
+          <div
+            className="border-2 border-dashed border-gray-400 rounded-lg w-full"
+            style={{ height: `${block.alto_cm}cm` }}
+          />
+        </div>
+      )
+
+    case 'tabla_llenar':
+      return (
+        <div className="my-3 overflow-x-auto">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr>
+                {block.columnas.map((c, i) => (
+                  <th key={i} className="border-2 border-gray-400 bg-[#1A3A5C]/10 text-[#1A3A5C] font-semibold px-3 py-2 text-left">{c}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: block.filas_cantidad }).map((_, i) => (
+                <tr key={i}>
+                  {block.columnas.map((_, j) => (
+                    <td key={j} className="border-2 border-gray-400 h-9">
+                      {j === 0 && block.columna_indice?.[i] && (
+                        <span className="px-2 text-sm text-[#1A3A5C] font-medium">{block.columna_indice[i]}</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+
+    case 'opcion_marcar': {
+      const marker = block.marcador === 'circulo'
+        ? <span className="w-4 h-4 rounded-full border-2 border-gray-500 inline-block shrink-0" />
+        : <span className="w-4 h-4 border-2 border-gray-500 inline-block shrink-0" />
+      return (
+        <div className="my-3">
+          <div className="text-sm text-gray-700 mb-2">{block.enunciado}</div>
+          <ul className="space-y-2 pl-2">
+            {block.opciones.map((op, i) => (
+              <li key={i} className="flex items-center gap-2.5 text-sm text-gray-700">
+                {marker}
+                <span>{op}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
   }
 }

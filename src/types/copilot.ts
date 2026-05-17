@@ -75,6 +75,48 @@ export const ResourceBlockSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('separador'),
   }),
+
+  // ============================================
+  // BLOQUES VISUALES PEDAGÓGICOS (Fase 2c)
+  // El chico realmente escribe/marca/dibuja sobre estos
+  // ============================================
+  z.object({
+    // Palabra + N casilleros vacíos (uno por letra). Para ortografía,
+    // escritura inicial, vocabulario por letra.
+    kind:     z.literal('cuadricula_escritura'),
+    items:    z.array(z.object({
+      palabra:    z.string().describe('La palabra a escribir, en mayúsculas'),
+      casilleros: z.number().int().min(1).max(20).describe('Cantidad de letras = casilleros visibles'),
+      pista:      z.string().optional().describe('Pista opcional al costado'),
+    })),
+    mostrar_etiqueta: z.boolean().default(true).describe('Si mostrar la palabra como referencia al lado'),
+  }),
+  z.object({
+    // N líneas en blanco para escribir a mano la respuesta.
+    kind:     z.literal('lineas_respuesta'),
+    cantidad: z.number().int().min(1).max(20),
+    etiqueta: z.string().optional().describe('Etiqueta corta tipo "Tu respuesta:" o "Escribí acá:"'),
+  }),
+  z.object({
+    // Caja vacía grande para que el chico dibuje.
+    kind:        z.literal('recuadro_dibujar'),
+    etiqueta:    z.string().describe('Qué se espera que dibuje, ej: "Dibujá la escena"'),
+    alto_cm:     z.number().int().min(3).max(20).default(8),
+  }),
+  z.object({
+    // Tabla con encabezados pero celdas vacías para completar.
+    kind:           z.literal('tabla_llenar'),
+    columnas:       z.array(z.string()),
+    filas_cantidad: z.number().int().min(1).max(30),
+    columna_indice: z.array(z.string()).optional().describe('Si la primera columna tiene labels (ej. nombres, números), van acá'),
+  }),
+  z.object({
+    // Opciones para marcar con círculo o cruz (físicamente).
+    kind:      z.literal('opcion_marcar'),
+    enunciado: z.string(),
+    opciones:  z.array(z.string()),
+    marcador:  z.enum(['circulo', 'casilla']).default('casilla'),
+  }),
 ])
 export type ResourceBlock = z.infer<typeof ResourceBlockSchema>
 
