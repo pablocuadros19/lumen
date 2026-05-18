@@ -216,5 +216,103 @@ function Block({ block }: { block: ResourceBlock }) {
         </div>
       )
     }
+
+    case 'tablero_juego':
+      return <TableroJuego block={block} compact={false} />
   }
+}
+
+// Render compartido del tablero — usado en pantalla Y en print.
+// El zig-zag automático hace que los casilleros vayan izq→der, después der→izq, etc.
+export function TableroJuego({
+  block,
+  compact = false,
+}: {
+  block: Extract<ResourceBlock, { kind: 'tablero_juego' }>
+  compact?: boolean
+}) {
+  const cols = block.columnas
+  const sorted = [...block.casilleros].sort((a, b) => a.numero - b.numero)
+  // Calcular posición serpenteada
+  const positioned = sorted.map((c, index) => {
+    const fila    = Math.floor(index / cols)
+    const colFila = index % cols
+    const col     = fila % 2 === 0 ? colFila : (cols - 1 - colFila)
+    return { ...c, _row: fila + 1, _col: col + 1, _index: index }
+  })
+  const filas = Math.ceil(sorted.length / cols)
+
+  const cellSize = compact ? 'min-h-[68px]' : 'min-h-[78px]'
+  const fontSize = compact ? 'text-[10px]'  : 'text-xs'
+
+  return (
+    <div className="my-3">
+      <div
+        className="grid gap-1.5"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+          gridTemplateRows:    `repeat(${filas}, auto)`,
+        }}
+      >
+        {positioned.map((c) => (
+          <Casillero key={c.numero} c={c} cellSize={cellSize} fontSize={fontSize} compact={compact} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function Casillero({
+  c, cellSize, fontSize, compact,
+}: {
+  c: Extract<ResourceBlock, { kind: 'tablero_juego' }>['casilleros'][number] & { _row: number; _col: number }
+  cellSize: string
+  fontSize: string
+  compact:  boolean
+}) {
+  const palette = {
+    normal:      { bg: 'bg-white',        bd: 'border-gray-400', tx: 'text-gray-800' },
+    salida:      { bg: 'bg-emerald-100',  bd: 'border-emerald-500 border-2', tx: 'text-emerald-900' },
+    meta:        { bg: 'bg-amber-100',    bd: 'border-amber-500 border-2', tx: 'text-amber-900' },
+    avanzar:     { bg: 'bg-yellow-50',    bd: 'border-yellow-500', tx: 'text-yellow-900' },
+    retroceder:  { bg: 'bg-red-50',       bd: 'border-red-400', tx: 'text-red-900' },
+    especial:    { bg: 'bg-blue-50',      bd: 'border-blue-400', tx: 'text-blue-900' },
+  }[c.tipo]
+
+  const labelTipo = {
+    salida:     '🏁 SALIDA',
+    meta:       '🏆 META',
+    avanzar:    c.valor ? `→ Avanzá ${c.valor}` : '→ Avanzá',
+    retroceder: c.valor ? `← Retrocedé ${c.valor}` : '← Retrocedé',
+    especial:   c.icono ? `${c.icono} ${c.texto}` : '★',
+    normal:     null,
+  }[c.tipo]
+
+  return (
+    <div
+      className={`${cellSize} border ${palette.bd} ${palette.bg} rounded p-1 flex flex-col`}
+      style={{ gridRow: c._row, gridColumn: c._col }}
+    >
+      <div className="flex items-start justify-between gap-1">
+        <span className={`${compact ? 'text-[9px]' : 'text-[10px]'} font-bold text-gray-500`}>
+          {c.tipo === 'salida' ? '↓' : c.tipo === 'meta' ? '★' : c.numero}
+        </span>
+        {c.icono && c.tipo !== 'especial' && (
+          <span className={compact ? 'text-xs' : 'text-sm'} aria-hidden>{c.icono}</span>
+        )}
+      </div>
+      <div className={`${fontSize} ${palette.tx} font-medium leading-tight mt-0.5 flex-1 flex items-center`}>
+        {labelTipo ? (
+          <div>
+            <div className="font-bold text-[10px] mb-0.5">{labelTipo}</div>
+            {c.tipo !== 'salida' && c.tipo !== 'meta' && (
+              <div className="font-normal opacity-75">{c.texto}</div>
+            )}
+          </div>
+        ) : (
+          <span>{c.texto}</span>
+        )}
+      </div>
+    </div>
+  )
 }

@@ -134,6 +134,19 @@ export const ResourceBlockSchema = z.discriminatedUnion('kind', [
     opciones:  z.array(z.string()),
     marcador:  z.enum(['circulo', 'casilla']).default('casilla'),
   }),
+  z.object({
+    // Tablero de juego serpenteado tipo Oca. El docente imprime, los chicos juegan.
+    // Casos típicos: tablero de vocabulario, operaciones, efemérides, geografía.
+    kind:       z.literal('tablero_juego'),
+    columnas:   z.number().int().min(4).max(10).default(6).describe('Casilleros por fila. El render hace zig-zag automático'),
+    casilleros: z.array(z.object({
+      numero: z.number().int().min(0).describe('Orden de juego. 0 puede ser SALIDA, último puede ser META'),
+      texto:  z.string().describe('Palabra, consigna o frase del casillero'),
+      tipo:   z.enum(['normal', 'salida', 'meta', 'avanzar', 'retroceder', 'especial']).default('normal'),
+      valor:  z.number().int().optional().describe('Para tipo avanzar/retroceder: cuántos casilleros mover'),
+      icono:  z.string().optional().describe('Emoji opcional al lado del texto'),
+    })).min(6).max(80),
+  }),
 ])
 export type ResourceBlock = z.infer<typeof ResourceBlockSchema>
 

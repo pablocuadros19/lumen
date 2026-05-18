@@ -1,5 +1,6 @@
 'use client'
 
+import { TableroJuego } from '../ResourceBlocks'
 import type { ResourceBlock } from '@/types/copilot'
 
 // Versión print de ResourceBlocks. Diferencias:
@@ -215,5 +216,9 @@ function Block({ block }: { block: ResourceBlock }) {
         </div>
       )
     }
+
+    case 'tablero_juego':
+      // En print usamos modo compact para que entre cómodo en A4
+      return <TableroJuego block={block} compact={true} />
   }
 }
