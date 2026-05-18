@@ -6,12 +6,14 @@ import PrintAdaptedResource from './print/PrintAdaptedResource'
 import PrintSimilarActivities from './print/PrintSimilarActivities'
 import PrintEvaluationMaterial from './print/PrintEvaluationMaterial'
 import PrintImplementationGuide from './print/PrintImplementationGuide'
+import { styleProfileToCss } from './print/styleProfileToCss'
 import type { CopilotFunctionKey } from './CopilotPanel'
 import type {
   AdaptedResource,
   SimilarActivity,
   EvaluationMaterial,
   ImplementationGuide,
+  StyleProfile,
 } from '@/types/copilot'
 
 interface Props {
@@ -39,6 +41,12 @@ export default function PrintView({ funcion, data, recursoTitulo, generatedAt }:
     data !== null &&
     'tipo' in data &&
     (data as { tipo: string }).tipo === 'rubrica'
+
+  // Extraer style_profile si el modelo lo proveyó (multimodal con archivo original)
+  const styleProfile = (data && typeof data === 'object' && 'style_profile' in data)
+    ? (data as { style_profile?: StyleProfile }).style_profile
+    : undefined
+  const cssVars = styleProfileToCss(styleProfile)
 
   return (
     <>
@@ -91,18 +99,22 @@ export default function PrintView({ funcion, data, recursoTitulo, generatedAt }:
       {/* Documento imprimible — en pantalla simulamos hoja A4 */}
       <div className="py-6 px-4 print:p-0">
         <div
-          className="mx-auto bg-white shadow-lg print:shadow-none"
+          className="mx-auto bg-white shadow-lg print:shadow-none print-document"
           style={{
             maxWidth: isRubrica ? '29.7cm' : '21cm',
             minHeight: isRubrica ? '21cm' : '29.7cm',
             padding: '1.5cm',
+            ...cssVars,
           }}
         >
-          {/* Header compacto */}
-          <header className="flex items-center justify-between pb-3 mb-5 border-b-2 border-[#8B2252]">
+          {/* Header compacto — usa la paleta del style profile */}
+          <header
+            className="flex items-center justify-between pb-3 mb-5 border-b-2"
+            style={{ borderColor: 'var(--color-primary)' }}
+          >
             <div className="flex items-center gap-2.5">
               <Image src="/logo.png" alt="LUMEN" width={28} height={28} className="rounded" />
-              <span className="text-sm font-bold text-[#1A3A5C] tracking-tight">LUMEN</span>
+              <span className="text-sm font-bold tracking-tight" style={{ color: 'var(--color-primary)' }}>LUMEN</span>
             </div>
             <div className="text-right text-[10px] text-gray-500 max-w-xs truncate">
               {recursoTitulo}

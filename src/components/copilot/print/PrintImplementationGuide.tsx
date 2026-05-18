@@ -8,8 +8,8 @@ import type { ImplementationGuide } from '@/types/copilot'
 export default function PrintImplementationGuide({ data }: { data: ImplementationGuide }) {
   return (
     <article>
-      <div className="text-[11px] font-bold text-[#8B2252] uppercase tracking-wider">Guía para el docente</div>
-      <h1 className="text-2xl font-bold text-[#1A3A5C] leading-tight mt-0.5">
+      <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-secondary)' }}>Guía para el docente</div>
+      <h1 className="text-2xl font-bold leading-tight mt-0.5" style={{ color: 'var(--color-primary)' }}>
         Cómo implementar este recurso
       </h1>
       <p className="text-xs text-gray-500 mt-1">
@@ -80,7 +80,7 @@ export default function PrintImplementationGuide({ data }: { data: Implementatio
 function Box({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="border border-gray-300 rounded p-3">
-      <div className="text-[10px] font-bold text-[#8B2252] uppercase tracking-wider mb-1.5">{title}</div>
+      <div className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--color-secondary)' }}>{title}</div>
       {children}
     </div>
   )

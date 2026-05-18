@@ -29,6 +29,23 @@ export const CopilotOutputMetaSchema = z.object({
 export type CopilotOutputMeta = z.infer<typeof CopilotOutputMetaSchema>
 
 // ============================================
+// STYLE PROFILE — extraído por Claude del recurso original
+// Solo se llena cuando el modelo "ve" el archivo original (multimodal).
+// El PrintView lo usa para aplicar CSS variables que aproximen la estética.
+// ============================================
+const HEX_COLOR = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/
+export const StyleProfileSchema = z.object({
+  paleta: z.object({
+    primario:   z.string().regex(HEX_COLOR).describe('Color hex principal observado en el original (header, títulos)'),
+    secundario: z.string().regex(HEX_COLOR).optional().describe('Color hex secundario si lo hay (acento, bordes)'),
+  }),
+  densidad:           z.enum(['compacta', 'media', 'espaciosa']).describe('Cuánto aire blanco tiene el original'),
+  tipografia_estilo:  z.enum(['serif', 'sans', 'redondeada', 'manuscrita']).describe('Tipo de fuente que predomina'),
+  tono_visual:        z.enum(['formal', 'amigable', 'ludico']).describe('Sensación general del documento'),
+})
+export type StyleProfile = z.infer<typeof StyleProfileSchema>
+
+// ============================================
 // BLOQUES DE CONTENIDO (Fase 2)
 // Unidad mínima de un output estructurado
 // ============================================
@@ -136,6 +153,7 @@ export const AdaptedResourceSchema = z.object({
   contenido:        z.array(ResourceBlockSchema),
   notas_pedagogicas: z.string().optional(),
   derived_from:     z.string(),
+  style_profile:    StyleProfileSchema.optional(),
 })
 export type AdaptedResource = z.infer<typeof AdaptedResourceSchema>
 
@@ -151,6 +169,7 @@ export const SimilarActivitySchema = z.object({
   contenido:        z.array(ResourceBlockSchema),
   inspired_by:      z.string(),
   diferencias_clave: z.string(),
+  style_profile:    StyleProfileSchema.optional(),
 })
 export type SimilarActivity = z.infer<typeof SimilarActivitySchema>
 
@@ -221,6 +240,7 @@ export const EvaluationMaterialSchema = z.object({
   grado:              z.number().int().min(1).max(7),
   tiempo_estimado_min: z.number().int().optional(),
   contenido:          EvaluationContentSchema,
+  style_profile:      StyleProfileSchema.optional(),
 })
 export type EvaluationMaterial = z.infer<typeof EvaluationMaterialSchema>
 
@@ -245,6 +265,7 @@ export const ImplementationGuideSchema = z.object({
   para_cerrar:     z.string(),
   si_sobra_tiempo: z.string().optional(),
   si_falta_tiempo: z.string().optional(),
+  style_profile:   StyleProfileSchema.optional(),
 })
 export type ImplementationGuide = z.infer<typeof ImplementationGuideSchema>
 

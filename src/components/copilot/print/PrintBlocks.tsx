@@ -20,7 +20,7 @@ function Block({ block }: { block: ResourceBlock }) {
   switch (block.kind) {
     case 'titulo': {
       const sizes = { 1: 'text-xl', 2: 'text-lg', 3: 'text-base' } as const
-      return <h3 className={`${sizes[block.nivel]} font-bold text-[#1A3A5C] mt-4`}>{block.texto}</h3>
+      return <h3 className={`${sizes[block.nivel]} font-bold mt-4`} style={{ color: 'var(--color-primary)' }}>{block.texto}</h3>
     }
 
     case 'texto':

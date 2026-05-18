@@ -27,10 +27,10 @@ export default function PrintEvaluationMaterial({ data }: { data: EvaluationMate
 
   return (
     <article>
-      <div className="text-[11px] font-bold text-[#8B2252] uppercase tracking-wider">
+      <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-secondary)' }}>
         {TIPO_LABEL[data.tipo]}
       </div>
-      <h1 className="text-2xl font-bold text-[#1A3A5C] leading-tight mt-0.5">{data.titulo}</h1>
+      <h1 className="text-2xl font-bold leading-tight mt-0.5" style={{ color: 'var(--color-primary)' }}>{data.titulo}</h1>
       <p className="text-xs text-gray-500 mt-1">
         {data.area} · {data.grado}° grado
         {data.tiempo_estimado_min ? ' · ' + data.tiempo_estimado_min + ' min' : ''}
