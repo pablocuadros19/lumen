@@ -8,7 +8,7 @@ interface Props {
   cargando: boolean
 }
 
-const GRADOS = [1, 2, 3, 4, 5, 6, 7] as const
+const GRADOS = [1, 2, 3, 4, 5, 6] as const
 
 const DUA_OPTIONS: Array<{ value: DuaLevel; label: string; helper: string }> = [
   { value: 'estandar',         label: 'Estándar',         helper: 'Sin cambios de accesibilidad' },

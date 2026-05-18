@@ -156,7 +156,7 @@ export type ResourceBlock = z.infer<typeof ResourceBlockSchema>
 export const AdaptedResourceSchema = z.object({
   meta:             CopilotOutputMetaSchema,
   titulo:           z.string(),
-  grado_destino:    z.number().int().min(1).max(7),
+  grado_destino:    z.number().int().min(1).max(6),
   area:             z.string(),
   eje_tematico:     z.string().optional(),
   cambios_realizados: z.array(z.object({
@@ -178,7 +178,7 @@ export const SimilarActivitySchema = z.object({
   titulo:           z.string(),
   tipo_actividad:   z.string(),
   area:             z.string(),
-  grado:            z.number().int().min(1).max(7),
+  grado:            z.number().int().min(1).max(6),
   contenido:        z.array(ResourceBlockSchema),
   inspired_by:      z.string(),
   diferencias_clave: z.string(),
@@ -250,7 +250,7 @@ export const EvaluationMaterialSchema = z.object({
   tipo:               EvaluationTypeSchema,
   titulo:             z.string(),
   area:               z.string(),
-  grado:              z.number().int().min(1).max(7),
+  grado:              z.number().int().min(1).max(6),
   tiempo_estimado_min: z.number().int().optional(),
   contenido:          EvaluationContentSchema,
   style_profile:      StyleProfileSchema.optional(),
